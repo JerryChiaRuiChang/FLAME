@@ -15,7 +15,7 @@ FLAME_bit <- function(df, holdout, covs, covs_max_list,num_treated,num_control) 
   covs <- as.integer(covs)
   holdout <- data.frame(holdout)
   covs_max_list <- as.integer(covs_max_list)
-  source_python(system.file("python","run_bit.py",package = "FLAME"))
+  source_python(system.file("run_bit.py",package = "FLAME"))
   return(run_bit(r_to_py(df),r_to_py(holdout),covs,covs_max_list,as.integer(num_treated),
                  as.integer(num_control)))
 }

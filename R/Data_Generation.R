@@ -13,7 +13,7 @@
 
 #Data Generation Function
 Data_Generation <- function(num_control, num_treated, num_cov_dense, num_covs_unimportant) {
-  source_python(system.file("python","Data_Generation.py",package = "FLAME"))
+  source_python(system.file("Data_Generation.py",package = "FLAME"))
   #Convert Data Type from Numeric to Integer
   num_control <- as.integer(num_control)
   num_treated <- as.integer(num_treated)
