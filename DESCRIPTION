@@ -6,7 +6,7 @@ Author: person("Jerry Chia-Rui", "Chang", role=c("aut", "cre"),
     email = "chiarui424@gmail.com")
 Description: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference
 Depends:
-    R (>= 3.4.3)
+    R (>= 3.3.1)
 Imports:
     reticulate
 License: What license is it under?
