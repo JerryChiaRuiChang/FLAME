@@ -45,9 +45,8 @@ def match(df, covs, covs_max_list, treatment_indicator_col = 'treated', match_in
     return match_indicator, lidx_wo_t[match_indicator]
 
 # match_quality, the larger the better
-def match_quality(df, holdout, covs_subset, match_indicator, ridge_reg = 0.1, tradeoff = 0.1):
-    
-    s = time.time() 
+def match_quality(df, holdout, covs_subset, match_indicator, tradeoff, ridge_reg = 0.1):
+     
 
     #Calculate number of units unmatched (available)
     num_control = len(df[df['treated']==0]) # how many control units that are unmatched (recall matched units are removed from the data frame)
@@ -57,10 +56,8 @@ def match_quality(df, holdout, covs_subset, match_indicator, ridge_reg = 0.1, tr
     num_control_matched = np.sum(( match_indicator ) & (df['treated']==0) ) # how many control units that are matched on this level
     num_treated_matched = np.sum(( match_indicator ) & (df['treated']==1) ) # how many treated units that are matched on this level
   
-    time_BF = time.time() - s 
 
     #Calculate PE 
-    s = time.time() #?  
     ridge_c = Ridge(alpha=ridge_reg) 
     ridge_t = Ridge(alpha=ridge_reg) 
 
@@ -69,12 +66,11 @@ def match_quality(df, holdout, covs_subset, match_indicator, ridge_reg = 0.1, tr
 
     n_mse_c = np.mean(cross_val_score(ridge_c, holdout[holdout['treated']==0][covs_subset], 
                                 holdout[holdout['treated']==0]['outcome'] , scoring = 'neg_mean_squared_error' ) )
-    time_PE = time.time() - s # ? 
 
 
     # return level-wise match quality 
     return  (tradeoff * ( float(num_control_matched)/num_control + float(num_treated_matched)/num_treated ) +
-             ( n_mse_t + n_mse_c ) , time_PE , time_BF)
+             ( n_mse_t + n_mse_c ))
 
 
 def get_CATE_bit(df, match_indicator, index):
@@ -117,7 +113,7 @@ def num2vec(num, covs_max_list):
         num = num % pow(covs_max_list[i],i)
     return res
 
-def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff_param = 0.1):
+def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff_param):
 
     #Change column names into panda index (object)
     col = list(range(len(covs)))
@@ -139,26 +135,19 @@ def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff
     cur_covs = covs[:]
     cur_covs_max_list = covs_max_list[:]
 
-    timings = [0]*5 # first entry - match (matrix multiplication and value counting and comparison), 
-                    # second entry - regression (compute PE),
-                    # third entry - compute BF
-                    # fourth entry - keep track of CATE,
-                    # fifth entry - update dataframe (remove matched units)
     
     level = 0
-    s = time.time()
     match_indicator, index = match(df, cur_covs, covs_max_list) # match without dropping anything
-    timings[0] = timings[0] + time.time() - s
     
-    s = time.time()
+
     res = get_CATE_bit(df, match_indicator, index) # get the CATEs without dropping anything
-    timings[3] = timings[3] + time.time() - s
+ 
     
     matching_res = [[( cur_covs, cur_covs_max_list, None, match_indicator, index), res]] # result on first level, None says nothing is dropped
     
-    s = time.time()
+
     df = df[~match_indicator][ cur_covs + constant_list ] # remove matched units
-    timings[4] = timings[4] + time.time() - s
+
     
     level_scores = []
     
@@ -180,13 +169,11 @@ def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff
             
             cur_covs_max_list_no_c = cur_covs_max_list[:i] + cur_covs_max_list[i+1:]
             
-            s = time.time()
             match_indicator, index = match(df, cur_covs_no_c, cur_covs_max_list_no_c)
-            timings[0] = timings[0] + time.time() - s 
             
-            score, time_PE, time_BF = match_quality(df, holdout, cur_covs_no_c, match_indicator, tradeoff=tradeoff_param)
-            timings[1] = timings[1] + time_PE 
-            timings[2] = timings[2] + time_BF 
+            
+            score = match_quality(df, holdout, cur_covs_no_c, match_indicator, tradeoff_param)
+            
                                     
             matching_result_tmp.append( (cur_covs_no_c, cur_covs_max_list_no_c, score, match_indicator, index) )
         
@@ -202,9 +189,8 @@ def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff
         cur_covs_max_list = best_res[1]
         matching_res.append([best_res, new_matching_res])
         
-        s = time.time()
+
         df = df[~ best_res[-2] ]
-        timings[4] = timings[4] + time.time() - s
         
     return (cleanup_result(matching_res), level_scores)
 

@@ -4,7 +4,7 @@
 \alias{FLAME_bit}
 \title{FLAME: Bit Vector Method}
 \usage{
-FLAME_bit(df, holdout, covs, covs_max_list, num_treated, num_control)
+FLAME_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff)
 }
 \arguments{
 \item{df}{Data Frame}
@@ -18,6 +18,8 @@ FLAME_bit(df, holdout, covs, covs_max_list, num_treated, num_control)
 \item{num_treated}{Number of units in treated group}
 
 \item{num_control}{Number of units in control group}
+
+\item{tradeoff}{Tradeoff parameter to compute Match Quality}
 }
 \value{
 Data Frame
