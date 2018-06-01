@@ -2,4 +2,6 @@
 
 export(Data_Generation)
 export(FLAME_bit)
+export(FLAME_db)
+import(RSQLite)
 import(reticulate)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/FLAMEbit.R
 \name{FLAME_bit}
 \alias{FLAME_bit}
-\title{Bit Vector Algorithm}
+\title{FLAME: Bit Vector Method}
 \usage{
 FLAME_bit(df, holdout, covs, covs_max_list, num_treated, num_control)
 }
@@ -23,5 +23,5 @@ FLAME_bit(df, holdout, covs, covs_max_list, num_treated, num_control)
 Data Frame
 }
 \description{
-Bit Vector Algorithm
+FLAME: Bit Vector Method
 }

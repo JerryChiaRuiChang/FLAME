@@ -1,4 +1,4 @@
-#' Bit Vector Algorithm
+#' FLAME: Bit Vector Method
 #'
 #' @param df Data Frame
 #' @param holdout Holdout Training Data
