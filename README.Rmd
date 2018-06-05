@@ -1,0 +1,11 @@
+## FLAME 
+
+### About   
+
+The *FLAME* algorithm provides fast and large-scale matching approach to causal inference. *FLAME* matches units with the same covariate values, and sequentially drops unimportant covaraites by comparing matching quality. Currently `FLAME` package provides two methods for matching - Bit-Vector and SQL Database. For moderate-sized data, Bit-Vector method should be applied. For large-scale data, SQL Database method should be applied. 
+
+Matching quality is used to determine which unimportant covariate to drop, and consists of two components - Balancing Factor and Predictive Error. Balancing Factor assesses the proportion of units that can be matched. Predictive Error evaluates the predictive power of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a trafeoff between producing more matched units and predicting more accurately. 
+
+Please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf) for more details about the algorithm.
+
+###Installation
