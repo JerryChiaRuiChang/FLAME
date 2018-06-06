@@ -5,26 +5,26 @@ update_matched <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
-  covariates <- toString(sprintf("`%s`", cur_covs, cur_covs))
-  equalcovariates <- paste(sprintf("S.`%s` = data.`%s`", cur_covs, cur_covs), collapse = " AND ")
+  covariates <- toString(sprintf("x%s", cur_covs, cur_covs))
+  equalcovariates <- paste(sprintf("S.x%s = data.x%s", cur_covs, cur_covs), collapse = " AND ")
   level <- toString(level)
 
   #Update Data
 
   dbExecute(db, gsub("[[:space:]]{2,}"," ",
-            sprintf("WITH tempgroups AS
-                    (SELECT %s
-                    FROM data
-                    WHERE matched = 0
-                    GROUP BY %s
-                    HAVING SUM(treated) > 0 AND SUM(treated) < COUNT(*))
-                    UPDATE data
-                    SET matched = %s
-                    WHERE EXISTS
-                    (SELECT %s
-                    FROM tempgroups S
-                    WHERE %s)
-                    AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+                     sprintf("WITH tempgroups AS
+                             (SELECT %s
+                             FROM data
+                             WHERE matched = 0
+                             GROUP BY %s
+                             HAVING SUM(treated) > 0 AND SUM(treated) < COUNT(*))
+                             UPDATE data
+                             SET matched = %s
+                             WHERE EXISTS
+                             (SELECT %s
+                             FROM tempgroups S
+                             WHERE %s)
+                             AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
 }
 
 #get_CATE function takes list of covariates that are used to
@@ -37,9 +37,9 @@ get_CATE <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
-  covariates <- toString(sprintf("`%s`", cur_covs, cur_covs))
-  datacovariates <- toString(sprintf("control.`%s`", cur_covs, cur_covs))
-  equalcovariates <- paste(sprintf("control.`%s` = treated.`%s`", cur_covs, cur_covs), collapse = " AND ")
+  covariates <- toString(sprintf("x%s", cur_covs, cur_covs))
+  datacovariates <- toString(sprintf("control.x%s", cur_covs, cur_covs))
+  equalcovariates <- paste(sprintf("control.x%s = treated.x%s", cur_covs, cur_covs), collapse = " AND ")
 
   #Get conditional average treatment effect
 
@@ -76,14 +76,14 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 
   #Convert column names to dynamic strings
 
-  covariates <- toString(sprintf("`%s`", covs_to_match, covs_to_match))
-  equalcovariates <- paste(sprintf("S.`%s` = data.`%s`", covs_to_match, covs_to_match), collapse = " AND ")
+  covariates <- toString(sprintf("x%s", covs_to_match, covs_to_match))
+  equalcovariates <- paste(sprintf("S.x%s = data.x%s", covs_to_match, covs_to_match), collapse = " AND ")
 
   #get matched group for covariate list that exclude c
 
   match <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ",
                                sprintf("WITH tempgroups AS
-                                       (SELECT *
+                                       (SELECT %s
                                        FROM data
                                        WHERE matched = 0
                                        GROUP BY %s
@@ -95,12 +95,15 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
                                        FROM tempgroups S
                                        WHERE %s)
                                        AND matched = 0",
-                                       covariates,equalcovariates)))
+                                       covariates,covariates,equalcovariates)))
 
+  match <- match[,-1] #Get rid of row.names
   dbWriteTable(db,"match",match, overwrite = TRUE) #write match dataframe into db
 
   #get unmatched group for covariate list that exclude c
-
+  if (nrow(match) == 0) {
+    unmatch <- dbGetQuery(db, "SELECT * FROM data WHERE matched = 0")
+  } else {
   unmatch <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ",
                                  sprintf("SELECT *
                                          FROM data
@@ -109,8 +112,9 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
                                          (SELECT *
                                          FROM match S
                                          WHERE %s)",
-                                         equalcovariates)))
+                                         equalcovariates)))}
 
+  unmatch <- unmatch[,-1] #Get rid of row.names
   dbWriteTable(db,"unmatch",unmatch, overwrite = TRUE) # write unmatch dataframe into db
 
   #Get number of units in each following group to calculate Balancing Factor
@@ -119,11 +123,21 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
   #(3) units that haven't been matched and belong to control group (unmatch_control)
   #(4) units that haven't been matched and belong to treated group (unmatch_treated)
 
+  if (nrow(match) == 0) {
+    match_control <- 0
+    match_treated <- 0
+  } else {
   match_control <- as.integer(dbGetQuery(db, "SELECT count(*) FROM match WHERE treated = 0")[1,1])
   match_treated <- as.integer(dbGetQuery(db, "SELECT count(*) FROM match WHERE treated = 1")[1,1])
+  }
+
+  if (nrow(unmatch) == 0) {
+    unmatch_control <- 0
+    unmatch_treated <- 0
+  } else {
   unmatch_control <- as.integer(dbGetQuery(db, "SELECT count(*) FROM unmatch WHERE treated = 0")[1,1])
   unmatch_treated <- as.integer(dbGetQuery(db, "SELECT count(*) FROM unmatch WHERE treated = 1")[1,1])
-
+  }
 
   #Run python script PE.py to get Predictive Error
   source_python(system.file("PE.py",package = "FLAME"))
@@ -132,8 +146,7 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
   #Compute Predictive Error
   if (length(covs_to_match) == 1) {
     PE <- predictive_error(r_to_py(holdout),seq(0,num_covs - 1),list(covs_to_match))
-  }
-  else {
+  } else {
     PE <- predictive_error(r_to_py(holdout),seq(0,num_covs - 1),covs_to_match)
   }
 
@@ -141,9 +154,7 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 
   if (unmatch_control == 0 | unmatch_treated == 0) {
     return(PE)
-  }
-
-  else {
+  } else {
     BF <- match_control/unmatch_control + match_treated/unmatch_treated #Compute Balancing Factor
     return(tradeoff * BF + PE)
   }
@@ -161,12 +172,12 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 #' @import RSQLite
 #' @export
 
-FLAME_db <- function(db,data,holdout,num_covs,tradeoff) {
+FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
   #Connect to database
 
   #Change dataframe column name and write it to db
-  colnames(data) <- c(seq(0,num_covs-1),"outcome","treated","matched")
+  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
   dbWriteTable(db,"data",data, overwrite = TRUE) #Write dataframe to database
 
   #Set up return objects
@@ -226,28 +237,18 @@ FLAME_db <- function(db,data,holdout,num_covs,tradeoff) {
   return(return_list)
 }
 
+
+
 #data <- data.frame(FLAME::Data_Generation(100,100,10,0))
 #holdout <- data
 #num_covs <- 10
 #tradeoff <- 0.1
 
 
+# Connecting to RPostgreSQL
 
-#result.FLAME <- FLAME::FLAME_bit(data,holdout,seq(0,9),rep(2,10),100,100)
+#drv <- dbDriver('PostgreSQL')
+#db<- dbConnect(drv, dbname="FLAME", host='localhost',
+#               port=5432, user="postgres", password = 'new_password')
 
-
-#library('RPostgreSQL')
-
-
-
-
-#db <- dbConnect(SQLite(),"tempdb")
-
-
-#result.db <- FLAME::FLAME_db(conn,data,holdout,10,0.1)
 #dbDisconnect(db)
-
-
-
-
-
