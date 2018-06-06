@@ -2,7 +2,7 @@
 
 export(Data_Generation)
 export(FLAME_PostgreSQL)
+export(FLAME_SQLite)
 export(FLAME_bit)
-export(FLAME_db)
 import(RSQLite)
 import(reticulate)

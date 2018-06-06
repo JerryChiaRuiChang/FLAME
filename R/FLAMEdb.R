@@ -161,7 +161,7 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 #' @import RSQLite
 #' @export
 
-FLAME_db <- function(db,data,holdout,num_covs,tradeoff) {
+FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
 
   #Connect to database
 
