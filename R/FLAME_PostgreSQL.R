@@ -169,7 +169,7 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 #' @param tradeoff Tradeoff Parameter to compute Match Quality
 #' @return List of covariates matched in each iteration, CATE for matched units
 #' @import reticulate
-#' @import RSQLite
+#' @import RPostgreSQL
 #' @export
 
 FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
