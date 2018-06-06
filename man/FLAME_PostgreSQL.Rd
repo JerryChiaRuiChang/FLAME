@@ -2,12 +2,12 @@
 % Please edit documentation in R/FLAME_PostgreSQL.R
 \name{FLAME_PostgreSQL}
 \alias{FLAME_PostgreSQL}
-\title{FLAME: Database Method}
+\title{FLAME: PostgreSQL Database}
 \usage{
 FLAME_PostgreSQL(db, data, holdout, num_covs, tradeoff)
 }
 \arguments{
-\item{db}{Name of Database}
+\item{db}{Name of the Database Connection}
 
 \item{data}{Data Frame}
 
@@ -21,5 +21,5 @@ FLAME_PostgreSQL(db, data, holdout, num_covs, tradeoff)
 List of covariates matched in each iteration, CATE for matched units
 }
 \description{
-FLAME: Database Method
+FLAME: PostgreSQL Database
 }

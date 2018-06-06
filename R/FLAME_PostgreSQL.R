@@ -1,7 +1,7 @@
 #update_matched function takes list of covariates (cur_covs) to match
 #and update column matched = 0 to matched = l (level) for matched units
 
-update_matched <- function(cur_covs, level) {
+update_matched_PostgreSQL <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
@@ -33,7 +33,7 @@ update_matched <- function(cur_covs, level) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE <- function(cur_covs, level) {
+get_CATE_PostgreSQL <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
@@ -68,7 +68,7 @@ get_CATE <- function(cur_covs, level) {
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
 #returning Match Quality.
 
-match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
+match_quality_PostgreSQL <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 
   #temporarly remove covariate c
 
@@ -160,9 +160,9 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
   }
 }
 
-#' FLAME: Database Method
+#' FLAME: PostgreSQL Database
 #'
-#' @param db Name of Database
+#' @param db Name of the Database Connection
 #' @param data Data Frame
 #' @param holdout Holdout Training Data
 #' @param num_covs Number of Covariates
@@ -193,9 +193,9 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
   #Get matched units without dropping anything
 
-  update_matched(cur_covs,level)
+  update_matched_PostgreSQL(cur_covs,level)
   covs_list[[level]] <- cur_covs
-  CATE[[level]] <- get_CATE(cur_covs,level)
+  CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level)
 
 
   #while there are still covariates for matching
@@ -213,7 +213,7 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
     covs_to_drop = NULL
 
     for (c in cur_covs) {
-      score = match_quality(holdout, num_covs, cur_covs, c, tradeoff)
+      score = match_quality_PostgreSQL(holdout, num_covs, cur_covs, c, tradeoff)
       if (score > quality) {
         quality = score
         covs_to_drop = c
@@ -225,8 +225,8 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- cur_covs
-    update_matched(cur_covs,level)
-    CATE[[level]] <- get_CATE(cur_covs,level)
+    update_matched_PostgreSQL(cur_covs,level)
+    CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level)
 
   }
 
@@ -239,7 +239,7 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
 
 
-#data <- data.frame(FLAME::Data_Generation(100,100,10,0))
+#data <- data.frame(Data_Generation(100,100,10,0))
 #holdout <- data
 #num_covs <- 10
 #tradeoff <- 0.1
@@ -249,6 +249,16 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
 #drv <- dbDriver('PostgreSQL')
 #db<- dbConnect(drv, dbname="FLAME", host='localhost',
-#               port=5432, user="postgres", password = 'new_password')
+#             port=5432, user="postgres", password = 'new_password')
+
+#FLAME::FLAME_PostgreSQL(db,data,holdout,num_covs,0.1)
 
 #dbDisconnect(db)
+
+#db <- dbConnect(SQLite(),"tempdb")
+#FLAME::FLAME_SQLite(db,data,holdout,num_covs,0.1)
+#dbDisconnect(db)
+
+#FLAME::FLAME_bit(data,holdout,seq(0,9),rep(2,10),100,100,0.1)
+
+

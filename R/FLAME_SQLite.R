@@ -1,7 +1,7 @@
 #update_matched function takes list of covariates (cur_covs) to match
 #and update column matched = 0 to matched = l (level) for matched units
 
-update_matched <- function(cur_covs, level) {
+update_matched_SQLite <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
@@ -33,7 +33,7 @@ update_matched <- function(cur_covs, level) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE <- function(cur_covs, level) {
+get_CATE_SQLite <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
@@ -68,7 +68,7 @@ get_CATE <- function(cur_covs, level) {
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
 #returning Match Quality.
 
-match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
+match_quality_SQLite <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 
   #temporarly remove covariate c
 
@@ -149,9 +149,9 @@ match_quality <- function(holdout, num_covs, cur_covs, c, tradeoff) {
   }
 }
 
-#' FLAME: Database Method
+#' FLAME: SQLite Database
 #'
-#' @param db Name of Database
+#' @param db Name of the Database Connection
 #' @param data Data Frame
 #' @param holdout Holdout Training Data
 #' @param num_covs Number of Covariates
@@ -182,9 +182,9 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
 
   #Get matched units without dropping anything
 
-  update_matched(cur_covs,level)
+  update_matched_SQLite(cur_covs,level)
   covs_list[[level]] <- cur_covs
-  CATE[[level]] <- get_CATE(cur_covs,level)
+  CATE[[level]] <- get_CATE_SQLite(cur_covs,level)
 
 
   #while there are still covariates for matching
@@ -202,7 +202,7 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
     covs_to_drop = NULL
 
     for (c in cur_covs) {
-      score = match_quality(holdout, num_covs, cur_covs, c, tradeoff)
+      score = match_quality_SQLite(holdout, num_covs, cur_covs, c, tradeoff)
       if (score > quality) {
         quality = score
         covs_to_drop = c
@@ -214,8 +214,8 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- cur_covs
-    update_matched(cur_covs,level)
-    CATE[[level]] <- get_CATE(cur_covs,level)
+    update_matched_SQLite(cur_covs,level)
+    CATE[[level]] <- get_CATE_SQLite(cur_covs,level)
 
   }
 
