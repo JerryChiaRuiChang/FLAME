@@ -44,6 +44,18 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/Synthetic_Data.html">Modeling Synthetic Data</a>
+    </li>
+  </ul>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -60,21 +72,30 @@
 
     
     
-<div id="flame" class="section level2">
+<div id="flame-fast-large-scale-almost-matching-exactly" class="section level2">
 <h2 class="hasAnchor">
-<a href="#flame" class="anchor"></a>FLAME</h2>
-<div id="about" class="section level3">
+<a href="#flame-fast-large-scale-almost-matching-exactly" class="anchor"></a>FLAME (Fast, Large-scale, Almost Matching Exactly)</h2>
+<div id="overview-of-flame-algorithm" class="section level3">
 <h3 class="hasAnchor">
-<a href="#about" class="anchor"></a>About</h3>
-<p>The <em>FLAME</em> algorithm provides fast and large-scale matching approach to causal inference. <em>FLAME</em> matches units with the same covariate values, and sequentially drops unimportant covaraites by comparing matching quality. Currently <code>FLAME</code> package provides two methods for matching - Bit-Vector and SQL Database. For moderate-sized data, Bit-Vector method should be applied. For large-scale data, SQL Database method should be applied.</p>
-<p>Matching quality is used to determine which unimportant covariate to drop, and consists of two components - Balancing Factor and Predictive Error. Balancing Factor assesses the proportion of units that can be matched. Predictive Error evaluates the predictive power of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a trafeoff between producing more matched units and predicting more accurately.</p>
-<p>Please refer to <a href="https://arxiv.org/pdf/1707.06315.pdf">FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference</a> for more details about the algorithm.</p>
+<a href="#overview-of-flame-algorithm" class="anchor"></a>Overview of FLAME algorithm</h3>
+<p>The <em>FLAME</em> (Fast, Large-scale, Almost Matching Exactly) algorithm provides fast and large-scale matching approach to causal inference. <em>FLAME</em> creates matches that include as many covariates as possible, and iteratively drops covaraites that are successively less useful for predicting outcomes based on matching quality. Currently <code>FLAME</code> package provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied (R function: FLAME_bit). For extremely large data that does not fit in memory, database systems should be applied (R function: FLAME_PostgreSQL or FLAME_SQLite).</p>
+</div>
+<div id="matching-quality" class="section level3">
+<h3 class="hasAnchor">
+<a href="#matching-quality" class="anchor"></a>Matching Quality</h3>
+<p>Matching quality is used to determine which unimportant covariate to drop, and consists of two components - Balancing Factor (BF) and Predictive Error (PE). Balancing factor assesses the proportion of units that can be matched. Larger balancing factor indicates that more matched groups can be found. Predictive Error evaluates the estimation quality of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a bias-variance tradeoff between producing more matched groups and better estimation quality.</p>
+<p>For more details about the FLAME algorithm, please refer to <a href="https://arxiv.org/pdf/1707.06315.pdf">FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference</a></p>
 </div>
 <div id="installation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Current version on GitHub</span>
 devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"chiarui424/FLAME"</span>) </code></pre></div>
+</div>
+<div id="some-examples" class="section level3">
+<h3 class="hasAnchor">
+<a href="#some-examples" class="anchor"></a>Some examples</h3>
+<p><a href="articles/Synthetic_Data.html">Modeling Synthetic Data</a></p>
 </div>
 </div>
   </div>

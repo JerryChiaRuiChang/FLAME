@@ -76,6 +76,18 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/Synthetic_Data.html">Modeling Synthetic Data</a>
+    </li>
+  </ul>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -103,26 +115,19 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>FLAME_bit</span>(<span class='no'>df</span>, <span class='no'>holdout</span>, <span class='no'>covs</span>, <span class='no'>covs_max_list</span>, <span class='no'>num_treated</span>, <span class='no'>num_control</span>, <span class='no'>tradeoff</span>)</pre>
+    <pre class="usage"><span class='fu'>FLAME_bit</span>(<span class='no'>data</span>, <span class='no'>holdout</span>, <span class='no'>num_covs</span>, <span class='no'>num_treated</span>, <span class='no'>num_control</span>, <span class='no'>covs_max_list</span>,
+  <span class='no'>tradeoff</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>df</th>
-      <td><p>Data Frame</p></td>
-    </tr>
-    <tr>
       <th>holdout</th>
       <td><p>Holdout Training Data</p></td>
     </tr>
     <tr>
-      <th>covs</th>
-      <td><p>List of covariates</p></td>
-    </tr>
-    <tr>
-      <th>covs_max_list</th>
-      <td><p>List indicates each covariate is binary/ternary/...</p></td>
+      <th>num_covs</th>
+      <td><p>Number of covariates</p></td>
     </tr>
     <tr>
       <th>num_treated</th>
@@ -133,8 +138,16 @@
       <td><p>Number of units in control group</p></td>
     </tr>
     <tr>
+      <th>covs_max_list</th>
+      <td><p>List indicates each covariate is binary/ternary/...</p></td>
+    </tr>
+    <tr>
       <th>tradeoff</th>
       <td><p>Tradeoff parameter to compute Match Quality</p></td>
+    </tr>
+    <tr>
+      <th>df</th>
+      <td><p>Data Frame</p></td>
     </tr>
     </table>
     

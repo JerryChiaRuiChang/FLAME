@@ -1,19 +1,23 @@
 ## FLAME (Fast, Large-scale, Almost Matching Exactly)
 
-### About   
+### Overview of FLAME algorithm 
 
 The *FLAME* (Fast, Large-scale, Almost Matching Exactly) algorithm provides fast and large-scale matching approach to causal inference. *FLAME* creates matches that include as many covariates as possible, and iteratively drops covaraites that are successively less useful for predicting outcomes based on matching quality. Currently `FLAME` package provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied (R function: FLAME_bit). For extremely large data that does not fit in memory, database systems should be applied (R function: FLAME_PostgreSQL or FLAME_SQLite). 
 
-For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)
+### Matching Quality
+
+Matching quality is used to determine which unimportant covariate to drop, and consists of two components - Balancing Factor (BF) and Predictive Error (PE). Balancing factor assesses the proportion of units that can be matched. Larger balancing factor indicates that more matched groups can be found. Predictive Error evaluates the estimation quality of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a bias-variance tradeoff between producing more matched groups and better estimation quality.   
+
+For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)  
 
 
-### Installation
+### Installation  
 
 ```{r, eval=FALSE}
 # Current version on GitHub
 devtools::install_github("chiarui424/FLAME") 
 ```
 
-### Some examples
+### Some examples 
 
-[Modeling Synthetic Data](docs/synthetic.html)
+[Modeling Synthetic Data](articles/Synthetic_Data.html)
