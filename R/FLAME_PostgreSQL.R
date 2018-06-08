@@ -190,7 +190,6 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
   cur_covs = seq(0,num_covs - 1)
   level = 1
-
   #Get matched units without dropping anything
 
   update_matched_PostgreSQL(cur_covs,level)
@@ -227,7 +226,6 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
     covs_list[[level]] <- cur_covs
     update_matched_PostgreSQL(cur_covs,level)
     CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level)
-
   }
 
   return_list <- NULL
@@ -244,14 +242,13 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 #num_covs <- 10
 #tradeoff <- 0.1
 
-
 # Connecting to RPostgreSQL
 
 #drv <- dbDriver('PostgreSQL')
 #db<- dbConnect(drv, dbname="FLAME", host='localhost',
 #             port=5432, user="postgres", password = 'new_password')
 
-#FLAME::FLAME_PostgreSQL(db,data,holdout,num_covs,0.1)
+#res_Postgres <- FLAME::FLAME_PostgreSQL(db,data,holdout,num_covs,0.1)
 
 #dbDisconnect(db)
 
@@ -259,6 +256,5 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 #FLAME::FLAME_SQLite(db,data,holdout,num_covs,0.1)
 #dbDisconnect(db)
 
-#FLAME::FLAME_bit(data,holdout,seq(0,9),rep(2,10),100,100,0.1)
-
+#FLAME::FLAME_bit(data,holdout,10,100,100,rep(2,10),0.1)
 

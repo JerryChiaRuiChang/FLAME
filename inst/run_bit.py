@@ -96,7 +96,7 @@ def recover_covs(d, covs, covs_max_list, binary = True):
     df.loc[:,'effect'] = effect_list
     df.loc[:,'size'] = [size_list[2*i+1] + size_list[2*i] for i in range(len(size_list)//2) ]
     
-    return df
+    return df.values
 
 def cleanup_result(res_all):
     res = []
@@ -148,19 +148,19 @@ def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff
 
     df = df[~match_indicator][ cur_covs + constant_list ] # remove matched units
 
-    
+    return_cov = []
     level_scores = []
+
+    return_cov.append(cur_covs)
     
     while len(cur_covs)>1:
         
-        print(cur_covs)
         
         best_score = np.inf
         level += 1
         matching_result_tmp = []
         
         if (np.sum(df['treated'] == 0) == 0 ) | (np.sum(df['treated'] == 1) == 0 ): # the early stopping condition
-            print('no more matches')
             break
         
         for i in range(len(cur_covs)):
@@ -187,18 +187,11 @@ def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff
         
         cur_covs = best_res[0] 
         cur_covs_max_list = best_res[1]
+        return_cov.append(cur_covs)
         matching_res.append([best_res, new_matching_res])
         
 
         df = df[~ best_res[-2] ]
         
-    return (cleanup_result(matching_res), level_scores)
-
-
-
-
-
-
-
-
+    return (return_cov,cleanup_result(matching_res))
 

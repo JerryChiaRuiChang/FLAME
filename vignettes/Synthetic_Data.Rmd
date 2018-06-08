@@ -1,0 +1,114 @@
+---
+title: "Modeling Synthetic Data"
+author: "Jerry Chia-Rui Chang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Modeling Synthetic Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Load Required Package
+
+```{r}
+library(FLAME)
+library(RSQLite)
+library(RPostgreSQL)
+library(reticulate)
+```
+
+## Create Synthetic Data
+
+`Data_Generation` function creates simulated data with specific characteristics and known treatment effects. The following function is used to generate synthetic data.
+
+$$
+\begin{aligned}
+& y = \sum_{i}\alpha_{i}x_{i} + T\sum_{i}\beta_{i}x_{i} + T \cdot U \sum_{i=1..5, \gamma = 1...5, \gamma > i} x_{i}x_{\gamma}
+\end{aligned}
+$$
+$T$ ($T \in \{0,1\}$) indicates whether an unit is treated or in control. $U$ represents the number of unimportant covariates. $\alpha_{i} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, $\beta_{i} \sim N(1.5,0.15)$.  
+
+Apply `Data_Generation` function to generate 100 treated units and 100 control units with 10 important covariates and 5 unimportant covariates.  
+```{r}
+data <- FLAME::Data_Generation(num_control = 100, num_treated = 100,
+                               num_cov_dense = 10, num_covs_unimportant = 5)
+
+holdout <- data #create holdout training data the same as synthetic data
+```
+
+
+```{r}
+head(data)
+```
+
+## FLAME_bit Implementation
+
+One of the input requirement for FLAME_bit implementation is a list specifying the number of level each covariate has. For example, the data generation function generates 15 covariates, where each covariate has 2 level (binary variable). Therefore, the input requirement for *covs_max_list* list should be as below.  
+```{r}
+covs_max_list = rep(2,15)
+covs_max_list
+```
+
+Run `FLAME_bit` function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
+```{r}
+result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15,
+                               num_treated = 100, num_control = 100, 
+                               covs_max_list = covs_max_list, tradeoff = 0.1)
+```
+
+## Database Systems Implementation 
+
+For database systems implementation, `FLAME` provides two versions - SQLite and PostgreSQL. PostgreSQL version requires installmenet of external database system and has faster implementation. SQLite version does not require external database system but its implementation is slower than PostgreSQL version. 
+
+### PostgreSQL Version
+
+If your computer does not have PostgreSQL installed, please install from [here](https://www.postgresql.org/download/). For connecting and setup of PostgreSQL server, please refer to [tutorial](http://www.postgresqltutorial.com/connect-to-postgresql-database/).  
+
+Connect to PostgreSQL in R.  
+```{r}
+#Connect to PostgreSQL
+drv <- dbDriver('PostgreSQL')
+
+#Name the connection as db
+db<- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
+             port=5432, password = 'new_password')
+```
+
+Run `FLAME_PostgreSQL` function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
+```{r}
+result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = holdout,
+                                             num_covs = 15, tradeoff = 0.1)
+```
+
+Disconnect PostgreSQL  
+```{r}
+dbDisconnect(db)
+```
+
+### SQLite Version
+
+Connect to a temporary database in R.
+```{r}
+db <- dbConnect(SQLite(),"tempdb") 
+```
+
+Run `FLAME_SQLite` function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
+```{r}
+result_SQLite <- FLAME::FLAME_SQLite(db = db, data = data, holdout = holdout,
+                                             num_covs = 15, tradeoff = 0.1)
+```
+
+Disconnect SQLite
+```{r}
+dbDisconnect(db)
+```
+

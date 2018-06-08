@@ -1,12 +1,11 @@
-## FLAME 
+## FLAME (Fast, Large-scale, Almost Matching Exactly)
 
 ### About   
 
-The *FLAME* algorithm provides fast and large-scale matching approach to causal inference. *FLAME* matches units with the same covariate values, and sequentially drops unimportant covaraites by comparing matching quality. Currently `FLAME` package provides two methods for matching - Bit-Vector and SQL Database. For moderate-sized data, Bit-Vector method should be applied. For large-scale data, SQL Database method should be applied. 
+The *FLAME* (Fast, Large-scale, Almost Matching Exactly) algorithm provides fast and large-scale matching approach to causal inference. *FLAME* creates matches that include as many covariates as possible, and iteratively drops covaraites that are successively less useful for predicting outcomes based on matching quality. Currently `FLAME` package provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied (R function: FLAME_bit). For extremely large data that does not fit in memory, database systems should be applied (R function: FLAME_PostgreSQL or FLAME_SQLite). 
 
-Matching quality is used to determine which unimportant covariate to drop, and consists of two components - Balancing Factor (BF) and Predictive Error (PE). Balancing factor assesses the proportion of units that can be matched. Larger balancing factor indicates that more matched groups can be found. Predictive Error evaluates the estimation quality of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a bias-variance trafeoff between producing more matched groups and better estimation quality.  
+For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)
 
-Please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf) for more details about the algorithm.
 
 ### Installation
 
@@ -14,3 +13,7 @@ Please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to C
 # Current version on GitHub
 devtools::install_github("chiarui424/FLAME") 
 ```
+
+### Some examples
+
+[Modeling Synthetic Data](docs/synthetic.html)

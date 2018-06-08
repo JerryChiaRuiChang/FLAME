@@ -4,22 +4,23 @@
 \alias{FLAME_bit}
 \title{FLAME: Bit Vector Method}
 \usage{
-FLAME_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff)
+FLAME_bit(data, holdout, num_covs, num_treated, num_control, covs_max_list,
+  tradeoff)
 }
 \arguments{
-\item{df}{Data Frame}
-
 \item{holdout}{Holdout Training Data}
 
-\item{covs}{List of covariates}
-
-\item{covs_max_list}{List indicates each covariate is binary/ternary/...}
+\item{num_covs}{Number of covariates}
 
 \item{num_treated}{Number of units in treated group}
 
 \item{num_control}{Number of units in control group}
 
+\item{covs_max_list}{List indicates each covariate is binary/ternary/...}
+
 \item{tradeoff}{Tradeoff parameter to compute Match Quality}
+
+\item{df}{Data Frame}
 }
 \value{
 Data Frame

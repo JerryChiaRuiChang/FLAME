@@ -5,8 +5,8 @@ update_matched_SQLite <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
-  covariates <- toString(sprintf("`%s`", cur_covs, cur_covs))
-  equalcovariates <- paste(sprintf("S.`%s` = data.`%s`", cur_covs, cur_covs), collapse = " AND ")
+  covariates <- toString(sprintf("x%s", cur_covs, cur_covs))
+  equalcovariates <- paste(sprintf("S.x%s = data.x%s", cur_covs, cur_covs), collapse = " AND ")
   level <- toString(level)
 
   #Update Data
@@ -37,9 +37,9 @@ get_CATE_SQLite <- function(cur_covs, level) {
 
   #Convert column names to dynamic strings
 
-  covariates <- toString(sprintf("`%s`", cur_covs, cur_covs))
-  datacovariates <- toString(sprintf("control.`%s`", cur_covs, cur_covs))
-  equalcovariates <- paste(sprintf("control.`%s` = treated.`%s`", cur_covs, cur_covs), collapse = " AND ")
+  covariates <- toString(sprintf("x%s", cur_covs, cur_covs))
+  datacovariates <- toString(sprintf("control.x%s", cur_covs, cur_covs))
+  equalcovariates <- paste(sprintf("control.x%s = treated.x%s", cur_covs, cur_covs), collapse = " AND ")
 
   #Get conditional average treatment effect
 
@@ -76,8 +76,8 @@ match_quality_SQLite <- function(holdout, num_covs, cur_covs, c, tradeoff) {
 
   #Convert column names to dynamic strings
 
-  covariates <- toString(sprintf("`%s`", covs_to_match, covs_to_match))
-  equalcovariates <- paste(sprintf("S.`%s` = data.`%s`", covs_to_match, covs_to_match), collapse = " AND ")
+  covariates <- toString(sprintf("x%s", covs_to_match, covs_to_match))
+  equalcovariates <- paste(sprintf("S.x%s = data.x%s", covs_to_match, covs_to_match), collapse = " AND ")
 
   #get matched group for covariate list that exclude c
 
@@ -166,7 +166,7 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
   #Connect to database
 
   #Change dataframe column name and write it to db
-  colnames(data) <- c(seq(0,num_covs-1),"outcome","treated","matched")
+  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
   dbWriteTable(db,"data",data, overwrite = TRUE) #Write dataframe to database
 
   #Set up return objects
