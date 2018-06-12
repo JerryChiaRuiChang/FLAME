@@ -1,12 +1,34 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
 ## FLAME (Fast, Large-scale, Almost Matching Exactly)
 
 ### Overview of FLAME algorithm 
 
-The *FLAME* (Fast, Large-scale, Almost Matching Exactly) algorithm provides fast and large-scale matching approach to causal inference. *FLAME* creates matches that include as many covariates as possible, and iteratively drops covaraites that are successively less useful for predicting outcomes based on matching quality. Currently `FLAME` package provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied (R function: FLAME_bit). For extremely large data that does not fit in memory, database systems should be applied (R function: FLAME_PostgreSQL or FLAME_SQLite). 
+The **FLAME** algorithm provides fast and large-scale matching approach to causal inference. **FLAME** creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently `FLAME` package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.
 
-### Matching Quality
+### Required data format
 
-Matching quality is used to determine which unimportant covariate to drop, and consists of two components - Balancing Factor (BF) and Predictive Error (PE). Balancing factor assesses the proportion of units that can be matched. Larger balancing factor indicates that more matched groups can be found. Predictive Error evaluates the estimation quality of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a bias-variance tradeoff between producing more matched groups and better estimation quality.   
+`FLAME` package requires input data to have specific format. First, input data should be either a **R Matrix** or a **R Data Frame**. Second, input data columns should contain (1) covariates (2) outcome variable (3) variable specifying a unit is treated or control (treated = 1, control = 0). Third, though there are no requirements for input data column names, the column order should follow *[covariates, outcome, treatment]*. Below is an example of input data with $n$ units and $m$ covariates.
+
+|       | **$x_1$** | **$x_2$** | **...** | **$x_{m-1}$** | **$x_m$** | **outcome** | **treated** |
+| :---: | :---: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: |
+| **unit 1** | 0     | 1     | ... | 1         | 2     | 3.8     | 1       |
+| **unit 2** | 1     | 0     | ... | 1         | 0     | 1.36    | 0       |
+| **unit 3** | 0     | 1     | ... | 0         | 1     | -7.25   | 0       |
+| ... | ...     | ...     | ... | ...       | ...     | ...   | ...    |
+| **unit $n$** | 0     | 1     | ... | 1         | 0     | 20   | 1       |
+
+Holdout training data should also follow the same format as input data.
+
+### Other requirements
+
+1. For database systems implementation, please name database connection as **db**.
+2. 
+
+
 
 For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)  
 

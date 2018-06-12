@@ -33,7 +33,7 @@ update_matched_SQLite <- function(cur_covs, level) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_SQLite <- function(cur_covs, level) {
+get_CATE_SQLite <- function(cur_covs, level,column) {
 
   #Convert column names to dynamic strings
 
@@ -60,6 +60,12 @@ get_CATE_SQLite <- function(cur_covs, level) {
     ON %s)",
     covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
 
+  #If the data frame to be returned is empty, convert its column names to covariates at current iteration
+  if (nrow(CATE) == 0) {
+    CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
+                     c(column[(cur_covs + 1)],"effect","size"))
+  }
+
   return(CATE)
 }
 
@@ -68,7 +74,7 @@ get_CATE_SQLite <- function(cur_covs, level) {
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
 #returning Match Quality.
 
-match_quality_SQLite <- function(holdout, num_covs, cur_covs, c, tradeoff) {
+match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff) {
 
   #temporarly remove covariate c
 
@@ -149,25 +155,42 @@ match_quality_SQLite <- function(holdout, num_covs, cur_covs, c, tradeoff) {
   }
 }
 
-#' FLAME: SQLite Database
+#'SQLite Database Implementation
 #'
-#' @param db Name of the Database Connection
-#' @param data Data Frame
-#' @param holdout Holdout Training Data
-#' @param num_covs Number of Covariates
-#' @param tradeoff Tradeoff Parameter to compute Match Quality
-#' @return List of covariates matched in each iteration, CATE for matched units
-#' @import reticulate
-#' @import RSQLite
-#' @export
+#'\code{FLAME_SQLite} applies FLAME matching algorithm based on SQLite.
+#'\code{FLAME_SQLite} does not require external database installment. However,
+#'user should connect to a temporary database with command
+#'\code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
+#'\strong{db}.
+#'
+#'
+#'@param db Name of the connection to temporary database  (\strong{must name the
+#'  connection as db})
+#'@param data Input data
+#'@param holdout Holdout training data
+#'@param num_covs Number of covariates
+#'@param tradeoff Tradeoff parameter to compute Match Quality
+#'@return (1) List of covariates matched at each iteration (2) List of data
+#'  frame showing matched groups, conditional average treatment effect (CATE),
+#'  and the size of each matched group
+#'@import reticulate
+#'@import RSQLite
+#'@export
 
 FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
 
-  #Connect to database
+  data <- data.frame(data) #Convert input data to data.frame if not already converted
+  holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
+  column <- colnames(data)
 
-  #Change dataframe column name and write it to db
-  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
-  dbWriteTable(db,"data",data, overwrite = TRUE) #Write dataframe to database
+  #change input data and holdout training data column name
+  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
+  colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
+
+  data$matched <- 0 #add column matched to input data
+
+  #Write input data to database
+  dbWriteTable(db,"data",data, overwrite = TRUE)
 
   #Set up return objects
 
@@ -183,8 +206,8 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
   #Get matched units without dropping anything
 
   update_matched_SQLite(cur_covs,level)
-  covs_list[[level]] <- cur_covs
-  CATE[[level]] <- get_CATE_SQLite(cur_covs,level)
+  covs_list[[level]] <- column[(cur_covs + 1)]
+  CATE[[level]] <- get_CATE_SQLite(cur_covs,level,column)
 
 
   #while there are still covariates for matching
@@ -198,24 +221,28 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
     #Temporarily drop one covariate at a time to calculate Match Quality
     #Drop the covariate that returns highest Match Quality Score
 
-    quality = -Inf
-    covs_to_drop = NULL
+    #quality = -Inf
+    #covs_to_drop = NULL
 
-    for (c in cur_covs) {
-      score = match_quality_SQLite(holdout, num_covs, cur_covs, c, tradeoff)
-      if (score > quality) {
-        quality = score
-        covs_to_drop = c
-      }
-    }
+    #for (c in cur_covs) {
+    #  score = match_quality_SQLite(holdout, num_covs, cur_covs, c, tradeoff)
+    #  if (score > quality) {
+    #    quality = score
+    #    covs_to_drop = c
+    #  }
+    #}
+
+    list_score <- unlist(lapply(cur_covs,match_quality_SQLite,holdout, num_covs, cur_covs, tradeoff))
+    quality <- max(list_score)
+    covs_to_drop <- cur_covs[which(list_score == quality)]
 
     cur_covs = cur_covs[cur_covs != covs_to_drop] #Dropping one covariate
 
     #Update Match
     SCORE[[level-1]] <- quality
-    covs_list[[level]] <- cur_covs
+    covs_list[[level]] <- column[(cur_covs + 1)]
     update_matched_SQLite(cur_covs,level)
-    CATE[[level]] <- get_CATE_SQLite(cur_covs,level)
+    CATE[[level]] <- get_CATE_SQLite(cur_covs,level,column)
 
   }
 

@@ -65,7 +65,7 @@ covs_max_list
 \newline
 
 Run `FLAME_bit` function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
-```{r}
+```{r, warning=FALSE}
 result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15,
                                num_treated = 100, num_control = 100, 
                                covs_max_list = covs_max_list, tradeoff = 0.1)
@@ -81,13 +81,13 @@ If your computer does not have PostgreSQL installed, please install from [here](
 
 \newline
 
-Connect to PostgreSQL in R.  
+Connect to PostgreSQL in R. Note that it is required to name the connection as **db**. 
 ```{r}
 #Connect to PostgreSQL
 drv <- dbDriver('PostgreSQL')
 
 #Name the connection as db
-db<- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
+db <- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
              port=5432, password = 'new_password')
 ```
 
@@ -102,14 +102,15 @@ result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = hol
 \newline
 
 Disconnect PostgreSQL  
-```{r}
+```{r, results="hide"}
 dbDisconnect(db)
 ```
 
 ### SQLite Version
 
-Connect to a temporary database in R.  
+Connect to a temporary database in R. Note that it is required to name the connection as **db**. 
 ```{r}
+#Name the connection as conn
 db <- dbConnect(SQLite(),"tempdb") 
 ```
 
@@ -134,20 +135,28 @@ We compare the results of bit vector, PostgreSQL, and SQLite implementations.
 
 \newline 
 
-Bit Vector 
-```{r, echo=FALSE}
-result_bit[[1]]
+1. Compare Average Treatment Effect
+```{r}
+ATE(result_bit) #bit vectors
+ATE(result_PostgreSQL) #PostgreSQL
+ATE(result_SQLite) #SQLite
 ```
 
-PostgreSQL
-```{r, echo= FALSE}
-result_PostgreSQL[[1]]
+\newline 
+
+2. Compare Conditional Average Treatment Effect with 15 covariates
+
+```{r}
+CATE(result_bit,15) #bit vectors
+CATE(result_PostgreSQL,15) #PostgreSQL
+CATE(result_SQLite,15) #SQLite
 ```
 
+\newline 
 
-SQLite
-```{r, echo= FALSE}
-result_SQLite[[1]]
+3. Compare Conditional Average Treatment Effect with 3 covariates
+```{r}
+CATE(result_bit,3) #bit vectors
+CATE(result_PostgreSQL,3) #PostgreSQL
+CATE(result_SQLite,3) #SQLite
 ```
-
-All three implementation yields the same results.

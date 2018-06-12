@@ -15,8 +15,13 @@ FLAME_bit <- function(data, holdout, num_covs, num_treated, num_control, covs_ma
 
   #Type Conversion and Preprocessing
 
-  data <- data.frame(data) #Convert data to data.frame if not already converted
-  holdout <- data.frame(holdout) #Convert holdout to data.frame if not already converted
+  data <- data.frame(data) #Convert input data to data.frame if not already converted
+  holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
+  column <- colnames(data)
+
+  data$matched <- 0 #add column matched to input data
+  holdout$matched <- 0 #add column matched to holdout data
+
   covs <- as.integer(seq(0,num_covs-1)) #Create list of covariate
   covs_max_list <- as.integer(covs_max_list) #Convert covs_max_list to integer array
   num_treated <- as.integer(num_treated) #Convert numeric to integer
@@ -30,11 +35,12 @@ FLAME_bit <- function(data, holdout, num_covs, num_treated, num_control, covs_ma
                     num_treated, num_control, tradeoff)
 
   #Convert column name to match with covariate returned in each iteration
-  result_cov <- result[[1]]
+  result_cov <- NULL
   result_df <- result[[2]]
-  for (i in 1:length(result_cov)) {
+  for (i in 1:length(result_df)) {
     result_df[[i]] <- data.frame(result_df[[i]])
-    colnames(result_df[[i]]) <- c(paste("x",result_cov[[i]], sep = ""),"effect","size")
+    colnames(result_df[[i]]) <- c(column[(result[[1]][[i]] + 1)],"effect","size")
+    result_cov[[i]] <- column[(result[[1]][[i]] + 1)]
   }
 
   return_list <- NULL

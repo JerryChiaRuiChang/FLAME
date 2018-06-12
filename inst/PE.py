@@ -13,7 +13,7 @@ def predictive_error(holdout, covs, covs_subset, ridge_reg = 0.1):
 
 	#Change column names into panda index (object)
     col = list(range(len(covs)))
-    col.extend(["outcome","treated","matched"])
+    col.extend(["outcome","treated"])
     col = pd.Index(col)
     holdout.columns = col
 

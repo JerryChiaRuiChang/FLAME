@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>FLAME: SQLite Database — FLAME_SQLite • FLAME</title>
+<title>SQLite Database Implementation — FLAME_SQLite • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,13 @@
 
 
 
-<meta property="og:title" content="FLAME: SQLite Database — FLAME_SQLite" />
+<meta property="og:title" content="SQLite Database Implementation — FLAME_SQLite" />
 
-<meta property="og:description" content="FLAME: SQLite Database" />
+<meta property="og:description" content="FLAME_SQLite applies FLAME matching algorithm based on SQLite.
+FLAME_SQLite does not require external database installment. However,
+user should connect to a temporary database with command
+dbConnect(SQLite(),&quot;tempdb_name&quot;) and name the connection as
+db." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -104,14 +108,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>FLAME: SQLite Database</h1>
+    <h1>SQLite Database Implementation</h1>
     
     <div class="hidden name"><code>FLAME_SQLite.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>FLAME: SQLite Database</p>
+    <p><code>FLAME_SQLite</code> applies FLAME matching algorithm based on SQLite.
+<code>FLAME_SQLite</code> does not require external database installment. However,
+user should connect to a temporary database with command
+<code>dbConnect(SQLite(),"tempdb_name")</code> and name the connection as
+<strong>db</strong>.</p>
     
     </div>
 
@@ -122,29 +130,32 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>db</th>
-      <td><p>Name of the Database Connection</p></td>
+      <td><p>Name of the connection to temporary database  (<strong>must name the
+connection as db</strong>)</p></td>
     </tr>
     <tr>
       <th>data</th>
-      <td><p>Data Frame</p></td>
+      <td><p>Input data</p></td>
     </tr>
     <tr>
       <th>holdout</th>
-      <td><p>Holdout Training Data</p></td>
+      <td><p>Holdout training data</p></td>
     </tr>
     <tr>
       <th>num_covs</th>
-      <td><p>Number of Covariates</p></td>
+      <td><p>Number of covariates</p></td>
     </tr>
     <tr>
       <th>tradeoff</th>
-      <td><p>Tradeoff Parameter to compute Match Quality</p></td>
+      <td><p>Tradeoff parameter to compute Match Quality</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of covariates matched in each iteration, CATE for matched units</p>
+    <p>(1) List of covariates matched at each iteration (2) List of data
+ frame showing matched groups, conditional average treatment effect (CATE),
+ and the size of each matched group</p>
     
 
   </div>

@@ -33,7 +33,7 @@ update_matched_PostgreSQL <- function(cur_covs, level) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_PostgreSQL <- function(cur_covs, level) {
+get_CATE_PostgreSQL <- function(cur_covs, level, column) {
 
   #Convert column names to dynamic strings
 
@@ -60,6 +60,12 @@ get_CATE_PostgreSQL <- function(cur_covs, level) {
     ON %s)",
     covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
 
+  #If the data frame to be returned is empty, convert its column names to covariates at current iteration
+  if (nrow(CATE) == 0) {
+    CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
+                     c(column[(cur_covs + 1)],"effect","size"))
+  }
+
   return(CATE)
 }
 
@@ -68,7 +74,7 @@ get_CATE_PostgreSQL <- function(cur_covs, level) {
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
 #returning Match Quality.
 
-match_quality_PostgreSQL <- function(holdout, num_covs, cur_covs, c, tradeoff) {
+match_quality_PostgreSQL <- function(c, holdout, num_covs, cur_covs,tradeoff) {
 
   #temporarly remove covariate c
 
@@ -160,25 +166,45 @@ match_quality_PostgreSQL <- function(holdout, num_covs, cur_covs, c, tradeoff) {
   }
 }
 
-#' FLAME: PostgreSQL Database
+#'PostgreSQL Database Implementation
 #'
-#' @param db Name of the Database Connection
-#' @param data Data Frame
-#' @param holdout Holdout Training Data
-#' @param num_covs Number of Covariates
-#' @param tradeoff Tradeoff Parameter to compute Match Quality
-#' @return List of covariates matched in each iteration, CATE for matched units
-#' @import reticulate
-#' @import RPostgreSQL
-#' @export
+#'\code{FLAME_PostgreSQL} applies FLAME matching algorithm based on PostgreSQL.
+#'If your computer does not have PostgreSQL installed, please install from
+#'\href{https://www.postgresql.org/download/}{here}. For setup PostgreSQL
+#'server, please refer to
+#'\href{http://www.postgresqltutorial.com/connect-to-postgresql-database/}{tutorial}.
+#'User must connect to PostgreSQL server in R using the command
+#'\code{dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
+#'host='your_localhost', port='your_port', user='your_username', password =
+#''your_password')} and name the connection as \strong{db}
+#'
+#'@param db Name of the database connection (\strong{must name the connection as
+#'  db})
+#'@param data Input data
+#'@param holdout Holdout training data
+#'@param num_covs Number of covariates
+#'@param tradeoff Tradeoff parameter to compute Match Quality
+#'@return (1) List of covariates matched at each iteration (2) List of data
+#'  frame showing matched groups, conditional average treatment effect (CATE),
+#'  and the size of each matched group
+#'@import reticulate
+#'@import RPostgreSQL
+#'@export
 
 FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
-  #Connect to database
+  data <- data.frame(data) #Convert input data to data.frame if not already converted
+  holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
+  column <- colnames(data)
 
-  #Change dataframe column name and write it to db
-  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
-  dbWriteTable(db,"data",data, overwrite = TRUE) #Write dataframe to database
+  #change input data and holdout training data column name
+  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
+  colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
+
+  data$matched <- 0 #add column matched to input data
+
+  #Write input data to database
+  dbWriteTable(db,"data",data, overwrite = TRUE)
 
   #Set up return objects
 
@@ -193,8 +219,8 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
   #Get matched units without dropping anything
 
   update_matched_PostgreSQL(cur_covs,level)
-  covs_list[[level]] <- cur_covs
-  CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level)
+  covs_list[[level]] <- column[(cur_covs + 1)]
+  CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level,column)
 
 
   #while there are still covariates for matching
@@ -208,24 +234,28 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
     #Temporarily drop one covariate at a time to calculate Match Quality
     #Drop the covariate that returns highest Match Quality Score
 
-    quality = -Inf
-    covs_to_drop = NULL
+    #quality = -Inf
+    #covs_to_drop = NULL
 
-    for (c in cur_covs) {
-      score = match_quality_PostgreSQL(holdout, num_covs, cur_covs, c, tradeoff)
-      if (score > quality) {
-        quality = score
-        covs_to_drop = c
-      }
-    }
+    #for (c in cur_covs) {
+    #  score = match_quality_PostgreSQL(c,holdout, num_covs, cur_covs, tradeoff)
+    #  if (score > quality) {
+    #    quality = score
+    #    covs_to_drop = c
+    #  }
+    #}
+
+    list_score <- unlist(lapply(cur_covs,match_quality_PostgreSQL,holdout, num_covs, cur_covs, tradeoff))
+    quality <- max(list_score)
+    covs_to_drop <- cur_covs[which(list_score == quality)]
 
     cur_covs = cur_covs[cur_covs != covs_to_drop] #Dropping one covariate
 
     #Update Match
     SCORE[[level-1]] <- quality
-    covs_list[[level]] <- cur_covs
+    covs_list[[level]] <- column[(cur_covs + 1)]
     update_matched_PostgreSQL(cur_covs,level)
-    CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level)
+    CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level,column)
   }
 
   return_list <- NULL
@@ -245,10 +275,10 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 # Connecting to RPostgreSQL
 
 #drv <- dbDriver('PostgreSQL')
-#db<- dbConnect(drv, dbname="FLAME", host='localhost',
+#db <- dbConnect(drv, dbname="FLAME", host='localhost',
 #             port=5432, user="postgres", password = 'new_password')
 
-#res_Postgres <- FLAME::FLAME_PostgreSQL(db,data,holdout,num_covs,0.1)
+#res_Postgres <- FLAME_PostgreSQL(db,data,data,10,0.1)
 
 #dbDisconnect(db)
 

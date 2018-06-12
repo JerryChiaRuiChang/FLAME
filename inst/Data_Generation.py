@@ -56,6 +56,5 @@ def data_generation_dense_2(num_control, num_treated, num_cov_dense, num_covs_un
     df2['treated'] = 1
 
     df = pd.concat([df1,df2])
-    df['matched'] = 0
   
     return df.values

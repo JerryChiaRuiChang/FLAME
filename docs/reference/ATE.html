@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PostgreSQL Database Implementation — FLAME_PostgreSQL • FLAME</title>
+<title>Compute Average Treatment Effect — ATE • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,17 +30,9 @@
 
 
 
-<meta property="og:title" content="PostgreSQL Database Implementation — FLAME_PostgreSQL" />
+<meta property="og:title" content="Compute Average Treatment Effect — ATE" />
 
-<meta property="og:description" content="FLAME_PostgreSQL applies FLAME matching algorithm based on PostgreSQL.
-If your computer does not have PostgreSQL installed, please install from
-here. For setup PostgreSQL
-server, please refer to
-tutorial.
-User must connect to PostgreSQL server in R using the command
-dbConnect(dbDriver('PostgreSQL'), dbname=&quot;your_dbname&quot;,
-host='your_localhost', port='your_port', user='your_username', password =
-'your_password') and name the connection as db" />
+<meta property="og:description" content="ATE computes average treatment effect for all matched groups." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,58 +104,33 @@ host='your_localhost', port='your_port', user='your_username', password =
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>PostgreSQL Database Implementation</h1>
+    <h1>Compute Average Treatment Effect</h1>
     
-    <div class="hidden name"><code>FLAME_PostgreSQL.Rd</code></div>
+    <div class="hidden name"><code>ATE.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>FLAME_PostgreSQL</code> applies FLAME matching algorithm based on PostgreSQL.
-If your computer does not have PostgreSQL installed, please install from
-<a href='https://www.postgresql.org/download/'>here</a>. For setup PostgreSQL
-server, please refer to
-<a href='http://www.postgresqltutorial.com/connect-to-postgresql-database/'>tutorial</a>.
-User must connect to PostgreSQL server in R using the command
-<code>dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
-host='your_localhost', port='your_port', user='your_username', password =
-'your_password')</code> and name the connection as <strong>db</strong></p>
+    <p><code>ATE</code> computes average treatment effect for all matched groups.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>FLAME_PostgreSQL</span>(<span class='no'>db</span>, <span class='no'>data</span>, <span class='no'>holdout</span>, <span class='no'>num_covs</span>, <span class='no'>tradeoff</span>)</pre>
+    <pre class="usage"><span class='fu'>ATE</span>(<span class='no'>FLAME_object</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>db</th>
-      <td><p>Name of the database connection (<strong>must name the connection as
-db</strong>)</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>Input data</p></td>
-    </tr>
-    <tr>
-      <th>holdout</th>
-      <td><p>Holdout training data</p></td>
-    </tr>
-    <tr>
-      <th>num_covs</th>
-      <td><p>Number of covariates</p></td>
-    </tr>
-    <tr>
-      <th>tradeoff</th>
-      <td><p>Tradeoff parameter to compute Match Quality</p></td>
+      <th>FLAME_object</th>
+      <td><p>object returned by applying FLAME matching algorithm
+(<code><a href='FLAME_bit.html'>FLAME_bit</a></code> or <code><a href='FLAME_PostgreSQL.html'>FLAME_PostgreSQL</a></code> or
+<code><a href='FLAME_SQLite.html'>FLAME_SQLite</a></code>)</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>(1) List of covariates matched at each iteration (2) List of data
- frame showing matched groups, conditional average treatment effect (CATE),
- and the size of each matched group</p>
+    <p>Average Treatment Effect (ATE)</p>
     
 
   </div>

@@ -72,7 +72,7 @@
       <h1>Modeling Synthetic Data</h1>
                         <h4 class="author">Jerry Chia-Rui Chang</h4>
             
-            <h4 class="date">2018-06-08</h4>
+            <h4 class="date">2018-06-12</h4>
       
       
       <div class="hidden name"><code>Synthetic_Data.Rmd</code></div>
@@ -108,20 +108,13 @@
 holdout &lt;-<span class="st"> </span>data <span class="co">#create holdout training data the same as synthetic data</span></code></pre></div>
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data)
-<span class="co">#&gt;   x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14   outcome treated</span>
-<span class="co">#&gt; 1  0  0  0  1  1  0  1  0  1  0   1   0   0   0   0 37.277923       0</span>
-<span class="co">#&gt; 2  1  1  1  1  1  0  0  0  0  0   0   0   0   0   0  6.160111       0</span>
-<span class="co">#&gt; 3  0  0  1  1  1  1  0  1  0  1   0   0   0   0   0 18.210323       0</span>
-<span class="co">#&gt; 4  1  1  0  1  1  1  1  1  0  1   1   0   0   1   0 -4.336441       0</span>
-<span class="co">#&gt; 5  0  1  0  1  1  1  0  0  1  1   0   0   0   0   0 18.633174       0</span>
-<span class="co">#&gt; 6  0  0  0  1  1  0  0  0  1  1   0   0   0   0   0 19.491361       0</span>
-<span class="co">#&gt;   matched</span>
-<span class="co">#&gt; 1       0</span>
-<span class="co">#&gt; 2       0</span>
-<span class="co">#&gt; 3       0</span>
-<span class="co">#&gt; 4       0</span>
-<span class="co">#&gt; 5       0</span>
-<span class="co">#&gt; 6       0</span></code></pre></div>
+<span class="co">#&gt;   x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14    outcome treated</span>
+<span class="co">#&gt; 1  1  1  0  1  1  0  0  0  0  1   1   0   0   0   0   8.493351       0</span>
+<span class="co">#&gt; 2  1  1  0  1  0  0  0  0  0  1   0   0   0   0   0  18.268438       0</span>
+<span class="co">#&gt; 3  1  1  1  0  0  1  0  1  1  0   0   0   1   0   0   1.104347       0</span>
+<span class="co">#&gt; 4  0  1  1  0  1  0  1  0  0  1   0   0   0   0   0 -10.085622       0</span>
+<span class="co">#&gt; 5  0  0  1  0  1  1  0  1  1  1   0   0   0   0   0 -42.649661       0</span>
+<span class="co">#&gt; 6  1  1  1  1  1  0  1  0  1  1   0   0   0   0   0  19.094098       0</span></code></pre></div>
 </div>
 <div id="bit-vector-implementation" class="section level2">
 <h2 class="hasAnchor">
@@ -145,12 +138,12 @@ covs_max_list
 <a href="#postgresql-version" class="anchor"></a>PostgreSQL Version</h3>
 <p>If your computer does not have PostgreSQL installed, please install from <a href="https://www.postgresql.org/download/">here</a>. For connecting and setup of PostgreSQL server, please refer to <a href="http://www.postgresqltutorial.com/connect-to-postgresql-database/">tutorial</a>.</p>
 
-<p>Connect to PostgreSQL in R.</p>
+<p>Connect to PostgreSQL in R. Note that it is required to name the connection as <strong>db</strong>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Connect to PostgreSQL</span>
 drv &lt;-<span class="st"> </span><span class="kw">dbDriver</span>(<span class="st">'PostgreSQL'</span>)
 
 <span class="co">#Name the connection as db</span>
-db&lt;-<span class="st"> </span><span class="kw">dbConnect</span>(drv, <span class="dt">user=</span><span class="st">"postgres"</span>, <span class="dt">dbname=</span><span class="st">"FLAME"</span>, <span class="dt">host=</span><span class="st">'localhost'</span>,
+db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(drv, <span class="dt">user=</span><span class="st">"postgres"</span>, <span class="dt">dbname=</span><span class="st">"FLAME"</span>, <span class="dt">host=</span><span class="st">'localhost'</span>,
              <span class="dt">port=</span><span class="dv">5432</span>, <span class="dt">password =</span> <span class="st">'new_password'</span>)</code></pre></div>
 
 <p>Run <code>FLAME_PostgreSQL</code> function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)</p>
@@ -158,14 +151,14 @@ db&lt;-<span class="st"> </span><span class="kw">dbConnect</span>(drv, <span cla
                                              <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">tradeoff =</span> <span class="fl">0.1</span>)</code></pre></div>
 
 <p>Disconnect PostgreSQL</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbDisconnect</span>(db)
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbDisconnect</span>(db)</code></pre></div>
 </div>
 <div id="sqlite-version" class="section level3">
 <h3 class="hasAnchor">
 <a href="#sqlite-version" class="anchor"></a>SQLite Version</h3>
-<p>Connect to a temporary database in R.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(),<span class="st">"tempdb"</span>) </code></pre></div>
+<p>Connect to a temporary database in R. Note that it is required to name the connection as <strong>db</strong>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Name the connection as conn</span>
+db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(),<span class="st">"tempdb"</span>) </code></pre></div>
 
 <p>Run <code>FLAME_SQLite</code> function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_SQLite">FLAME_SQLite</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout,
@@ -180,133 +173,35 @@ db&lt;-<span class="st"> </span><span class="kw">dbConnect</span>(drv, <span cla
 <a href="#compare-result" class="anchor"></a>Compare Result</h2>
 <p>We compare the results of bit vector, PostgreSQL, and SQLite implementations.</p>
 
-<p>Bit Vector</p>
-<pre><code>#&gt; [[1]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
-#&gt; 
-#&gt; [[2]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 14
-#&gt; 
-#&gt; [[3]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 11 12 14
-#&gt; 
-#&gt; [[4]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 12 14
-#&gt; 
-#&gt; [[5]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 14
-#&gt; 
-#&gt; [[6]]
-#&gt;  [1] 0 1 2 3 4 5 6 7 8 9
-#&gt; 
-#&gt; [[7]]
-#&gt; [1] 0 1 2 3 4 5 6 8 9
-#&gt; 
-#&gt; [[8]]
-#&gt; [1] 0 1 2 3 4 5 6 8
-#&gt; 
-#&gt; [[9]]
-#&gt; [1] 0 1 2 3 4 5 8
-#&gt; 
-#&gt; [[10]]
-#&gt; [1] 0 2 3 4 5 8
-#&gt; 
-#&gt; [[11]]
-#&gt; [1] 0 2 3 4 5
-#&gt; 
-#&gt; [[12]]
-#&gt; [1] 0 2 4 5
-#&gt; 
-#&gt; [[13]]
-#&gt; [1] 0 2 5
-#&gt; 
-#&gt; [[14]]
-#&gt; [1] 0 2</code></pre>
-<p>PostgreSQL</p>
-<pre><code>#&gt; [[1]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
-#&gt; 
-#&gt; [[2]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 14
-#&gt; 
-#&gt; [[3]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 11 12 14
-#&gt; 
-#&gt; [[4]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 12 14
-#&gt; 
-#&gt; [[5]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 14
-#&gt; 
-#&gt; [[6]]
-#&gt;  [1] 0 1 2 3 4 5 6 7 8 9
-#&gt; 
-#&gt; [[7]]
-#&gt; [1] 0 1 2 3 4 5 6 8 9
-#&gt; 
-#&gt; [[8]]
-#&gt; [1] 0 1 2 3 4 5 6 8
-#&gt; 
-#&gt; [[9]]
-#&gt; [1] 0 1 2 3 4 5 8
-#&gt; 
-#&gt; [[10]]
-#&gt; [1] 0 2 3 4 5 8
-#&gt; 
-#&gt; [[11]]
-#&gt; [1] 0 2 3 4 5
-#&gt; 
-#&gt; [[12]]
-#&gt; [1] 0 2 4 5
-#&gt; 
-#&gt; [[13]]
-#&gt; [1] 0 2 5
-#&gt; 
-#&gt; [[14]]
-#&gt; [1] 0 2</code></pre>
-<p>SQLite</p>
-<pre><code>#&gt; [[1]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
-#&gt; 
-#&gt; [[2]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 14
-#&gt; 
-#&gt; [[3]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 11 12 14
-#&gt; 
-#&gt; [[4]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 12 14
-#&gt; 
-#&gt; [[5]]
-#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 14
-#&gt; 
-#&gt; [[6]]
-#&gt;  [1] 0 1 2 3 4 5 6 7 8 9
-#&gt; 
-#&gt; [[7]]
-#&gt; [1] 0 1 2 3 4 5 6 8 9
-#&gt; 
-#&gt; [[8]]
-#&gt; [1] 0 1 2 3 4 5 6 8
-#&gt; 
-#&gt; [[9]]
-#&gt; [1] 0 1 2 3 4 5 8
-#&gt; 
-#&gt; [[10]]
-#&gt; [1] 0 2 3 4 5 8
-#&gt; 
-#&gt; [[11]]
-#&gt; [1] 0 2 3 4 5
-#&gt; 
-#&gt; [[12]]
-#&gt; [1] 0 2 4 5
-#&gt; 
-#&gt; [[13]]
-#&gt; [1] 0 2 5
-#&gt; 
-#&gt; [[14]]
-#&gt; [1] 0 2</code></pre>
-<p>All three implementation yields the same results.</p>
+<ol style="list-style-type: decimal">
+<li>Compare Average Treatment Effect</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_bit) <span class="co">#bit vectors</span>
+<span class="co">#&gt; [1] 14.77549</span>
+<span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_PostgreSQL) <span class="co">#PostgreSQL</span>
+<span class="co">#&gt; [1] 14.77549</span>
+<span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_SQLite) <span class="co">#SQLite</span>
+<span class="co">#&gt; [1] 14.77549</span></code></pre></div>
+
+<ol start="2" style="list-style-type: decimal">
+<li>Compare Conditional Average Treatment Effect with 15 covariates</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_bit,<span class="dv">15</span>) <span class="co">#bit vectors</span>
+<span class="co">#&gt; [1] "There are no matches for 15 covariate"</span>
+<span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_PostgreSQL,<span class="dv">15</span>) <span class="co">#PostgreSQL</span>
+<span class="co">#&gt; [1] "There are no matches for 15 covariate"</span>
+<span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_SQLite,<span class="dv">15</span>) <span class="co">#SQLite</span>
+<span class="co">#&gt; [1] "There are no matches for 15 covariate"</span></code></pre></div>
+
+<ol start="3" style="list-style-type: decimal">
+<li>Compare Conditional Average Treatment Effect with 3 covariates</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_bit,<span class="dv">3</span>) <span class="co">#bit vectors</span>
+<span class="co">#&gt; [1] 33.93874</span>
+<span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_PostgreSQL,<span class="dv">3</span>) <span class="co">#PostgreSQL</span>
+<span class="co">#&gt; [1] 33.93874</span>
+<span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_SQLite,<span class="dv">3</span>) <span class="co">#SQLite</span>
+<span class="co">#&gt; [1] 33.93874</span></code></pre></div>
 </div>
   </div>
 

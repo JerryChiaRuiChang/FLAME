@@ -21,6 +21,6 @@ Data_Generation <- function(num_control, num_treated, num_cov_dense, num_covs_un
   num_covs_unimportant <- as.integer(num_covs_unimportant)
   #Pass Arguement to data_generation_dense_2
   dat <- data.frame(data_generation_dense_2(num_control, num_treated, num_cov_dense, num_covs_unimportant))
-  colnames(dat) <- c(paste("x",seq(0,num_cov_dense + num_covs_unimportant-1), sep = ""),"outcome","treated","matched")
+  colnames(dat) <- c(paste("x",seq(0,num_cov_dense + num_covs_unimportant-1), sep = ""),"outcome","treated")
   return(dat)
 }

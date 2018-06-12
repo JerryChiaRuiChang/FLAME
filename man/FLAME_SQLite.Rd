@@ -2,24 +2,31 @@
 % Please edit documentation in R/FLAME_SQLite.R
 \name{FLAME_SQLite}
 \alias{FLAME_SQLite}
-\title{FLAME: SQLite Database}
+\title{SQLite Database Implementation}
 \usage{
 FLAME_SQLite(db, data, holdout, num_covs, tradeoff)
 }
 \arguments{
-\item{db}{Name of the Database Connection}
+\item{db}{Name of the connection to temporary database  (\strong{must name the
+connection as db})}
 
-\item{data}{Data Frame}
+\item{data}{Input data}
 
-\item{holdout}{Holdout Training Data}
+\item{holdout}{Holdout training data}
 
-\item{num_covs}{Number of Covariates}
+\item{num_covs}{Number of covariates}
 
-\item{tradeoff}{Tradeoff Parameter to compute Match Quality}
+\item{tradeoff}{Tradeoff parameter to compute Match Quality}
 }
 \value{
-List of covariates matched in each iteration, CATE for matched units
+(1) List of covariates matched at each iteration (2) List of data
+ frame showing matched groups, conditional average treatment effect (CATE),
+ and the size of each matched group
 }
 \description{
-FLAME: SQLite Database
+\code{FLAME_SQLite} applies FLAME matching algorithm based on SQLite.
+\code{FLAME_SQLite} does not require external database installment. However,
+user should connect to a temporary database with command
+\code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
+\strong{db}.
 }

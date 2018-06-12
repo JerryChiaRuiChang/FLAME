@@ -2,24 +2,35 @@
 % Please edit documentation in R/FLAME_PostgreSQL.R
 \name{FLAME_PostgreSQL}
 \alias{FLAME_PostgreSQL}
-\title{FLAME: PostgreSQL Database}
+\title{PostgreSQL Database Implementation}
 \usage{
 FLAME_PostgreSQL(db, data, holdout, num_covs, tradeoff)
 }
 \arguments{
-\item{db}{Name of the Database Connection}
+\item{db}{Name of the database connection (\strong{must name the connection as
+db})}
 
-\item{data}{Data Frame}
+\item{data}{Input data}
 
-\item{holdout}{Holdout Training Data}
+\item{holdout}{Holdout training data}
 
-\item{num_covs}{Number of Covariates}
+\item{num_covs}{Number of covariates}
 
-\item{tradeoff}{Tradeoff Parameter to compute Match Quality}
+\item{tradeoff}{Tradeoff parameter to compute Match Quality}
 }
 \value{
-List of covariates matched in each iteration, CATE for matched units
+(1) List of covariates matched at each iteration (2) List of data
+ frame showing matched groups, conditional average treatment effect (CATE),
+ and the size of each matched group
 }
 \description{
-FLAME: PostgreSQL Database
+\code{FLAME_PostgreSQL} applies FLAME matching algorithm based on PostgreSQL.
+If your computer does not have PostgreSQL installed, please install from
+\href{https://www.postgresql.org/download/}{here}. For setup PostgreSQL
+server, please refer to
+\href{http://www.postgresqltutorial.com/connect-to-postgresql-database/}{tutorial}.
+User must connect to PostgreSQL server in R using the command
+\code{dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
+host='your_localhost', port='your_port', user='your_username', password =
+'your_password')} and name the connection as \strong{db}
 }
