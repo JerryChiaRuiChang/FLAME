@@ -9,7 +9,7 @@ The **FLAME** algorithm provides fast and large-scale matching approach to causa
 `FLAME` package requires input data to have specific format. First, input data should be either a **R Matrix** or a **R Data Frame**. Second, input data columns should contain (1) covariates (2) outcome variable (3) variable specifying a unit is treated or control (treated = 1, control = 0). Third, though there are no requirements for input data column names, the column order should follow *[covariates, outcome, treatment]*. Below is an example of input data with $n$ units and $m$ covariates.
 
 
-|       | **$x_1$** | **$x_2$** | **...** | **$x_{m-1}$** | **$x_m$** | **outcome** | **treated** |
+| units  | **$x_1$** | **$x_2$** | **...** | **$x_{m-1}$** | **$x_m$** | **outcome** | **treated** |
 | :---: | :---: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: |
 | **unit 1** | 0     | 1     | ... | 1         | 2     | 3.8     | 1       |
 | **unit 2** | 1     | 0     | ... | 1         | 0     | 1.36    | 0       |
