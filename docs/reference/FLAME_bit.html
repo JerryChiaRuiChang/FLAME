@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>FLAME: Bit Vector Method — FLAME_bit • FLAME</title>
+<title>Bit Vectors Implementation — FLAME_bit • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="FLAME: Bit Vector Method — FLAME_bit" />
+<meta property="og:title" content="Bit Vectors Implementation — FLAME_bit" />
 
-<meta property="og:description" content="FLAME: Bit Vector Method" />
+<meta property="og:description" content="FLAME_bit applies FLAME matching algorithm based on bit vectors implementation." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -104,14 +104,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>FLAME: Bit Vector Method</h1>
+    <h1>Bit Vectors Implementation</h1>
     
     <div class="hidden name"><code>FLAME_bit.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>FLAME: Bit Vector Method</p>
+    <p><code>FLAME_bit</code> applies FLAME matching algorithm based on bit vectors implementation.</p>
     
     </div>
 
@@ -122,8 +122,12 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>data</th>
+      <td><p>Input data</p></td>
+    </tr>
+    <tr>
       <th>holdout</th>
-      <td><p>Holdout Training Data</p></td>
+      <td><p>Holdout training data</p></td>
     </tr>
     <tr>
       <th>num_covs</th>
@@ -145,15 +149,12 @@
       <th>tradeoff</th>
       <td><p>Tradeoff parameter to compute Match Quality</p></td>
     </tr>
-    <tr>
-      <th>df</th>
-      <td><p>Data Frame</p></td>
-    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data Frame</p>
+    <p>(1) List of covariates matched at each iteration (2) list of data frame
+showing the size of matched group and its conditional average treatment effect (CATE)</p>
     
 
   </div>

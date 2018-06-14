@@ -2,13 +2,15 @@
 % Please edit documentation in R/FLAMEbit.R
 \name{FLAME_bit}
 \alias{FLAME_bit}
-\title{FLAME: Bit Vector Method}
+\title{Bit Vectors Implementation}
 \usage{
 FLAME_bit(data, holdout, num_covs, num_treated, num_control, covs_max_list,
   tradeoff)
 }
 \arguments{
-\item{holdout}{Holdout Training Data}
+\item{data}{Input data}
+
+\item{holdout}{Holdout training data}
 
 \item{num_covs}{Number of covariates}
 
@@ -19,12 +21,11 @@ FLAME_bit(data, holdout, num_covs, num_treated, num_control, covs_max_list,
 \item{covs_max_list}{List indicates each covariate is binary/ternary/...}
 
 \item{tradeoff}{Tradeoff parameter to compute Match Quality}
-
-\item{df}{Data Frame}
 }
 \value{
-Data Frame
+(1) List of covariates matched at each iteration (2) list of data frame
+showing the size of matched group and its conditional average treatment effect (CATE)
 }
 \description{
-FLAME: Bit Vector Method
+\code{FLAME_bit} applies FLAME matching algorithm based on bit vectors implementation.
 }

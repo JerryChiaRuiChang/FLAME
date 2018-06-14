@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate Data — Data_Generation • FLAME</title>
+<title>Generate Synthetic Data — Data_Generation • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,10 @@
 
 
 
-<meta property="og:title" content="Generate Data — Data_Generation" />
+<meta property="og:title" content="Generate Synthetic Data — Data_Generation" />
 
-<meta property="og:description" content="Generate Data" />
+<meta property="og:description" content="Data_Generation generates synthetic data, where each covariate is a
+binary variable." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -104,148 +105,50 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate Data</h1>
+    <h1>Generate Synthetic Data</h1>
     
     <div class="hidden name"><code>Data_Generation.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Generate Data</p>
+    <p><code>Data_Generation</code> generates synthetic data, where each covariate is a
+binary variable.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>Data_Generation</span>(<span class='no'>num_control</span>, <span class='no'>num_treated</span>, <span class='no'>num_cov_dense</span>, <span class='no'>num_covs_unimportant</span>)</pre>
+    <pre class="usage"><span class='fu'>Data_Generation</span>(<span class='no'>num_control</span>, <span class='no'>num_treated</span>, <span class='no'>num_cov_dense</span>, <span class='no'>num_cov_unimportant</span>, <span class='no'>U</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>num_control</th>
-      <td><p>Number of controlled samples</p></td>
+      <td><p>Number of samples in control group</p></td>
     </tr>
     <tr>
       <th>num_treated</th>
-      <td><p>Number of treated samples</p></td>
+      <td><p>Number of samples in treated group</p></td>
     </tr>
     <tr>
       <th>num_cov_dense</th>
-      <td><p>Number of covariates</p></td>
+      <td><p>Number of important covariates</p></td>
     </tr>
     <tr>
-      <th>num_covs_unimportant</th>
+      <th>num_cov_unimportant</th>
       <td><p>Number of unimportant covariates</p></td>
+    </tr>
+    <tr>
+      <th>U</th>
+      <td><p>Coefficient of non-linear term</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data Frame</p>
+    <p>Synthetic data</p>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>Data_Generation</span>(<span class='fl'>10</span>,<span class='fl'>10</span>,<span class='fl'>10</span>,<span class='fl'>0</span>)</div><div class='output co'>#&gt;    x0 x1 x2 x3 x4 x5 x6 x7 x8 x9     outcome treated
-#&gt; 1   1  0  0  0  0  1  0  0  0  0  -1.3104060       0
-#&gt; 2   1  1  1  0  0  0  0  0  1  1   8.0838653       0
-#&gt; 3   0  1  0  0  1  1  0  1  1  0  52.0322716       0
-#&gt; 4   1  0  0  1  1  0  1  1  0  1 -19.7885948       0
-#&gt; 5   0  0  0  0  1  1  1  1  1  1  18.8666351       0
-#&gt; 6   1  1  0  0  0  0  0  1  0  0  11.7790005       0
-#&gt; 7   0  0  1  1  0  0  1  0  1  0   0.0201899       0
-#&gt; 8   1  1  0  0  0  1  1  1  1  0  20.2477913       0
-#&gt; 9   0  1  0  1  1  0  0  1  1  1  20.5753337       0
-#&gt; 10  1  0  0  1  1  0  0  1  0  1  -9.9648742       0
-#&gt; 11  0  0  0  0  1  1  1  0  0  0  15.4573362       1
-#&gt; 12  0  0  0  1  1  1  0  0  1  1  16.3284602       1
-#&gt; 13  0  0  1  0  1  0  0  1  0  0  39.3309371       1
-#&gt; 14  0  1  1  1  1  0  0  0  1  0  46.1960898       1
-#&gt; 15  0  0  1  0  0  0  0  0  1  0  23.0363989       1
-#&gt; 16  1  1  1  1  1  0  0  0  1  1  30.6853513       1
-#&gt; 17  0  1  0  1  0  1  0  0  1  1  15.2915102       1
-#&gt; 18  0  0  0  1  1  1  0  1  0  0  29.1130347       1
-#&gt; 19  0  1  0  1  0  0  0  1  0  0  17.5556299       1
-#&gt; 20  0  0  1  1  0  0  1  0  0  1 -14.7341862       1</div><div class='input'><span class='fu'>Data_Generation</span>(<span class='fl'>20</span>,<span class='fl'>20</span>,<span class='fl'>10</span>,<span class='fl'>10</span>)</div><div class='output co'>#&gt;    x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19
-#&gt; 1   0  0  0  0  0  1  0  1  0  0   0   0   0   0   0   0   0   0   0   0
-#&gt; 2   1  1  1  0  0  1  1  0  1  0   0   0   0   0   0   0   1   0   0   0
-#&gt; 3   0  0  1  0  1  0  0  1  0  0   0   0   0   0   0   0   0   0   0   0
-#&gt; 4   0  1  1  0  1  1  0  0  0  1   0   0   0   0   0   0   0   0   0   0
-#&gt; 5   0  0  1  1  1  1  0  1  0  1   0   0   0   0   0   0   0   0   0   0
-#&gt; 6   0  0  0  0  0  0  0  1  1  0   0   0   0   1   0   0   0   0   0   0
-#&gt; 7   1  1  1  0  1  1  1  1  1  0   0   0   0   0   0   0   0   0   0   0
-#&gt; 8   0  1  0  0  1  1  1  0  1  0   0   0   0   0   1   0   0   0   0   0
-#&gt; 9   1  0  1  1  0  1  1  1  1  0   0   0   0   0   0   0   0   0   0   0
-#&gt; 10  0  0  1  1  0  1  0  0  1  0   0   0   0   0   0   1   0   0   0   0
-#&gt; 11  0  1  0  0  0  0  0  1  0  1   1   0   1   0   0   0   0   0   0   0
-#&gt; 12  1  1  0  1  0  1  1  0  0  0   0   0   0   0   0   0   0   0   1   0
-#&gt; 13  0  0  1  0  1  0  1  1  1  1   0   0   1   0   0   0   0   0   0   0
-#&gt; 14  0  0  1  1  0  0  1  1  1  0   0   0   0   0   0   0   1   0   0   0
-#&gt; 15  0  1  0  0  1  1  0  0  1  0   0   0   0   0   0   0   0   0   1   0
-#&gt; 16  0  0  1  1  0  0  1  0  1  1   0   1   0   0   0   0   0   0   1   0
-#&gt; 17  1  0  1  0  0  1  1  0  1  0   0   0   0   0   0   1   0   0   0   0
-#&gt; 18  1  0  0  1  0  0  0  1  0  1   0   0   0   0   0   0   0   0   0   0
-#&gt; 19  0  0  0  0  1  0  0  1  1  0   1   0   0   0   1   0   0   0   0   0
-#&gt; 20  1  0  0  1  0  1  1  0  0  0   0   0   0   0   0   0   0   0   0   0
-#&gt; 21  1  1  1  1  1  0  0  0  1  0   0   1   1   1   0   1   1   0   0   1
-#&gt; 22  1  1  1  0  1  1  0  0  1  1   1   1   1   1   1   1   1   0   1   1
-#&gt; 23  1  1  0  1  0  1  0  0  1  1   1   1   1   1   1   0   1   0   1   1
-#&gt; 24  0  0  0  1  0  1  0  1  1  0   0   1   1   1   1   1   1   1   1   1
-#&gt; 25  0  0  0  1  0  0  0  1  1  0   0   1   1   1   1   1   1   0   1   1
-#&gt; 26  1  0  0  0  0  0  1  0  0  0   1   1   0   1   1   1   1   1   1   0
-#&gt; 27  1  0  1  1  1  1  1  1  0  1   1   1   1   1   1   1   1   0   1   1
-#&gt; 28  0  0  0  1  0  1  1  1  0  0   1   0   1   1   1   1   1   1   1   1
-#&gt; 29  0  0  0  0  1  1  1  1  1  0   1   1   1   1   0   1   1   1   1   1
-#&gt; 30  0  0  0  1  0  0  1  0  1  1   1   1   1   1   1   1   1   0   1   1
-#&gt; 31  1  0  0  0  1  1  1  1  0  0   1   1   1   1   1   1   1   0   1   1
-#&gt; 32  0  1  1  1  1  1  1  1  0  0   1   1   1   1   0   1   1   1   1   1
-#&gt; 33  1  1  0  0  1  0  1  1  0  0   1   0   1   1   1   1   1   1   0   1
-#&gt; 34  1  1  1  0  0  1  0  0  0  1   1   0   1   1   0   1   1   1   1   1
-#&gt; 35  0  0  0  0  1  1  1  1  1  0   1   1   0   1   0   1   1   1   1   1
-#&gt; 36  1  1  0  0  1  1  1  0  1  1   1   1   1   0   1   1   1   1   1   1
-#&gt; 37  0  0  0  1  1  0  0  1  0  0   1   1   1   1   1   0   1   0   1   1
-#&gt; 38  1  0  0  1  1  1  0  0  1  1   1   1   1   1   1   1   1   1   1   1
-#&gt; 39  0  1  0  0  0  0  0  1  0  1   1   1   1   1   1   1   1   1   0   1
-#&gt; 40  0  1  0  1  1  1  1  0  1  0   1   0   0   1   1   1   1   1   1   1
-#&gt;        outcome treated
-#&gt; 1   -0.6609686       0
-#&gt; 2   -6.0043884       0
-#&gt; 3  -31.8989994       0
-#&gt; 4  -10.2984001       0
-#&gt; 5  -39.4488122       0
-#&gt; 6  -23.3301474       0
-#&gt; 7  -27.6965713       0
-#&gt; 8    3.9122396       0
-#&gt; 9  -35.1548005       0
-#&gt; 10 -20.4744155       0
-#&gt; 11 -11.4781739       0
-#&gt; 12   7.5163507       0
-#&gt; 13 -46.6267375       0
-#&gt; 14 -35.5849988       0
-#&gt; 15  -2.8093697       0
-#&gt; 16 -33.7041988       0
-#&gt; 17 -15.1385757       0
-#&gt; 18 -39.5374191       0
-#&gt; 19 -33.7757497       0
-#&gt; 20  -1.6178366       0
-#&gt; 21 -23.3234676       1
-#&gt; 22 -15.9892849       1
-#&gt; 23  -8.5972493       1
-#&gt; 24 -15.6482080       1
-#&gt; 25 -27.6699445       1
-#&gt; 26  -0.2509394       1
-#&gt; 27 -24.7250518       1
-#&gt; 28   3.2268068       1
-#&gt; 29  -9.2730620       1
-#&gt; 30 -17.2791884       1
-#&gt; 31  -6.2521266       1
-#&gt; 32   2.1891733       1
-#&gt; 33  -5.7595811       1
-#&gt; 34   0.6704638       1
-#&gt; 35  -9.2730620       1
-#&gt; 36  -2.2221033       1
-#&gt; 37 -25.1828036       1
-#&gt; 38 -28.1978353       1
-#&gt; 39  -7.2697715       1
-#&gt; 40   7.0179599       1</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -253,9 +156,7 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+          </ul>
 
   </div>
 </div>

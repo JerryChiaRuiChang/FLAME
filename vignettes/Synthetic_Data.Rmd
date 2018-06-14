@@ -37,14 +37,14 @@ $$
 & y = \sum_{i}\alpha_{i}x_{i} + T\sum_{i}\beta_{i}x_{i} + T \cdot U \sum_{i=1..5, \gamma = 1...5, \gamma > i} x_{i}x_{\gamma}
 \end{aligned}
 $$
-$T \in \{0,1\}$ indicates whether an unit is treated or in control. $U$ represents the number of unimportant covariates. $\alpha_{i} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, $\beta_{i} \sim N(1.5,0.15)$.   
+$T \in \{0,1\}$ indicates whether an unit is treated or in control. $\alpha_{i} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, $\beta_{i} \sim N(1.5,0.15)$, and $U$ represents the coefficient of non-linear term.
 
 \newline
   
-Apply `Data_Generation` function to generate 100 treated units and 100 control units with 10 important covariates and 5 unimportant covariates.  
+Apply `Data_Generation` function to generate 100 treated units and 100 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. 
 ```{r}
 data <- FLAME::Data_Generation(num_control = 100, num_treated = 100,
-                               num_cov_dense = 10, num_covs_unimportant = 5)
+                               num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
 
 holdout <- data #create holdout training data the same as synthetic data
 ```

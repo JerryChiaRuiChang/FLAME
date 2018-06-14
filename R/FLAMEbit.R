@@ -1,13 +1,16 @@
-#' FLAME: Bit Vector Method
+#' Bit Vectors Implementation
 #'
-#' @param df Data Frame
-#' @param holdout Holdout Training Data
+#' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors implementation.
+#'
+#' @param data Input data
+#' @param holdout Holdout training data
 #' @param num_covs Number of covariates
 #' @param num_treated Number of units in treated group
 #' @param num_control Number of units in control group
 #' @param covs_max_list List indicates each covariate is binary/ternary/...
 #' @param tradeoff Tradeoff parameter to compute Match Quality
-#' @return Data Frame
+#' @return (1) List of covariates matched at each iteration (2) list of data frame
+#' showing the size of matched group and its conditional average treatment effect (CATE)
 #' @import reticulate
 #' @export
 
