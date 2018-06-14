@@ -11,12 +11,16 @@ The **FLAME** algorithm provides fast and large-scale matching approach to causa
 
 |   | **$x_1$** | **$x_2$** | **...** | **$x_{m-1}$** | **$x_m$** | **outcome** | **treated** |
 | :---: | :---: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: |
-
 | **unit 1** | 0     | 1     | ... | 1         | 2     | 3.8     | 1       |
 | **unit 2** | 1     | 0     | ... | 1         | 0     | 1.36    | 0       |
 | **unit 3** | 0     | 1     | ... | 0         | 1     | -7.25   | 0       |
 | ... | ...     | ...     | ... | ...       | ...     | ...   | ...    |
 | **unit $n$** | 0     | 1     | ... | 1         | 0     | 20   | 1       |
+
+
+|A|B|C|AA|
+| --- | --- | --- | --- |
+|Q|W   |    E | RR     |
 
 Holdout training data should also follow the same format as input data.
 
