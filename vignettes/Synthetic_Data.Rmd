@@ -24,6 +24,7 @@ library(FLAME)
 library(RSQLite)
 library(RPostgreSQL)
 library(reticulate)
+library(latticeExtra)
 ```
 
 ## Create Synthetic Data
@@ -64,7 +65,7 @@ covs_max_list
 ```
 \newline
 
-Run `FLAME_bit` function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
+Run `FLAME_bit` function with the following command. The output contains two elements (1) list of matched covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
 ```{r, warning=FALSE}
 result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15,
                                num_treated = 100, num_control = 100, 
@@ -93,7 +94,7 @@ db <- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
 
 \newline
 
-Run `FLAME_PostgreSQL` function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
+Run `FLAME_PostgreSQL` function with the following command. The output contains two elements (1) list of matched covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
 ```{r}
 result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = holdout,
                                              num_covs = 15, tradeoff = 0.1)
@@ -159,4 +160,12 @@ CATE(result_SQLite,15) #SQLite
 CATE(result_bit,3) #bit vectors
 CATE(result_PostgreSQL,3) #PostgreSQL
 CATE(result_SQLite,3) #SQLite
+```
+
+## Visualize Results
+
+Apply `summary_plot` function to visualize results at each iteration, including the number of matched units, its conditional average treatment effect, and the covariate being dropped. Note that nothing is dropped in the beginning and is represented by NA in the covariate dropped axis (remember all covariates are used to find matched units in the beginning). 
+
+```{r}
+FLAME::summary_plot(result_bit)
 ```

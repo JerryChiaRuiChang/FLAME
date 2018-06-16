@@ -16,7 +16,8 @@ Depends:
 Imports:
     reticulate,
     RSQLite,
-    RPostgreSQL
+    RPostgreSQL,
+    latticeExtra
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

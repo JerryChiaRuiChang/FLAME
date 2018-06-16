@@ -22,8 +22,9 @@ Holdout training data should also follow the same format as input data.
 
 ### Other requirements
 
-1. For database systems implementation, please name database connection as **db**.
-2. 
+1. `FLAME` requires installation of python, specifically with at least python3 version. If you need to install or update python3, please refer to [here](https://www.python.org/downloads/).   
+
+2. For database systems implementation, please name database connection as **db**.
 
 
 
