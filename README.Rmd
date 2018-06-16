@@ -4,6 +4,8 @@
 
 The **FLAME** algorithm provides fast and large-scale matching approach to causal inference. **FLAME** creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently `FLAME` package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.
 
+For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)  
+
 ### Required data format
 
 `FLAME` package requires input data to have specific format. First, input data should be either a **R Matrix** or a **R Data Frame**. Second, input data columns should contain (1) covariates (2) outcome variable (3) variable specifying a unit is treated or control (treated = 1, control = 0). Third, though there are no requirements for input data column names, the column order should follow *[covariates, outcome, treatment]*. Below is an example of input data with $n$ units and $m$ covariates.
@@ -27,8 +29,6 @@ Holdout training data should also follow the same format as input data.
 2. For database systems implementation, please name database connection as **db**.
 
 
-
-For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)  
 
 
 ### Installation  

@@ -111,13 +111,13 @@
 holdout &lt;-<span class="st"> </span>data <span class="co">#create holdout training data the same as synthetic data</span></code></pre></div>
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data)
-<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15      outcome treated</span>
-<span class="co">#&gt; 1  1  0  1  0  0  1  1  1  0   0   1   1   1   1   0 -11.56812973       0</span>
-<span class="co">#&gt; 2  1  0  0  0  0  0  1  1  1   1   1   1   0   0   0  -0.27375681       0</span>
-<span class="co">#&gt; 3  1  0  0  1  1  0  1  0  1   1   1   0   0   0   1  -0.27972476       0</span>
-<span class="co">#&gt; 4  0  0  0  0  0  1  1  1  0   1   0   0   0   0   0 -16.31463813       0</span>
-<span class="co">#&gt; 5  1  0  1  1  0  0  0  0  0   0   0   1   0   1   0  -0.01909372       0</span>
-<span class="co">#&gt; 6  1  1  1  0  1  0  0  0  1   0   1   0   0   0   0  -4.59769659       0</span></code></pre></div>
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated</span>
+<span class="co">#&gt; 1  0  0  1  1  1  0  0  0  1   1   0   1   0   1   0  5.7897564       0</span>
+<span class="co">#&gt; 2  1  0  1  0  1  0  1  1  0   1   0   0   0   0   1 -0.9190625       0</span>
+<span class="co">#&gt; 3  1  1  0  0  0  1  1  0  0   0   0   1   1   1   0 -5.2161581       0</span>
+<span class="co">#&gt; 4  0  0  1  0  0  0  1  0  1   1   0   1   0   1   0 10.3333018       0</span>
+<span class="co">#&gt; 5  0  0  0  1  1  1  0  0  1   0   1   1   0   0   0 -0.8378582       0</span>
+<span class="co">#&gt; 6  1  1  0  0  1  1  1  1  1   1   0   1   0   0   0 -9.7817738       0</span></code></pre></div>
 </div>
 <div id="bit-vector-implementation" class="section level2">
 <h2 class="hasAnchor">
@@ -180,11 +180,11 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="
 <li>Compare Average Treatment Effect</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_bit) <span class="co">#bit vectors</span>
-<span class="co">#&gt; [1] 21.33116</span>
+<span class="co">#&gt; [1] 18.94438</span>
 <span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_PostgreSQL) <span class="co">#PostgreSQL</span>
-<span class="co">#&gt; [1] 21.33116</span>
+<span class="co">#&gt; [1] 18.94438</span>
 <span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_SQLite) <span class="co">#SQLite</span>
-<span class="co">#&gt; [1] 21.33116</span></code></pre></div>
+<span class="co">#&gt; [1] 18.94438</span></code></pre></div>
 
 <ol start="2" style="list-style-type: decimal">
 <li>Compare Conditional Average Treatment Effect with 15 covariates</li>

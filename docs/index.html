@@ -85,6 +85,7 @@
 <h3 class="hasAnchor">
 <a href="#overview-of-flame-algorithm" class="anchor"></a>Overview of FLAME algorithm</h3>
 <p>The <strong>FLAME</strong> algorithm provides fast and large-scale matching approach to causal inference. <strong>FLAME</strong> creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently <code>FLAME</code> package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.</p>
+<p>For more details about the FLAME algorithm, please refer to <a href="https://arxiv.org/pdf/1707.06315.pdf">FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference</a></p>
 </div>
 <div id="required-data-format" class="section level3">
 <h3 class="hasAnchor">
@@ -163,7 +164,6 @@
 <li><p><code>FLAME</code> requires installation of python, specifically with at least python3 version. If you need to install or update python3, please refer to <a href="https://www.python.org/downloads/">here</a>.</p></li>
 <li><p>For database systems implementation, please name database connection as <strong>db</strong>.</p></li>
 </ol>
-<p>For more details about the FLAME algorithm, please refer to <a href="https://arxiv.org/pdf/1707.06315.pdf">FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference</a></p>
 </div>
 <div id="installation" class="section level3">
 <h3 class="hasAnchor">
