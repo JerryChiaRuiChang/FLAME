@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">FLAME</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
       </span>
     </div>
 
@@ -63,7 +63,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/chiarui424/FLAME">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -84,13 +91,13 @@
 <div id="overview-of-flame-algorithm" class="section level3">
 <h3 class="hasAnchor">
 <a href="#overview-of-flame-algorithm" class="anchor"></a>Overview of FLAME algorithm</h3>
-<p>The <strong>FLAME</strong> algorithm provides fast and large-scale matching approach to causal inference. <strong>FLAME</strong> creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently <code>FLAME</code> package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.</p>
-<p>For more details about the FLAME algorithm, please refer to <a href="https://arxiv.org/pdf/1707.06315.pdf">FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference</a></p>
+<p>The <strong>FLAME</strong> algorithm provides fast and large-scale matching approach to causal inference. <strong>FLAME</strong> creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently the <code>FLAME</code> package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.</p>
+<p>For more details about the FLAME algorithm, please refer to the paper: <a href="https://arxiv.org/pdf/1707.06315.pdf">FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference</a></p>
 </div>
 <div id="required-data-format" class="section level3">
 <h3 class="hasAnchor">
 <a href="#required-data-format" class="anchor"></a>Required data format</h3>
-<p><code>FLAME</code> package requires input data to have specific format. First, input data should be either a <strong>R Matrix</strong> or a <strong>R Data Frame</strong>. Second, input data columns should contain (1) covariates (2) outcome variable (3) variable specifying a unit is treated or control (treated = 1, control = 0). Third, though there are no requirements for input data column names, the column order should follow <em>[covariates, outcome, treatment]</em>. Below is an example of input data with <span class="math inline">\(n\)</span> units and <span class="math inline">\(m\)</span> covariates.</p>
+<p><code>FLAME</code> package requires input data to have specific format. First, input data should be either a <strong>R Matrix</strong> or a <strong>R Data Frame</strong>. Second, all covariates in the input data should be categorical covariates. If there are continuous covariates, please consider regrouping. Third, input data columns should contain (1) covariates (2) outcome variable (3) variable specifying a unit is treated or control (treated = 1, control = 0). Lastly, though there are no requirements for input data column names, the column order should follow <em>[covariates, outcome, treated]</em>. Below is an example of input data with <span class="math inline">\(n\)</span> units and <span class="math inline">\(m\)</span> covariates.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="center"></th>
@@ -155,14 +162,14 @@
 </tr>
 </tbody>
 </table>
-<p>Holdout training data should also follow the same format as input data.</p>
+<p>Holdout training data should also follow the same format.</p>
 </div>
 <div id="other-requirements" class="section level3">
 <h3 class="hasAnchor">
 <a href="#other-requirements" class="anchor"></a>Other requirements</h3>
 <ol style="list-style-type: decimal">
-<li><p><code>FLAME</code> requires installation of python, specifically with at least python3 version. If you need to install or update python3, please refer to <a href="https://www.python.org/downloads/">here</a>.</p></li>
-<li><p>For database systems implementation, please name database connection as <strong>db</strong>.</p></li>
+<li><p><code>FLAME</code> requires installation of python, specifically with at least python3 version. If your computer system does not have python3, install from <a href="https://www.python.org/downloads/">here</a>.</p></li>
+<li><p>For database systems implementation, please name the database connection as <strong>db</strong>.</p></li>
 </ol>
 </div>
 <div id="installation" class="section level3">
@@ -183,20 +190,26 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Report a bug at <br><a href="NA">NA</a>
+<li>Browse source code at <br><a href="https://github.com/chiarui424/FLAME">https://​github.com/​chiarui424/​FLAME</a>
+</li>
+<li>Report a bug at <br><a href="https://github.com/chiarui424/FLAME/issues">https://​github.com/​chiarui424/​FLAME/​issues</a>
 </li>
 </ul>
 </div>
 <div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
-<li>What license is it under?</li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
 </ul>
 </div>
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Jerry Chia-Rui Chang <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Chia-Rui (Jerry) Chang <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Cynthia Rudin <br><small class="roles"> Author </small>  </li>
+<li>Alexander Volfovsky <br><small class="roles"> Author </small>  </li>
+<li>Sudeepa Roy <br><small class="roles"> Author </small>  </li>
+<li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
 
@@ -206,7 +219,7 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 
 
       <footer><div class="copyright">
-  <p>Developed by Jerry Chia-Rui Chang.</p>
+  <p>Developed by Chia-Rui (Jerry) Chang, Cynthia Rudin, Alexander Volfovsky, Sudeepa Roy.</p>
 </div>
 
 <div class="pkgdown">

@@ -1,16 +1,18 @@
-#' Bit Vectors Implementation
+#' bit vectors implementation
 #'
-#' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors implementation.
+#' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors
+#' implementation.
 #'
-#' @param data Input data
-#' @param holdout Holdout training data
-#' @param num_covs Number of covariates
-#' @param num_treated Number of units in treated group
-#' @param num_control Number of units in control group
-#' @param covs_max_list List indicates each covariate is binary/ternary/...
-#' @param tradeoff Tradeoff parameter to compute Match Quality
-#' @return (1) List of covariates matched at each iteration (2) list of data frame
-#' showing the size of matched group and its conditional average treatment effect (CATE)
+#' @param data input data
+#' @param holdout holdout training data
+#' @param num_covs number of covariates
+#' @param num_treated number of units in treated group
+#' @param num_control number of units in control group
+#' @param covs_max_list list indicates each covariate is binary/ternary/...
+#' @param tradeoff tradeoff parameter to compute Matching Quality
+#' @return (1) list of covariates used for matching at each iteration (2) list
+#'   of dataframe showing all matched units, size of each matched group, and its
+#'   conditional average treatment effect (CATE).
 #' @import reticulate
 #' @export
 
@@ -18,12 +20,16 @@ FLAME_bit <- function(data, holdout, num_covs, num_treated, num_control, covs_ma
 
   #Type Conversion and Preprocessing
 
-  data <- data.frame(data) #Convert input data to data.frame if not already converted
+  data <- data.frame(data) # Convert input data to data.frame if not already converted
   holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
   column <- colnames(data)
 
   data$matched <- 0 #add column matched to input data
   holdout$matched <- 0 #add column matched to holdout data
+
+  # Convert each covariate and treated into type integer
+  data[,c(1:num_covs,num_covs+2)] <- sapply(data[,c(1:num_covs,num_covs+2)],as.integer)
+  holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
 
   covs <- as.integer(seq(0,num_covs-1)) #Create list of covariate
   covs_max_list <- as.integer(covs_max_list) #Convert covs_max_list to integer array

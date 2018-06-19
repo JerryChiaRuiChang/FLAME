@@ -2,19 +2,20 @@
 % Please edit documentation in R/summary_plot.R
 \name{summary_plot}
 \alias{summary_plot}
-\title{Summary Plot}
+\title{visualize matching process}
 \usage{
 summary_plot(FLAME_object)
 }
 \arguments{
-\item{FLAME_object}{object returned by applying FLAME matching algorithm
-(\code{\link{FLAME_bit}} or \code{\link{FLAME_PostgreSQL}} or
+\item{FLAME_object}{object returned by applying the FLAME algorithm
+(\code{\link{FLAME_bit}}, \code{\link{FLAME_PostgreSQL}}, or
 \code{\link{FLAME_SQLite}})}
 }
 \value{
-summary plot of FLAME algorithm
+summary plot of the FLAME algorithm
 }
 \description{
-\code{summary_plot} visualizes the covariate dropped, number of matched units, and its
-conditional average treatment effect at each iteration.
+\code{summary_plot} visualizes matching process, summarizing
+each covariate dropped, number of matched units, and average
+CATE at each iteration.
 }

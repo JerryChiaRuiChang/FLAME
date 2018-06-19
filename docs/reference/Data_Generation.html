@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate Synthetic Data — Data_Generation • FLAME</title>
+<title>generate synthetic data — Data_Generation • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,7 +30,7 @@
 
 
 
-<meta property="og:title" content="Generate Synthetic Data — Data_Generation" />
+<meta property="og:title" content="generate synthetic data — Data_Generation" />
 
 <meta property="og:description" content="Data_Generation generates synthetic data, where each covariate is a
 binary variable." />
@@ -62,7 +62,7 @@ binary variable." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">FLAME</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
       </span>
     </div>
 
@@ -92,7 +92,12 @@ binary variable." />
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/chiarui424/FLAME">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -105,8 +110,8 @@ binary variable." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate Synthetic Data</h1>
-    
+    <h1>generate synthetic data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/Data_Generation.R'><code>R/Data_Generation.R</code></a></small>
     <div class="hidden name"><code>Data_Generation.Rd</code></div>
     </div>
 
@@ -124,29 +129,29 @@ binary variable.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>num_control</th>
-      <td><p>Number of samples in control group</p></td>
+      <td><p>number of samples in control group</p></td>
     </tr>
     <tr>
       <th>num_treated</th>
-      <td><p>Number of samples in treated group</p></td>
+      <td><p>number of samples in treated group</p></td>
     </tr>
     <tr>
       <th>num_cov_dense</th>
-      <td><p>Number of important covariates</p></td>
+      <td><p>number of important covariates</p></td>
     </tr>
     <tr>
       <th>num_cov_unimportant</th>
-      <td><p>Number of unimportant covariates</p></td>
+      <td><p>number of unimportant covariates</p></td>
     </tr>
     <tr>
       <th>U</th>
-      <td><p>Coefficient of non-linear term</p></td>
+      <td><p>coefficient of non-linear term</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Synthetic data</p>
+    <p>synthetic data</p>
     
 
   </div>
@@ -163,7 +168,7 @@ binary variable.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jerry Chia-Rui Chang.</p>
+  <p>Developed by Chia-Rui (Jerry) Chang, Cynthia Rudin, Alexander Volfovsky, Sudeepa Roy.</p>
 </div>
 
 <div class="pkgdown">

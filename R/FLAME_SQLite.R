@@ -64,6 +64,8 @@ get_CATE_SQLite <- function(cur_covs, level,column) {
   if (nrow(CATE) == 0) {
     CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
                      c(column[(cur_covs + 1)],"effect","size"))
+  } else {
+    colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
   }
 
   return(CATE)
@@ -155,21 +157,21 @@ match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff) {
   }
 }
 
-#'SQLite Database Implementation
+#'SQLite database implementation
 #'
-#'\code{FLAME_SQLite} applies FLAME matching algorithm based on SQLite.
+#'\code{FLAME_SQLite} applies the FLAME algorithm based on SQLite.
 #'\code{FLAME_SQLite} does not require external database installment. However,
 #'user should connect to a temporary database with command
 #'\code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
 #'\strong{db}.
 #'
 #'
-#'@param db Name of the connection to temporary database  (\strong{must name the
+#'@param db name of the connection to temporary database  (\strong{must name the
 #'  connection as db})
-#'@param data Input data
-#'@param holdout Holdout training data
-#'@param num_covs Number of covariates
-#'@param tradeoff Tradeoff parameter to compute Match Quality
+#'@param data input data
+#'@param holdout holdout training data
+#'@param num_covs number of covariates
+#'@param tradeoff tradeoff parameter to compute Matching Quality
 #'@return (1) List of covariates matched at each iteration (2) List of data
 #'  frame showing matched groups, conditional average treatment effect (CATE),
 #'  and the size of each matched group
@@ -182,6 +184,10 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
   data <- data.frame(data) #Convert input data to data.frame if not already converted
   holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
   column <- colnames(data)
+
+  # Convert each covariate and treated into type integer
+  data[,c(1:num_covs,num_covs+2)] <- sapply(data[,c(1:num_covs,num_covs+2)],as.integer)
+  holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
 
   #change input data and holdout training data column name
   colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")

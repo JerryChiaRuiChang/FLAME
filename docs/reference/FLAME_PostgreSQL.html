@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PostgreSQL Database Implementation — FLAME_PostgreSQL • FLAME</title>
+<title>PostgreSQL database implementation — FLAME_PostgreSQL • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,12 +30,12 @@
 
 
 
-<meta property="og:title" content="PostgreSQL Database Implementation — FLAME_PostgreSQL" />
+<meta property="og:title" content="PostgreSQL database implementation — FLAME_PostgreSQL" />
 
-<meta property="og:description" content="FLAME_PostgreSQL applies FLAME matching algorithm based on PostgreSQL.
-If your computer does not have PostgreSQL installed, please install from
-here. For setup PostgreSQL
-server, please refer to
+<meta property="og:description" content="FLAME_PostgreSQL applies the FLAME algorithm based on PostgreSQL. If
+your computer system does not have PostgreSQL installed, install from
+here. For setup of PostgreSQL
+server, please refer to this
 tutorial.
 User must connect to PostgreSQL server in R using the command
 dbConnect(dbDriver('PostgreSQL'), dbname=&quot;your_dbname&quot;,
@@ -69,7 +69,7 @@ host='your_localhost', port='your_port', user='your_username', password =
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">FLAME</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
       </span>
     </div>
 
@@ -99,7 +99,12 @@ host='your_localhost', port='your_port', user='your_username', password =
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/chiarui424/FLAME">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -112,17 +117,17 @@ host='your_localhost', port='your_port', user='your_username', password =
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>PostgreSQL Database Implementation</h1>
-    
+    <h1>PostgreSQL database implementation</h1>
+    <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/FLAME_PostgreSQL.R'><code>R/FLAME_PostgreSQL.R</code></a></small>
     <div class="hidden name"><code>FLAME_PostgreSQL.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>FLAME_PostgreSQL</code> applies FLAME matching algorithm based on PostgreSQL.
-If your computer does not have PostgreSQL installed, please install from
-<a href='https://www.postgresql.org/download/'>here</a>. For setup PostgreSQL
-server, please refer to
+    <p><code>FLAME_PostgreSQL</code> applies the FLAME algorithm based on PostgreSQL. If
+your computer system does not have PostgreSQL installed, install from
+<a href='https://www.postgresql.org/download/'>here</a>. For setup of PostgreSQL
+server, please refer to this
 <a href='http://www.postgresqltutorial.com/connect-to-postgresql-database/'>tutorial</a>.
 User must connect to PostgreSQL server in R using the command
 <code>dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
@@ -138,32 +143,32 @@ host='your_localhost', port='your_port', user='your_username', password =
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>db</th>
-      <td><p>Name of the database connection (<strong>must name the connection as
+      <td><p>name of the database connection (<strong>must name the connection as
 db</strong>)</p></td>
     </tr>
     <tr>
       <th>data</th>
-      <td><p>Input data</p></td>
+      <td><p>input data</p></td>
     </tr>
     <tr>
       <th>holdout</th>
-      <td><p>Holdout training data</p></td>
+      <td><p>holdout training data</p></td>
     </tr>
     <tr>
       <th>num_covs</th>
-      <td><p>Number of covariates</p></td>
+      <td><p>number of covariates</p></td>
     </tr>
     <tr>
       <th>tradeoff</th>
-      <td><p>Tradeoff parameter to compute Match Quality</p></td>
+      <td><p>tradeoff parameter to compute Matching Quality</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>(1) List of covariates matched at each iteration (2) List of data
- frame showing matched groups, conditional average treatment effect (CATE),
- and the size of each matched group</p>
+    <p>(1) list of covariates used for matching at each iteration (2) list of
+ dataframe showing all matched units, size of each matched group, and its
+ conditional average treatment effect (CATE).</p>
     
 
   </div>
@@ -180,7 +185,7 @@ db</strong>)</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jerry Chia-Rui Chang.</p>
+  <p>Developed by Chia-Rui (Jerry) Chang, Cynthia Rudin, Alexander Volfovsky, Sudeepa Roy.</p>
 </div>
 
 <div class="pkgdown">

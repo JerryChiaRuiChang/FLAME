@@ -2,23 +2,23 @@
 % Please edit documentation in R/Data_Generation.R
 \name{Data_Generation}
 \alias{Data_Generation}
-\title{Generate Synthetic Data}
+\title{generate synthetic data}
 \usage{
 Data_Generation(num_control, num_treated, num_cov_dense, num_cov_unimportant, U)
 }
 \arguments{
-\item{num_control}{Number of samples in control group}
+\item{num_control}{number of samples in control group}
 
-\item{num_treated}{Number of samples in treated group}
+\item{num_treated}{number of samples in treated group}
 
-\item{num_cov_dense}{Number of important covariates}
+\item{num_cov_dense}{number of important covariates}
 
-\item{num_cov_unimportant}{Number of unimportant covariates}
+\item{num_cov_unimportant}{number of unimportant covariates}
 
-\item{U}{Coefficient of non-linear term}
+\item{U}{coefficient of non-linear term}
 }
 \value{
-Synthetic data
+synthetic data
 }
 \description{
 \code{Data_Generation} generates synthetic data, where each covariate is a

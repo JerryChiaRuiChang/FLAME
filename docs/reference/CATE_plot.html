@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SQLite database implementation — FLAME_SQLite • FLAME</title>
+<title>summarize CATE of all matched groups by boxplot — CATE_plot • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,13 +30,10 @@
 
 
 
-<meta property="og:title" content="SQLite database implementation — FLAME_SQLite" />
+<meta property="og:title" content="summarize CATE of all matched groups by boxplot — CATE_plot" />
 
-<meta property="og:description" content="FLAME_SQLite applies the FLAME algorithm based on SQLite.
-FLAME_SQLite does not require external database installment. However,
-user should connect to a temporary database with command
-dbConnect(SQLite(),&quot;tempdb_name&quot;) and name the connection as
-db." />
+<meta property="og:description" content="Given number of covariates used for matching, CATE_plot visualizes
+CATE of all matched groups by boxplot" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,54 +110,38 @@ db." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>SQLite database implementation</h1>
-    <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/FLAME_SQLite.R'><code>R/FLAME_SQLite.R</code></a></small>
-    <div class="hidden name"><code>FLAME_SQLite.Rd</code></div>
+    <h1>summarize CATE of all matched groups by boxplot</h1>
+    <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/CATE_plot.R'><code>R/CATE_plot.R</code></a></small>
+    <div class="hidden name"><code>CATE_plot.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>FLAME_SQLite</code> applies the FLAME algorithm based on SQLite.
-<code>FLAME_SQLite</code> does not require external database installment. However,
-user should connect to a temporary database with command
-<code>dbConnect(SQLite(),"tempdb_name")</code> and name the connection as
-<strong>db</strong>.</p>
+    <p>Given number of covariates used for matching, <code>CATE_plot</code> visualizes
+CATE of all matched groups by boxplot</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>FLAME_SQLite</span>(<span class='no'>db</span>, <span class='no'>data</span>, <span class='no'>holdout</span>, <span class='no'>num_covs</span>, <span class='no'>tradeoff</span>)</pre>
+    <pre class="usage"><span class='fu'>CATE_plot</span>(<span class='no'>FLAME_object</span>, <span class='no'>num_covs</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>db</th>
-      <td><p>name of the connection to temporary database  (<strong>must name the
-connection as db</strong>)</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>input data</p></td>
-    </tr>
-    <tr>
-      <th>holdout</th>
-      <td><p>holdout training data</p></td>
+      <th>FLAME_object</th>
+      <td><p>object returned by applying the FLAME algorithm
+(<code><a href='FLAME_bit.html'>FLAME_bit</a></code> or <code><a href='FLAME_PostgreSQL.html'>FLAME_PostgreSQL</a></code> or
+<code><a href='FLAME_SQLite.html'>FLAME_SQLite</a></code>)</p></td>
     </tr>
     <tr>
       <th>num_covs</th>
-      <td><p>number of covariates</p></td>
-    </tr>
-    <tr>
-      <th>tradeoff</th>
-      <td><p>tradeoff parameter to compute Matching Quality</p></td>
+      <td><p>number of covariates used for matching</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>(1) List of covariates matched at each iteration (2) List of data
- frame showing matched groups, conditional average treatment effect (CATE),
- and the size of each matched group</p>
+    <p>boxplot</p>
     
 
   </div>

@@ -61,9 +61,12 @@ get_CATE_PostgreSQL <- function(cur_covs, level, column) {
     covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
 
   #If the data frame to be returned is empty, convert its column names to covariates at current iteration
+  #else, convert column names to back to its original column
   if (nrow(CATE) == 0) {
     CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
                      c(column[(cur_covs + 1)],"effect","size"))
+  } else {
+    colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
   }
 
   return(CATE)
@@ -166,27 +169,27 @@ match_quality_PostgreSQL <- function(c, holdout, num_covs, cur_covs,tradeoff) {
   }
 }
 
-#'PostgreSQL Database Implementation
+#'PostgreSQL database implementation
 #'
-#'\code{FLAME_PostgreSQL} applies FLAME matching algorithm based on PostgreSQL.
-#'If your computer does not have PostgreSQL installed, please install from
-#'\href{https://www.postgresql.org/download/}{here}. For setup PostgreSQL
-#'server, please refer to
+#'\code{FLAME_PostgreSQL} applies the FLAME algorithm based on PostgreSQL. If
+#'your computer system does not have PostgreSQL installed, install from
+#'\href{https://www.postgresql.org/download/}{here}. For setup of PostgreSQL
+#'server, please refer to this
 #'\href{http://www.postgresqltutorial.com/connect-to-postgresql-database/}{tutorial}.
 #'User must connect to PostgreSQL server in R using the command
 #'\code{dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
 #'host='your_localhost', port='your_port', user='your_username', password =
 #''your_password')} and name the connection as \strong{db}
 #'
-#'@param db Name of the database connection (\strong{must name the connection as
+#'@param db name of the database connection (\strong{must name the connection as
 #'  db})
-#'@param data Input data
-#'@param holdout Holdout training data
-#'@param num_covs Number of covariates
-#'@param tradeoff Tradeoff parameter to compute Match Quality
-#'@return (1) List of covariates matched at each iteration (2) List of data
-#'  frame showing matched groups, conditional average treatment effect (CATE),
-#'  and the size of each matched group
+#'@param data input data
+#'@param holdout holdout training data
+#'@param num_covs number of covariates
+#'@param tradeoff tradeoff parameter to compute Matching Quality
+#'@return (1) list of covariates used for matching at each iteration (2) list of
+#'  dataframe showing all matched units, size of each matched group, and its
+#'  conditional average treatment effect (CATE).
 #'@import reticulate
 #'@import RPostgreSQL
 #'@export
@@ -195,6 +198,10 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
   data <- data.frame(data) #Convert input data to data.frame if not already converted
   holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
+  # Convert each covariate and treated into type integer
+  data[,c(1:num_covs,num_covs+2)] <- sapply(data[,c(1:num_covs,num_covs+2)],as.integer)
+  holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
+
   column <- colnames(data)
 
   #change input data and holdout training data column name

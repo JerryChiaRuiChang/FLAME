@@ -1,14 +1,14 @@
-#' Generate Synthetic Data
+#' generate synthetic data
 #'
 #' \code{Data_Generation} generates synthetic data, where each covariate is a
 #' binary variable.
 #'
-#' @param num_control Number of samples in control group
-#' @param num_treated Number of samples in treated group
-#' @param num_cov_dense Number of important covariates
-#' @param num_cov_unimportant Number of unimportant covariates
-#' @param U Coefficient of non-linear term
-#' @return Synthetic data
+#' @param num_control number of samples in control group
+#' @param num_treated number of samples in treated group
+#' @param num_cov_dense number of important covariates
+#' @param num_cov_unimportant number of unimportant covariates
+#' @param U coefficient of non-linear term
+#' @return synthetic data
 #' @export
 
 Data_Generation <- function(num_control, num_treated, num_cov_dense, num_cov_unimportant, U) {
@@ -50,6 +50,10 @@ Data_Generation <- function(num_control, num_treated, num_cov_dense, num_cov_uni
   df2 = cbind(xt,xt2,yt,rep(1,num_treated))
   df = data.frame(rbind(df1,df2))
   colnames(df) <- c(paste("x",seq(1,num_cov_dense + num_cov_unimportant), sep = ""),"outcome","treated")
+
+  num_covs = num_cov_dense + num_cov_unimportant
+  # Convert each covariate and treated into type integer
+  df[,c(1:num_covs,num_covs+2)] <- sapply(df[,c(1:num_covs,num_covs+2)],as.integer)
 
   return(df)
 }

@@ -2,13 +2,13 @@
 
 ### Overview of FLAME algorithm 
 
-The **FLAME** algorithm provides fast and large-scale matching approach to causal inference. **FLAME** creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently `FLAME` package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.
+The **FLAME** algorithm provides fast and large-scale matching approach to causal inference. **FLAME** creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently the `FLAME` package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.
 
-For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)  
+For more details about the FLAME algorithm, please refer to the paper: [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference ](https://arxiv.org/pdf/1707.06315.pdf)
 
 ### Required data format
 
-`FLAME` package requires input data to have specific format. First, input data should be either a **R Matrix** or a **R Data Frame**. Second, input data columns should contain (1) covariates (2) outcome variable (3) variable specifying a unit is treated or control (treated = 1, control = 0). Third, though there are no requirements for input data column names, the column order should follow *[covariates, outcome, treatment]*. Below is an example of input data with $n$ units and $m$ covariates.
+`FLAME` package requires input data to have specific format. First, input data should be either a **R Matrix** or a **R Data Frame**. Second, all covariates in the input data should be categorical covariates. If there are continuous covariates, please consider regrouping. Third, input data columns should contain (1) covariates (2) outcome variable (3) variable specifying a unit is treated or control (treated = 1, control = 0). Lastly, though there are no requirements for input data column names, the column order should follow *[covariates, outcome, treated]*. Below is an example of input data with $n$ units and $m$ covariates.
 
 
 |              | **$x_1$** | **$x_2$** | **...** | **$x_{m-1}$** | **$x_m$** | **outcome** | **treated** |
@@ -20,16 +20,13 @@ For more details about the FLAME algorithm, please refer to [FLAME: A Fast Large
 | **unit $n$** | 0         | 1         | ...     | 1             | 0         | 20          | 1           |
 
 
-Holdout training data should also follow the same format as input data.
+Holdout training data should also follow the same format.
 
 ### Other requirements
 
-1. `FLAME` requires installation of python, specifically with at least python3 version. If you need to install or update python3, please refer to [here](https://www.python.org/downloads/).   
+1. `FLAME` requires installation of python, specifically with at least python3 version. If your computer system does not have python3, install from [here](https://www.python.org/downloads/).   
 
-2. For database systems implementation, please name database connection as **db**.
-
-
-
+2. For database systems implementation, please name the database connection as **db**.
 
 ### Installation  
 

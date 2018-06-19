@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Bit Vectors Implementation — FLAME_bit • FLAME</title>
+<title>Bit vectors implementation — FLAME_bit • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,10 @@
 
 
 
-<meta property="og:title" content="Bit Vectors Implementation — FLAME_bit" />
+<meta property="og:title" content="Bit vectors implementation — FLAME_bit" />
 
-<meta property="og:description" content="FLAME_bit applies FLAME matching algorithm based on bit vectors implementation." />
+<meta property="og:description" content="FLAME_bit applies FLAME matching algorithm based on bit vectors
+implementation." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -61,7 +62,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">FLAME</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
       </span>
     </div>
 
@@ -91,7 +92,12 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/chiarui424/FLAME">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -104,14 +110,15 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Bit Vectors Implementation</h1>
-    
+    <h1>Bit vectors implementation</h1>
+    <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/FLAMEbit.R'><code>R/FLAMEbit.R</code></a></small>
     <div class="hidden name"><code>FLAME_bit.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>FLAME_bit</code> applies FLAME matching algorithm based on bit vectors implementation.</p>
+    <p><code>FLAME_bit</code> applies FLAME matching algorithm based on bit vectors
+implementation.</p>
     
     </div>
 
@@ -123,38 +130,39 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>Input data</p></td>
+      <td><p>input data</p></td>
     </tr>
     <tr>
       <th>holdout</th>
-      <td><p>Holdout training data</p></td>
+      <td><p>holdout training data</p></td>
     </tr>
     <tr>
       <th>num_covs</th>
-      <td><p>Number of covariates</p></td>
+      <td><p>number of covariates</p></td>
     </tr>
     <tr>
       <th>num_treated</th>
-      <td><p>Number of units in treated group</p></td>
+      <td><p>number of units in treated group</p></td>
     </tr>
     <tr>
       <th>num_control</th>
-      <td><p>Number of units in control group</p></td>
+      <td><p>number of units in control group</p></td>
     </tr>
     <tr>
       <th>covs_max_list</th>
-      <td><p>List indicates each covariate is binary/ternary/...</p></td>
+      <td><p>list indicates each covariate is binary/ternary/...</p></td>
     </tr>
     <tr>
       <th>tradeoff</th>
-      <td><p>Tradeoff parameter to compute Match Quality</p></td>
+      <td><p>tradeoff parameter to compute Matching Quality</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>(1) List of covariates matched at each iteration (2) list of data frame
-showing the size of matched group and its conditional average treatment effect (CATE)</p>
+    <p>(1) list of covariates used for matching at each iteration (2) list
+  of dataframe showing all matched units, size of each matched group, and its
+  conditional average treatment effect (CATE).</p>
     
 
   </div>
@@ -171,7 +179,7 @@ showing the size of matched group and its conditional average treatment effect (
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jerry Chia-Rui Chang.</p>
+  <p>Developed by Chia-Rui (Jerry) Chang, Cynthia Rudin, Alexander Volfovsky, Sudeepa Roy.</p>
 </div>
 
 <div class="pkgdown">

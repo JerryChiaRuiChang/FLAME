@@ -1,9 +1,17 @@
 Package: FLAME
 Type: Package
 Title: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference
-Version: 0.1.0
-Authors@R: person("Jerry Chia-Rui", "Chang", role=c("aut", "cre"),
-    email = "chiarui424@gmail.com")
+Version: 0.0.0.9000
+Authors@R: c(person("Chia-Rui (Jerry)", "Chang", role=c("aut", "cre"),
+    email = "chiarui424@gmail.com"),
+    person("Cynthia", "Rudin", role = c("aut"),
+    email = "cynthia@cs.duke.edu"),
+    person("Alexander", "Volfovsky", role = c("aut"),
+    email = "alexander.volfovsky@duke.edu"),
+    person("Sudeepa", "Roy", role = c("aut"),
+    email = "sudeepa@cs.duke.edu"),
+    person("Tianyu", "Wang", role = c("ctb"),
+    email = "tianyu@cs.duke.edu"))
 Description: The FLAME algorithm provides fast and large-scale matching approach to causal inference. 
     FLAME creates matches that include as many covariates as possible, and iteratively drops covariates 
     that are successively less useful for predicting outcomes based on matching quality. Currently `FLAME` 
@@ -11,6 +19,9 @@ Description: The FLAME algorithm provides fast and large-scale matching approach
     database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits 
     in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database 
     systems should be applied.
+Maintainer: Chia-Rui (Jerry) Chang <chiarui424@gmail.com>
+URL: https://github.com/chiarui424/FLAME
+BugReports: https://github.com/chiarui424/FLAME/issues
 Depends:
     R (>= 3.3.1)
 Imports:
@@ -18,7 +29,7 @@ Imports:
     RSQLite,
     RPostgreSQL,
     latticeExtra
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1.9000

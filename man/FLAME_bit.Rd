@@ -2,30 +2,32 @@
 % Please edit documentation in R/FLAMEbit.R
 \name{FLAME_bit}
 \alias{FLAME_bit}
-\title{Bit Vectors Implementation}
+\title{bit vectors implementation}
 \usage{
 FLAME_bit(data, holdout, num_covs, num_treated, num_control, covs_max_list,
   tradeoff)
 }
 \arguments{
-\item{data}{Input data}
+\item{data}{input data}
 
-\item{holdout}{Holdout training data}
+\item{holdout}{holdout training data}
 
-\item{num_covs}{Number of covariates}
+\item{num_covs}{number of covariates}
 
-\item{num_treated}{Number of units in treated group}
+\item{num_treated}{number of units in treated group}
 
-\item{num_control}{Number of units in control group}
+\item{num_control}{number of units in control group}
 
-\item{covs_max_list}{List indicates each covariate is binary/ternary/...}
+\item{covs_max_list}{list indicates each covariate is binary/ternary/...}
 
-\item{tradeoff}{Tradeoff parameter to compute Match Quality}
+\item{tradeoff}{tradeoff parameter to compute Matching Quality}
 }
 \value{
-(1) List of covariates matched at each iteration (2) list of data frame
-showing the size of matched group and its conditional average treatment effect (CATE)
+(1) list of covariates used for matching at each iteration (2) list
+  of dataframe showing all matched units, size of each matched group, and its
+  conditional average treatment effect (CATE).
 }
 \description{
-\code{FLAME_bit} applies FLAME matching algorithm based on bit vectors implementation.
+\code{FLAME_bit} applies FLAME matching algorithm based on bit vectors
+implementation.
 }

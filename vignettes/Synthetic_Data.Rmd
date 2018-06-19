@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 ```
 
 
-## Load Required Package
+## Load required packages
 
-```{r}
+```{r package, results="hide", warning=FALSE}
 library(FLAME)
 library(RSQLite)
 library(RPostgreSQL)
@@ -27,7 +27,7 @@ library(reticulate)
 library(latticeExtra)
 ```
 
-## Create Synthetic Data
+## Generate synthetic data
 
 `Data_Generation` function creates simulated data with specific characteristics and known treatment effects. The following function is used to generate synthetic data.  
 
@@ -38,16 +38,15 @@ $$
 & y = \sum_{i}\alpha_{i}x_{i} + T\sum_{i}\beta_{i}x_{i} + T \cdot U \sum_{i=1..5, \gamma = 1...5, \gamma > i} x_{i}x_{\gamma}
 \end{aligned}
 $$
-$T \in \{0,1\}$ indicates whether an unit is treated or in control. $\alpha_{i} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, $\beta_{i} \sim N(1.5,0.15)$, and $U$ represents the coefficient of non-linear term.
+$T \in \{0,1\}$ indicates whether an unit is treated or in control. $\alpha_{i} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, $\beta_{i} \sim N(1.5,0.15)$, and $U$ represents the coefficient of non-linear term.  
 
 \newline
   
-Apply `Data_Generation` function to generate 100 treated units and 100 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. 
+Apply `Data_Generation` function to generate 100 treated units and 100 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data.  
 ```{r}
 data <- FLAME::Data_Generation(num_control = 100, num_treated = 100,
                                num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
-
-holdout <- data #create holdout training data the same as synthetic data
+holdout <- data 
 ```
 
 \newline
@@ -56,33 +55,33 @@ holdout <- data #create holdout training data the same as synthetic data
 head(data)
 ```
 
-## Bit Vector Implementation  
+## Bit vectors implementation
 
 One of the input requirement for FLAME_bit implementation is a list specifying the number of level each covariate has. For example, the data generation function generates 15 covariates, where each covariate has 2 level (binary variable). Therefore, the input requirement for *covs_max_list* list should be as below.  
 ```{r}
 covs_max_list = rep(2,15)
 covs_max_list
 ```
-\newline
+\newline  
 
-Run `FLAME_bit` function with the following command. The output contains two elements (1) list of matched covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
+Run `FLAME_bit` function with the following command. The output contains two elements (1) list of covariates used for matching at each iteration (2) list of dataframe showing all matched units, size of each matched group, and its conditional average treatment effect (CATE).  
 ```{r, warning=FALSE}
 result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15,
                                num_treated = 100, num_control = 100, 
                                covs_max_list = covs_max_list, tradeoff = 0.1)
 ```
 
-## Database Systems Implementation 
+## Database systems implementation 
 
-For database systems implementation, `FLAME` provides two versions - SQLite and PostgreSQL. PostgreSQL version requires installmenet of external database system and has faster implementation. SQLite version does not require external database system but its implementation is slower than PostgreSQL version. 
+For database systems implementation, `FLAME` package provides two versions - SQLite and PostgreSQL. PostgreSQL version requires installmenet of external database system and has faster implementation. SQLite version does not require external database system but its implementation is slower than the PostgreSQL version.  
 
-### PostgreSQL Version
+### PostgreSQL
 
-If your computer does not have PostgreSQL installed, please install from [here](https://www.postgresql.org/download/). For connecting and setup of PostgreSQL server, please refer to [tutorial](http://www.postgresqltutorial.com/connect-to-postgresql-database/).  
+If your computer does not have PostgreSQL installed, install from [here](https://www.postgresql.org/download/). For connecting and setup of PostgreSQL server, please refer to [tutorial](http://www.postgresqltutorial.com/connect-to-postgresql-database/).  
 
 \newline
 
-Connect to PostgreSQL in R. Note that it is required to name the connection as **db**. 
+Connect to PostgreSQL in R and run `FLAME_PostgreSQL` function with the following command. Note that it is required to name the connection as **db**, and disconnect it once done. The output contains two elements (1) list of covariates used for matching at each iteration (2) list of dataframe showing all matched units, size of each matched group, and its conditional average treatment effect (CATE).  
 ```{r}
 #Connect to PostgreSQL
 drv <- dbDriver('PostgreSQL')
@@ -90,53 +89,37 @@ drv <- dbDriver('PostgreSQL')
 #Name the connection as db
 db <- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
              port=5432, password = 'new_password')
-```
 
-\newline
-
-Run `FLAME_PostgreSQL` function with the following command. The output contains two elements (1) list of matched covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
-```{r}
+#Run FLAME_PostgreSQL 
 result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = holdout,
                                              num_covs = 15, tradeoff = 0.1)
-```
 
-\newline
-
-Disconnect PostgreSQL  
-```{r, results="hide"}
+#Disconnect from db
 dbDisconnect(db)
 ```
 
-### SQLite Version
 
-Connect to a temporary database in R. Note that it is required to name the connection as **db**. 
+### SQLite
+
+Connect to a temporary database in R and run `FLAME_SQLite` function with the following command. Note that it is required to name the connection as **db**. The output contains two elements (1) list of covariates used for matching at each iteration (2) list of dataframe showing all matched units, size of each matched group, and its conditional average treatment effect (CATE).  
 ```{r}
 #Name the connection as conn
 db <- dbConnect(SQLite(),"tempdb") 
-```
 
-\newline
-
-Run `FLAME_SQLite` function with the following command. The output contains two elements (1) list of matching covariates at each iteration (2) list of dataframe showing the size of matched group and its conditional average treatment effect (CATE)  
-```{r}
+#Run FLAME_SQLite
 result_SQLite <- FLAME::FLAME_SQLite(db = db, data = data, holdout = holdout,
                                              num_covs = 15, tradeoff = 0.1)
-```
-
-\newline
-
-Disconnect SQLite  
-```{r}
+#Disconnect from db
 dbDisconnect(db)
 ```
 
-## Compare Result
+## Results
 
-We compare the results of bit vector, PostgreSQL, and SQLite implementations. 
+We compare the results of bit vectors, PostgreSQL, and SQLite implementations, where all three yield the same outcomes.  
 
 \newline 
 
-1. Compare Average Treatment Effect
+1. Compare average treatment effect (ATE) by applying `ATE` function.
 ```{r}
 ATE(result_bit) #bit vectors
 ATE(result_PostgreSQL) #PostgreSQL
@@ -145,26 +128,35 @@ ATE(result_SQLite) #SQLite
 
 \newline 
 
-2. Compare Conditional Average Treatment Effect with 15 covariates
+2. Compare conditional average treatment effect (CATE) when 8 covariates are used for matching.
 
+\newline
+
+a. Apply `CATE` function to see details of all matched units, including the size and CATE of each matched group. Note that if no units are matched, `CATE` will return nothing.  
 ```{r}
-CATE(result_bit,15) #bit vectors
-CATE(result_PostgreSQL,15) #PostgreSQL
-CATE(result_SQLite,15) #SQLite
+CATE(result_bit,8) #bit vectors
+CATE(result_PostgreSQL,8) #PostgreSQL
+CATE(result_SQLite,8) #SQLite
 ```
+
+\newline  
+
+b. Apply `CATE_plot` to visualize CATE of all matched groups in boxplot.
+```{r}
+CATE_plot(result_bit,8)
+```
+
 
 \newline 
 
-3. Compare Conditional Average Treatment Effect with 3 covariates
+c. Apply `CATE_AVG` to compute average CATE. Note that average CATE is the weighted average of all matched groups.  
 ```{r}
-CATE(result_bit,3) #bit vectors
-CATE(result_PostgreSQL,3) #PostgreSQL
-CATE(result_SQLite,3) #SQLite
+CATE_AVG(result_bit,8) 
 ```
 
-## Visualize Results
+## Summary Visualization  
 
-Apply `summary_plot` function to visualize results at each iteration, including the number of matched units, its conditional average treatment effect, and the covariate being dropped. Note that nothing is dropped in the beginning and is represented by NA in the covariate dropped axis (remember all covariates are used to find matched units in the beginning). 
+Apply `summary_plot` function to visualize matching process, including covariate dropped, total number of matched units, and average CATE at each iteration. Note that nothing is dropped in the beginning since all covariates are used for matching. It is represented by NA in the covariate dropped axis.  
 
 ```{r}
 FLAME::summary_plot(result_bit)
