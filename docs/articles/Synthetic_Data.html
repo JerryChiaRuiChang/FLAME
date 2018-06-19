@@ -118,12 +118,12 @@ holdout &lt;-<span class="st"> </span>data </code></pre></div>
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data)
 <span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated</span>
-<span class="co">#&gt; 1  1  1  0  0  0  1  0  0  0   1   0   0   1   0   0 -12.202454       0</span>
-<span class="co">#&gt; 2  1  1  0  1  0  0  0  1  0   1   1   1   0   0   0 -10.236941       0</span>
-<span class="co">#&gt; 3  1  0  1  0  0  1  0  1  1   0   0   0   0   0   0   2.141028       0</span>
-<span class="co">#&gt; 4  1  1  0  0  0  1  0  0  1   0   0   0   1   1   1   1.705498       0</span>
-<span class="co">#&gt; 5  0  0  1  1  0  0  0  1  1   1   1   0   1   1   1  -3.679556       0</span>
-<span class="co">#&gt; 6  1  0  0  0  1  0  0  1  0   1   1   0   0   1   1 -17.694922       0</span></code></pre></div>
+<span class="co">#&gt; 1  0  0  0  0  0  0  1  1  1   1   0   0   1   1   1  -8.366582       0</span>
+<span class="co">#&gt; 2  0  0  0  1  0  1  0  1  1   0   1   0   0   1   0   3.238260       0</span>
+<span class="co">#&gt; 3  1  0  0  1  1  1  0  1  0   1   1   1   0   1   0 -13.317859       0</span>
+<span class="co">#&gt; 4  1  1  1  1  1  1  0  1  1   0   1   1   0   0   1   6.610069       0</span>
+<span class="co">#&gt; 5  0  0  0  1  1  0  0  0  1   1   0   0   1   1   0 -18.951211       0</span>
+<span class="co">#&gt; 6  0  0  1  1  0  0  0  1  1   0   0   1   0   1   0  15.095062       0</span></code></pre></div>
 </div>
 <div id="bit-vectors-implementation" class="section level2">
 <h2 class="hasAnchor">
@@ -186,11 +186,11 @@ result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span
 <li>Compare average treatment effect (ATE) by applying <code>ATE</code> function.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_bit) <span class="co">#bit vectors</span>
-<span class="co">#&gt; [1] 19.69388</span>
+<span class="co">#&gt; [1] 18.30795</span>
 <span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_PostgreSQL) <span class="co">#PostgreSQL</span>
-<span class="co">#&gt; [1] 19.69388</span>
+<span class="co">#&gt; [1] 18.30795</span>
 <span class="kw"><a href="../reference/ATE.html">ATE</a></span>(result_SQLite) <span class="co">#SQLite</span>
-<span class="co">#&gt; [1] 19.69388</span></code></pre></div>
+<span class="co">#&gt; [1] 18.30795</span></code></pre></div>
 
 <ol start="2" style="list-style-type: decimal">
 <li>Compare conditional average treatment effect (CATE) when 8 covariates are used for matching.</li>
@@ -200,43 +200,49 @@ result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_bit,<span class="dv">8</span>) <span class="co">#bit vectors</span>
 <span class="co">#&gt;    x1 x2 x3 x4 x5 x7 x9 x10    effect size</span>
-<span class="co">#&gt; 1   0  0  0  0  0  0  0   0 -2.694958    2</span>
-<span class="co">#&gt; 2   0  0  1  1  1  0  0   0 16.804994    2</span>
-<span class="co">#&gt; 3   0  1  0  0  1  0  0   0 15.071881    2</span>
-<span class="co">#&gt; 4   0  1  0  1  1  1  1   0 24.503315    2</span>
-<span class="co">#&gt; 5   0  1  1  0  1  0  1   0 18.497141    2</span>
-<span class="co">#&gt; 6   0  1  1  1  1  0  0   1 41.590189    2</span>
-<span class="co">#&gt; 7   1  0  0  0  0  0  0   0  3.231876    2</span>
-<span class="co">#&gt; 8   1  0  1  1  0  0  0   0 23.048706    2</span>
-<span class="co">#&gt; 9   1  1  0  0  0  0  0   0  6.602746    3</span>
-<span class="co">#&gt; 10  1  1  0  0  0  0  1   0  6.754269    2</span>
-<span class="co">#&gt; 11  1  1  1  1  1  0  0   1 66.053535    2</span>
+<span class="co">#&gt; 1   0  0  0  0  0  1  1   0  8.531722    3</span>
+<span class="co">#&gt; 2   0  0  0  0  1  1  0   1  1.749998    2</span>
+<span class="co">#&gt; 3   0  0  0  1  0  0  1   0  1.495456    3</span>
+<span class="co">#&gt; 4   0  0  0  1  0  1  1   0  8.733539    2</span>
+<span class="co">#&gt; 5   0  0  1  0  1  0  1   1  8.474515    3</span>
+<span class="co">#&gt; 6   0  0  1  1  0  0  0   1 14.137201    2</span>
+<span class="co">#&gt; 7   0  1  0  1  1  0  0   0 16.902508    2</span>
+<span class="co">#&gt; 8   1  0  0  1  0  1  0   0  6.512445    2</span>
+<span class="co">#&gt; 9   1  0  1  0  0  0  0   0  5.302122    3</span>
+<span class="co">#&gt; 10  1  1  0  0  0  1  0   0  7.876504    2</span>
+<span class="co">#&gt; 11  1  1  0  1  1  0  0   0 40.408271    2</span>
+<span class="co">#&gt; 12  1  1  1  1  0  0  0   1 43.345550    2</span>
+<span class="co">#&gt; 13  1  1  1  1  1  0  1   1 66.351172    2</span>
 <span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_PostgreSQL,<span class="dv">8</span>) <span class="co">#PostgreSQL</span>
 <span class="co">#&gt;    x1 x2 x3 x4 x5 x7 x9 x10    effect size</span>
-<span class="co">#&gt; 1   0  0  0  0  0  0  0   0 -2.694958    2</span>
-<span class="co">#&gt; 2   0  0  1  1  1  0  0   0 16.804994    2</span>
-<span class="co">#&gt; 3   0  1  0  0  1  0  0   0 15.071881    2</span>
-<span class="co">#&gt; 4   0  1  0  1  1  1  1   0 24.503315    2</span>
-<span class="co">#&gt; 5   0  1  1  0  1  0  1   0 18.497141    2</span>
-<span class="co">#&gt; 6   0  1  1  1  1  0  0   1 41.590189    2</span>
-<span class="co">#&gt; 7   1  0  0  0  0  0  0   0  3.231876    2</span>
-<span class="co">#&gt; 8   1  0  1  1  0  0  0   0 23.048706    2</span>
-<span class="co">#&gt; 9   1  1  0  0  0  0  0   0  6.602746    3</span>
-<span class="co">#&gt; 10  1  1  0  0  0  0  1   0  6.754269    2</span>
-<span class="co">#&gt; 11  1  1  1  1  1  0  0   1 66.053535    2</span>
+<span class="co">#&gt; 1   0  0  0  0  0  1  1   0  8.531722    3</span>
+<span class="co">#&gt; 2   0  0  0  0  1  1  0   1  1.749998    2</span>
+<span class="co">#&gt; 3   0  0  0  1  0  0  1   0  1.495456    3</span>
+<span class="co">#&gt; 4   0  0  0  1  0  1  1   0  8.733539    2</span>
+<span class="co">#&gt; 5   0  0  1  0  1  0  1   1  8.474515    3</span>
+<span class="co">#&gt; 6   0  0  1  1  0  0  0   1 14.137201    2</span>
+<span class="co">#&gt; 7   0  1  0  1  1  0  0   0 16.902508    2</span>
+<span class="co">#&gt; 8   1  0  0  1  0  1  0   0  6.512445    2</span>
+<span class="co">#&gt; 9   1  0  1  0  0  0  0   0  5.302122    3</span>
+<span class="co">#&gt; 10  1  1  0  0  0  1  0   0  7.876504    2</span>
+<span class="co">#&gt; 11  1  1  0  1  1  0  0   0 40.408271    2</span>
+<span class="co">#&gt; 12  1  1  1  1  0  0  0   1 43.345550    2</span>
+<span class="co">#&gt; 13  1  1  1  1  1  0  1   1 66.351172    2</span>
 <span class="kw"><a href="../reference/CATE.html">CATE</a></span>(result_SQLite,<span class="dv">8</span>) <span class="co">#SQLite</span>
 <span class="co">#&gt;    x1 x2 x3 x4 x5 x7 x9 x10    effect size</span>
-<span class="co">#&gt; 1   0  0  0  0  0  0  0   0 -2.694958    2</span>
-<span class="co">#&gt; 2   0  0  1  1  1  0  0   0 16.804994    2</span>
-<span class="co">#&gt; 3   0  1  0  0  1  0  0   0 15.071881    2</span>
-<span class="co">#&gt; 4   0  1  0  1  1  1  1   0 24.503315    2</span>
-<span class="co">#&gt; 5   0  1  1  0  1  0  1   0 18.497141    2</span>
-<span class="co">#&gt; 6   0  1  1  1  1  0  0   1 41.590189    2</span>
-<span class="co">#&gt; 7   1  0  0  0  0  0  0   0  3.231876    2</span>
-<span class="co">#&gt; 8   1  0  1  1  0  0  0   0 23.048706    2</span>
-<span class="co">#&gt; 9   1  1  0  0  0  0  0   0  6.602746    3</span>
-<span class="co">#&gt; 10  1  1  0  0  0  0  1   0  6.754269    2</span>
-<span class="co">#&gt; 11  1  1  1  1  1  0  0   1 66.053535    2</span></code></pre></div>
+<span class="co">#&gt; 1   0  0  0  0  0  1  1   0  8.531722    3</span>
+<span class="co">#&gt; 2   0  0  0  0  1  1  0   1  1.749998    2</span>
+<span class="co">#&gt; 3   0  0  0  1  0  0  1   0  1.495456    3</span>
+<span class="co">#&gt; 4   0  0  0  1  0  1  1   0  8.733539    2</span>
+<span class="co">#&gt; 5   0  0  1  0  1  0  1   1  8.474515    3</span>
+<span class="co">#&gt; 6   0  0  1  1  0  0  0   1 14.137201    2</span>
+<span class="co">#&gt; 7   0  1  0  1  1  0  0   0 16.902508    2</span>
+<span class="co">#&gt; 8   1  0  0  1  0  1  0   0  6.512445    2</span>
+<span class="co">#&gt; 9   1  0  1  0  0  0  0   0  5.302122    3</span>
+<span class="co">#&gt; 10  1  1  0  0  0  1  0   0  7.876504    2</span>
+<span class="co">#&gt; 11  1  1  0  1  1  0  0   0 40.408271    2</span>
+<span class="co">#&gt; 12  1  1  1  1  0  0  0   1 43.345550    2</span>
+<span class="co">#&gt; 13  1  1  1  1  1  0  1   1 66.351172    2</span></code></pre></div>
 
 <ol start="2" style="list-style-type: lower-alpha">
 <li>Apply <code>CATE_plot</code> to visualize CATE of all matched groups in boxplot.</li>
@@ -248,7 +254,7 @@ result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span
 <li>Apply <code>CATE_AVG</code> to compute average CATE. Note that average CATE is the weighted average of all matched groups.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/CATE_AVG.html">CATE_AVG</a></span>(result_bit,<span class="dv">8</span>) 
-<span class="co">#&gt; [1] 19.37088</span></code></pre></div>
+<span class="co">#&gt; [1] 16.11486</span></code></pre></div>
 </div>
 <div id="summary-visualization" class="section level2">
 <h2 class="hasAnchor">
