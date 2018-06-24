@@ -2,9 +2,9 @@
 % Please edit documentation in R/CATE.R
 \name{CATE}
 \alias{CATE}
-\title{detailed information of each matched group}
+\title{get matched units and its CATE}
 \usage{
-CATE(FLAME_object, num_covs)
+CATE(FLAME_object, num_covs = NULL, cov_name = NULL, cov_val = NULL)
 }
 \arguments{
 \item{FLAME_object}{object returned by applying the FLAME algorithm
@@ -12,12 +12,24 @@ CATE(FLAME_object, num_covs)
 \code{\link{FLAME_SQLite}})}
 
 \item{num_covs}{number of covariates used for matching}
+
+\item{cov_name}{a vector of covariate names}
+
+\item{cov_val}{a vector of covariate values, where the value position should match cov_name position}
 }
 \value{
-data frame with all matched units, the size and CATE of each matched group
+data frame with all matched units, the size and CATE of each matched
+  group
 }
 \description{
-Given number of covariates used for matching, \code{CATE} returns all matched
-units and their conditional average treatment effect. If no
-units are matched, \code{CATE} will return nothing.
+\code{CATE} provides detailed information of matched units and its CATE.
+First, given numberof covariates used for matching, \code{CATE(FLAME_object,
+num_covs = x)} returns all matched units and each matched group's CATE and
+size. Second, if user would like to see a specific matched group given user's
+covariate combination, \code{CATE(FLAME_object, num_covs = x, cov_name =
+c("x1", "x2", ...), cov_val = c(0,1,...))} returns the CATE and size of this
+specific matched group. Third, if user would like to see all matched groups
+given user's covariate combination, \code{CATE(FLAME_object, cov_name =
+c("x1", "x2", ...), cov_val = c(0,1,...))} returns all matched group
+containing the covariate combination.
 }

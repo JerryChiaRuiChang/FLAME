@@ -60,14 +60,18 @@ get_CATE_PostgreSQL <- function(cur_covs, level, column) {
     ON %s)",
     covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
 
+
   #If the data frame to be returned is empty, convert its column names to covariates at current iteration
   #else, convert column names to back to its original column
   if (nrow(CATE) == 0) {
     CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
                      c(column[(cur_covs + 1)],"effect","size"))
   } else {
+    CATE <- data.frame(data.matrix(CATE)) # convert all columns into numeric
     colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
   }
+
+
 
   return(CATE)
 }

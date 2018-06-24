@@ -4,19 +4,15 @@
 \alias{CATE_plot}
 \title{summarize CATE of all matched groups by boxplot}
 \usage{
-CATE_plot(FLAME_object, num_covs)
+CATE_plot(CATE_object)
 }
 \arguments{
-\item{FLAME_object}{object returned by applying the FLAME algorithm
-(\code{\link{FLAME_bit}} or \code{\link{FLAME_PostgreSQL}} or
-\code{\link{FLAME_SQLite}})}
-
-\item{num_covs}{number of covariates used for matching}
+\item{CATE_object}{object returned by applying \code{\link{CATE}} function}
 }
 \value{
 boxplot
 }
 \description{
-Given number of covariates used for matching, \code{CATE_plot} visualizes
-CATE of all matched groups by boxplot
+Given CATE_object, \code{CATE_plot} visualizes CATE of all matched groups by
+boxplot
 }

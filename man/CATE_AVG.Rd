@@ -7,15 +7,11 @@
 CATE_AVG(FLAME_object, num_covs)
 }
 \arguments{
-\item{FLAME_object}{object returned by applying the FLAME algorithm
-(\code{\link{FLAME_bit}} or \code{\link{FLAME_PostgreSQL}} or
-\code{\link{FLAME_SQLite}})}
-
-\item{num_covs}{number of covariates used for matching}
+\item{CATE_object}{object returned by applying \code{\link{CATE}} function}
 }
 \value{
-Average CATE
+(weighted) average CATE
 }
 \description{
-\code{CATE_AVG} computes average CATE given number of covariates used for matching.
+\code{CATE_AVG} computes (weighted) average CATE given CATE_object
 }

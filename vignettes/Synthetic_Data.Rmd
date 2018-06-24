@@ -42,9 +42,9 @@ $T \in \{0,1\}$ indicates whether an unit is treated or in control. $\alpha_{i} 
 
 \newline
   
-Apply `Data_Generation` function to generate 100 treated units and 100 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data.  
+Apply `Data_Generation` function to generate 1000 treated units and 1000 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data.  
 ```{r}
-data <- FLAME::Data_Generation(num_control = 100, num_treated = 100,
+data <- FLAME::Data_Generation(num_control = 1000, num_treated = 1000,
                                num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
 holdout <- data 
 ```
@@ -67,7 +67,7 @@ covs_max_list
 Run `FLAME_bit` function with the following command. The output contains two elements (1) list of covariates used for matching at each iteration (2) list of dataframe showing all matched units, size of each matched group, and its conditional average treatment effect (CATE).  
 ```{r, warning=FALSE}
 result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15,
-                               num_treated = 100, num_control = 100, 
+                               num_treated = 1000, num_control = 1000, 
                                covs_max_list = covs_max_list, tradeoff = 0.1)
 ```
 
@@ -121,37 +121,67 @@ We compare the results of bit vectors, PostgreSQL, and SQLite implementations, w
 
 1. Compare average treatment effect (ATE) by applying `ATE` function.
 ```{r}
-ATE(result_bit) #bit vectors
-ATE(result_PostgreSQL) #PostgreSQL
-ATE(result_SQLite) #SQLite
+FLAME::ATE(result_bit) #bit vectors
+FLAME::ATE(result_PostgreSQL) #PostgreSQL
+FLAME::ATE(result_SQLite) #SQLite
 ```
 
 \newline 
 
-2. Compare conditional average treatment effect (CATE) when 8 covariates are used for matching.
+2. Get conditional average treatment effect (CATE)
 
 \newline
 
-a. Apply `CATE` function to see details of all matched units, including the size and CATE of each matched group. Note that if no units are matched, `CATE` will return nothing.  
+a. When 8 covariates are used for matching, apply `CATE` function to see details of all matched units, including the size and CATE of each matched group. Note that if no units are matched, `CATE` will return nothing.  
 ```{r}
-CATE(result_bit,8) #bit vectors
-CATE(result_PostgreSQL,8) #PostgreSQL
-CATE(result_SQLite,8) #SQLite
+head(FLAME::CATE(FLAME_object = result_bit, num_covs  = 8)) #bit vectors
+head(FLAME::CATE(FLAME_object = result_PostgreSQL, num_covs = 8)) #PostgreSQL
+head(FLAME::CATE(FLAME_object = result_SQLite, num_covs = 8)) #SQLite
 ```
 
 \newline  
 
-b. Apply `CATE_plot` to visualize CATE of all matched groups in boxplot.
+b. To see the CATE for (x1 = 1, x2 = 1, x3 = 0,...) when exactly $n$ covariates are used for matching, apply `CATE` function as below. Note that (x1 = 1, x2 = 1, x3 = 0, ...) is represented by input cov_name = c("x1", x2", "x3", ...) and cov_val = c(1, 1, 0, ...).
+
 ```{r}
-CATE_plot(result_bit,8)
+n <- 8
+cov_name <- result_bit[[1]][[8]]
+  
+FLAME::CATE(FLAME_object = result_bit, num_covs  = n, cov_name = cov_name, 
+     cov_val = c(1,0,1,0,1,0,0,0))
+
+FLAME::CATE(FLAME_object = result_bit, num_covs  = n, cov_name = cov_name, 
+     cov_val = c(1,1,1,0,1,0,0,1))
+
+FLAME::CATE(FLAME_object = result_bit, num_covs  = n, cov_name = cov_name, 
+     cov_val = c(0,0,1,0,1,1,0,0))
+
+FLAME::CATE(FLAME_object = result_bit, num_covs  = n, cov_name = cov_name, 
+     cov_val = c(0,1,1,0,1,0,0,0))
+
+FLAME::CATE(FLAME_object = result_bit, num_covs  = n, cov_name = cov_name, 
+     cov_val = c(1,1,1,1,1,0,0,1))
+```
+
+c. To see the all matched groups where (x2 = 1, x3 = 0, x5 = 1), apply `CATE` function as below. Note that (x2 = 1, x3 = 0, x5 = 1) is represented by input cov_name = c("x2", "x3", "x5") and cov_val = c(1, 0, 1).
+
+```{r}
+CATE_object <- CATE(FLAME_object = result_bit, cov_name = c("x2", "x3", "x5"), cov_val = c(1, 0, 1))
+CATE_object
+```
+
+
+d. Apply `CATE_plot` to visualize CATE of all matched groups in boxplot.
+```{r}
+CATE_plot(CATE_object)
 ```
 
 
 \newline 
 
-c. Apply `CATE_AVG` to compute average CATE. Note that average CATE is the weighted average of all matched groups.  
+e. Apply `CATE_AVG` to compute average CATE. Note that average CATE is the weighted average of all matched groups.  
 ```{r}
-CATE_AVG(result_bit,8) 
+CATE_AVG(CATE_object) 
 ```
 
 ## Summary Visualization  

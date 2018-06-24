@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>detailed information of each matched group — CATE • FLAME</title>
+<title>get matched units and its CATE — CATE • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,11 +30,18 @@
 
 
 
-<meta property="og:title" content="detailed information of each matched group — CATE" />
+<meta property="og:title" content="get matched units and its CATE — CATE" />
 
-<meta property="og:description" content="Given number of covariates used for matching, CATE returns all matched
-units and their conditional average treatment effect. If no
-units are matched, CATE will return nothing." />
+<meta property="og:description" content="CATE provides detailed information of matched units and its CATE.
+First, given numberof covariates used for matching, CATE(FLAME_object,
+num_covs = x) returns all matched units and each matched group's CATE and
+size. Second, if user would like to see a specific matched group given user's
+covariate combination, CATE(FLAME_object, num_covs = x, cov_name =
+c(&quot;x1&quot;, &quot;x2&quot;, ...), cov_val = c(0,1,...)) returns the CATE and size of this
+specific matched group. Third, if user would like to see all matched groups
+given user's covariate combination, CATE(FLAME_object, cov_name =
+c(&quot;x1&quot;, &quot;x2&quot;, ...), cov_val = c(0,1,...)) returns all matched group
+containing the covariate combination." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -111,20 +118,27 @@ units are matched, CATE will return nothing." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>detailed information of each matched group</h1>
+    <h1>get matched units and its CATE</h1>
     <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/CATE.R'><code>R/CATE.R</code></a></small>
     <div class="hidden name"><code>CATE.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Given number of covariates used for matching, <code>CATE</code> returns all matched
-units and their conditional average treatment effect. If no
-units are matched, <code>CATE</code> will return nothing.</p>
+    <p><code>CATE</code> provides detailed information of matched units and its CATE.
+First, given numberof covariates used for matching, <code>CATE(FLAME_object,
+num_covs = x)</code> returns all matched units and each matched group's CATE and
+size. Second, if user would like to see a specific matched group given user's
+covariate combination, <code>CATE(FLAME_object, num_covs = x, cov_name =
+c("x1", "x2", ...), cov_val = c(0,1,...))</code> returns the CATE and size of this
+specific matched group. Third, if user would like to see all matched groups
+given user's covariate combination, <code>CATE(FLAME_object, cov_name =
+c("x1", "x2", ...), cov_val = c(0,1,...))</code> returns all matched group
+containing the covariate combination.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>CATE</span>(<span class='no'>FLAME_object</span>, <span class='no'>num_covs</span>)</pre>
+    <pre class="usage"><span class='fu'>CATE</span>(<span class='no'>FLAME_object</span>, <span class='kw'>num_covs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>cov_name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>cov_val</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,11 +153,20 @@ units are matched, <code>CATE</code> will return nothing.</p>
       <th>num_covs</th>
       <td><p>number of covariates used for matching</p></td>
     </tr>
+    <tr>
+      <th>cov_name</th>
+      <td><p>a vector of covariate names</p></td>
+    </tr>
+    <tr>
+      <th>cov_val</th>
+      <td><p>a vector of covariate values, where the value position should match cov_name position</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>data frame with all matched units, the size and CATE of each matched group</p>
+    <p>data frame with all matched units, the size and CATE of each matched
+  group</p>
     
 
   </div>
