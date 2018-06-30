@@ -58,6 +58,7 @@ def match_quality(df, holdout, covs_subset, match_indicator, tradeoff, ridge_reg
   
 
     #Calculate PE 
+
     ridge_c = Ridge(alpha=ridge_reg) 
     ridge_t = Ridge(alpha=ridge_reg) 
 
@@ -116,18 +117,26 @@ def num2vec(num, covs_max_list):
 def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff_param):
 
     #Change column names into panda index (object)
+
+    # holdout
+    col = list(range(len(covs)))
+    col.extend(["outcome","treated"])
+    col = pd.Index(col)
+    holdout.columns = col 
+
+    # data
     col = list(range(len(covs)))
     col.extend(["outcome","treated","matched"])
     col = pd.Index(col)
     df.columns = col
-    holdout.columns = col
+
 
     #Change row names into panda index (int64)
     row = list(range(num_control))
     row.extend(list(range(num_treated)))
     row = pd.Index(row)
     df.index = row
-    holdout.index = row
+
 
     constant_list = ['outcome', 'treated']
     
@@ -139,6 +148,8 @@ def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff
     level = 0
     match_indicator, index = match(df, cur_covs, covs_max_list) # match without dropping anything
     
+    df.loc[match_indicator,'matched'] = len(cur_covs)
+    return_df = df[match_indicator]
 
     res = get_CATE_bit(df, match_indicator, index) # get the CATEs without dropping anything
  
@@ -185,13 +196,20 @@ def run_bit(df, holdout, covs, covs_max_list, num_treated, num_control, tradeoff
         
         new_matching_res = get_CATE_bit(df, best_res[-2], best_res[-1])
         
+
         cur_covs = best_res[0] 
         cur_covs_max_list = best_res[1]
         return_cov.append(cur_covs)
         matching_res.append([best_res, new_matching_res])
+
+        df.loc[best_res[-2],'matched'] = len(cur_covs)
+        return_df = return_df.append(df[best_res[-2]])
+        
         
 
         df = df[~ best_res[-2] ]
+
+    return_df = return_df.append(df)
         
-    return (return_cov,cleanup_result(matching_res))
+    return (return_cov,cleanup_result(matching_res), return_df.values)
 

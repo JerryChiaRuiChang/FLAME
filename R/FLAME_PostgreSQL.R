@@ -76,6 +76,7 @@ get_CATE_PostgreSQL <- function(cur_covs, level, column) {
   return(CATE)
 }
 
+
 #match_quality function takes holdout dataset, number of total covariates,
 #list of current covariates, covariate c to temporily remove from, and trafeoff
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
@@ -202,17 +203,22 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
   data <- data.frame(data) #Convert input data to data.frame if not already converted
   holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
-  # Convert each covariate and treated into type integer
-  data[,c(1:num_covs,num_covs+2)] <- sapply(data[,c(1:num_covs,num_covs+2)],as.integer)
-  holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
-
-  column <- colnames(data)
-
-  #change input data and holdout training data column name
-  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
-  colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
 
   data$matched <- 0 #add column matched to input data
+  column <- colnames(data)
+
+  # Convert each covariate and treated into type integer
+  data[,c(1:num_covs, num_covs+2, num_covs+3)] <- sapply(data[,c(1:num_covs, num_covs+2, num_covs+3)],as.integer)
+  holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
+
+  # Convert outcome variable to numeric
+  data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
+  holdout[,num_covs + 1] <- as.numeric(holdout[,num_covs + 1])
+
+  #change input data and holdout training data column name
+  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
+  colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
+
 
   #Write input data to database
   dbWriteTable(db,"data",data, overwrite = TRUE)
@@ -229,9 +235,9 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
   level = 1
   #Get matched units without dropping anything
 
-  update_matched_PostgreSQL(cur_covs,level)
+  update_matched_PostgreSQL(cur_covs,length(cur_covs))
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level,column)
+  CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,length(cur_covs),column)
 
 
   #while there are still covariates for matching
@@ -265,20 +271,23 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
-    update_matched_PostgreSQL(cur_covs,level)
-    CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,level,column)
+    update_matched_PostgreSQL(cur_covs,length(cur_covs))
+    CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,length(cur_covs),column)
   }
 
   return_list <- NULL
   return_list[[1]] <- covs_list
   return_list[[2]] <- CATE
+  return_df <- dbGetQuery(db, "SELECT * FROM data")[,-1]
+  colnames(return_df) <- column
+  return_list[[3]] <- return_df
 
   return(return_list)
 }
 
 
 
-#data <- data.frame(Data_Generation(100,100,10,0))
+#data <- data.frame(Data_Generation(100,100,10,0,5))
 #holdout <- data
 #num_covs <- 10
 #tradeoff <- 0.1
@@ -293,9 +302,5 @@ FLAME_PostgreSQL <- function(db,data,holdout,num_covs,tradeoff) {
 
 #dbDisconnect(db)
 
-#db <- dbConnect(SQLite(),"tempdb")
-#FLAME::FLAME_SQLite(db,data,holdout,num_covs,0.1)
-#dbDisconnect(db)
 
-#FLAME::FLAME_bit(data,holdout,10,100,100,rep(2,10),0.1)
 

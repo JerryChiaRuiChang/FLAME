@@ -185,17 +185,21 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
 
   data <- data.frame(data) #Convert input data to data.frame if not already converted
   holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
+
+  data$matched <- 0 #add column matched to input data
   column <- colnames(data)
 
   # Convert each covariate and treated into type integer
-  data[,c(1:num_covs,num_covs+2)] <- sapply(data[,c(1:num_covs,num_covs+2)],as.integer)
+  data[,c(1:num_covs, num_covs+2, num_covs+3)] <- sapply(data[,c(1:num_covs, num_covs+2, num_covs+3)],as.integer)
   holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
 
-  #change input data and holdout training data column name
-  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
-  colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
+  # Convert outcome variable to numeric
+  data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
+  holdout[,num_covs + 1] <- as.numeric(holdout[,num_covs + 1])
 
-  data$matched <- 0 #add column matched to input data
+  #change input data and holdout training data column name
+  colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
+  colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
 
   #Write input data to database
   dbWriteTable(db,"data",data, overwrite = TRUE)
@@ -213,9 +217,9 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
 
   #Get matched units without dropping anything
 
-  update_matched_SQLite(cur_covs,level)
+  update_matched_SQLite(cur_covs,length(cur_covs))
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_SQLite(cur_covs,level,column)
+  CATE[[level]] <- get_CATE_SQLite(cur_covs,length(cur_covs),column)
 
 
   #while there are still covariates for matching
@@ -249,14 +253,17 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
-    update_matched_SQLite(cur_covs,level)
-    CATE[[level]] <- get_CATE_SQLite(cur_covs,level,column)
+    update_matched_SQLite(cur_covs,length(cur_covs))
+    CATE[[level]] <- get_CATE_SQLite(cur_covs,length(cur_covs),column)
 
   }
 
   return_list <- NULL
   return_list[[1]] <- covs_list
   return_list[[2]] <- CATE
+  return_df <- dbGetQuery(db, "SELECT * FROM data")
+  colnames(return_df) <- column
+  return_list[[3]] <- return_df
 
   return(return_list)
 }

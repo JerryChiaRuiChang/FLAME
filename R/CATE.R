@@ -115,23 +115,24 @@ find_match <- function(df, cov_name, cov_val) {
 #' get matched units and its CATE
 #'
 #' \code{CATE} provides detailed information of matched units and its CATE.
-#' First, given numberof covariates used for matching, \code{CATE(FLAME_object,
-#' num_covs = x)} returns all matched units and each matched group's CATE and
-#' size. Second, if user would like to see a specific matched group given user's
-#' covariate combination, \code{CATE(FLAME_object, num_covs = x, cov_name =
-#' c("x1", "x2", ...), cov_val = c(0,1,...))} returns the CATE and size of this
-#' specific matched group. Third, if user would like to see all matched groups
-#' given user's covariate combination, \code{CATE(FLAME_object, cov_name =
-#' c("x1", "x2", ...), cov_val = c(0,1,...))} returns all matched group
-#' containing the covariate combination.
+#' First, given number of covariates used for matching, \code{CATE(FLAME_object,
+#' num_covs = x)} returns the covariate values, CATE and size of each matched
+#' group. Second, if user would like to see a specific matched group given a
+#' specific covariate combination, \code{CATE(FLAME_object, num_covs = x,
+#' cov_name = c("x1", "x2", ...), cov_val = c(0,1,...))} returns the CATE and
+#' size of this specific matched group. Third, if user would like to see all
+#' matched groups given a specific covariate combination,
+#' \code{CATE(FLAME_object, cov_name = c("x1", "x2", ...), cov_val =
+#' c(0,1,...))} returns all matched group containing the covariate combination.
 #'
 #' @param FLAME_object object returned by applying the FLAME algorithm
 #'   (\code{\link{FLAME_bit}} or \code{\link{FLAME_PostgreSQL}} or
 #'   \code{\link{FLAME_SQLite}})
 #' @param num_covs number of covariates used for matching
 #' @param cov_name a vector of covariate names
-#' @param cov_val  a vector of covariate values, where the value position should match cov_name position
-#' @return data frame with all matched units, the size and CATE of each matched
+#' @param cov_val  a vector of covariate values, where the value position should
+#'   match cov_name position
+#' @return data frame with covariate values, CATE, and size of each matched
 #'   group
 #' @export
 

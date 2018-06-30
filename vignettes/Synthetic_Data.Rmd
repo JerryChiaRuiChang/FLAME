@@ -119,7 +119,7 @@ We compare the results of bit vectors, PostgreSQL, and SQLite implementations, w
 
 \newline 
 
-1. Compare average treatment effect (ATE) by applying `ATE` function.
+### compare average treatment effect (ATE) by applying `ATE` function.
 ```{r}
 FLAME::ATE(result_bit) #bit vectors
 FLAME::ATE(result_PostgreSQL) #PostgreSQL
@@ -128,7 +128,7 @@ FLAME::ATE(result_SQLite) #SQLite
 
 \newline 
 
-2. Get conditional average treatment effect (CATE)
+### get conditional average treatment effect (CATE)
 
 \newline
 
@@ -163,7 +163,7 @@ FLAME::CATE(FLAME_object = result_bit, num_covs  = n, cov_name = cov_name,
      cov_val = c(1,1,1,1,1,0,0,1))
 ```
 
-c. To see the all matched groups where (x2 = 1, x3 = 0, x5 = 1), apply `CATE` function as below. Note that (x2 = 1, x3 = 0, x5 = 1) is represented by input cov_name = c("x2", "x3", "x5") and cov_val = c(1, 0, 1).
+c. To see the all matched groups where the unit contains the covariate combination (x2 = 1, x3 = 0, x5 = 1), apply `CATE` function as below. Note that (x2 = 1, x3 = 0, x5 = 1) is represented by input cov_name = c("x2", "x3", "x5") and cov_val = c(1, 0, 1).
 
 ```{r}
 CATE_object <- CATE(FLAME_object = result_bit, cov_name = c("x2", "x3", "x5"), cov_val = c(1, 0, 1))
@@ -171,7 +171,7 @@ CATE_object
 ```
 
 
-d. Apply `CATE_plot` to visualize CATE of all matched groups in boxplot.
+d. Apply `CATE_plot` to visualize CATE of all matched groups in boxplot.  
 ```{r}
 CATE_plot(CATE_object)
 ```
@@ -182,6 +182,25 @@ CATE_plot(CATE_object)
 e. Apply `CATE_AVG` to compute average CATE. Note that average CATE is the weighted average of all matched groups.  
 ```{r}
 CATE_AVG(CATE_object) 
+```
+
+\newline 
+
+### Get detailed information of all matched units given specific covariate combination  
+
+The following is a specific covariate combination when eight covariates are used for matching.
+```{r, echo=FALSE}
+matched_df <- FLAME::CATE(FLAME_object = result_bit, num_covs  = 8)
+matched_df[1,]
+cov_name <- result_bit[[1]][[8]] 
+cov_val <- as.numeric(matched_df[1,1:8])
+```
+
+If we would like to see all units given this specific covariate combination, apply the following comand.
+```{r}
+FLAME::MATCH(FLAME_object = result_bit, cov_name = cov_name, cov_val = cov_val)
+FLAME::MATCH(FLAME_object = result_PostgreSQL, cov_name = cov_name, cov_val = cov_val)
+FLAME::MATCH(FLAME_object = result_SQLite, cov_name = cov_name, cov_val = cov_val)
 ```
 
 ## Summary Visualization  

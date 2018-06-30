@@ -20,16 +20,19 @@ FLAME_bit <- function(data, holdout, num_covs, num_treated, num_control, covs_ma
 
   #Type Conversion and Preprocessing
 
-  data <- data.frame(data) # Convert input data to data.frame if not already converted
+  data <- data.frame(data) #Convert input data to data.frame if not already converted
   holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
-  column <- colnames(data)
 
   data$matched <- 0 #add column matched to input data
-  holdout$matched <- 0 #add column matched to holdout data
+  column <- colnames(data)
 
   # Convert each covariate and treated into type integer
-  data[,c(1:num_covs,num_covs+2)] <- sapply(data[,c(1:num_covs,num_covs+2)],as.integer)
+  data[,c(1:num_covs, num_covs+2, num_covs+3)] <- sapply(data[,c(1:num_covs, num_covs+2, num_covs+3)],as.integer)
   holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
+
+  # Convert outcome variable to numeric
+  data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
+  holdout[,num_covs + 1] <- as.numeric(holdout[,num_covs + 1])
 
   covs <- as.integer(seq(0,num_covs-1)) #Create list of covariate
   covs_max_list <- as.integer(covs_max_list) #Convert covs_max_list to integer array
@@ -39,22 +42,33 @@ FLAME_bit <- function(data, holdout, num_covs, num_treated, num_control, covs_ma
   #Call Python File
   source_python(system.file("run_bit.py",package = "FLAME"))
 
+  #source_python("run_bit.py")
+
   #Run_bit
   result <- run_bit(r_to_py(data), r_to_py(holdout), covs, covs_max_list,
                     num_treated, num_control, tradeoff)
 
+
   #Convert column name to match with covariate returned in each iteration
   result_cov <- NULL
-  result_df <- result[[2]]
-  for (i in 1:length(result_df)) {
-    result_df[[i]] <- data.frame(result_df[[i]])
-    colnames(result_df[[i]]) <- c(column[(result[[1]][[i]] + 1)],"effect","size")
+  CATE_df <- result[[2]]
+  for (i in 1:length(CATE_df)) {
+    CATE_df[[i]] <- data.frame(CATE_df[[i]])
+    colnames(CATE_df[[i]]) <- c(column[(result[[1]][[i]] + 1)],"effect","size")
     result_cov[[i]] <- column[(result[[1]][[i]] + 1)]
   }
 
+  # Convert return dataframe column name
+  result_df <- as.data.frame(result[[3]])
+  colnames(result_df) <- column
+
+  # Convert from double ==> integer
+  result_df[,c(1:num_covs, num_covs+2, num_covs+3)] <- sapply(result_df[,c(1:num_covs, num_covs+2, num_covs+3)],as.integer)
+
   return_list <- NULL
   return_list[[1]] <- result_cov
-  return_list[[2]] <- result_df
+  return_list[[2]] <- CATE_df
+  return_list[[3]] <- result_df
 
   return(return_list)
 }
