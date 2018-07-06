@@ -54,6 +54,7 @@ partial_CATE <- function(FLAME_object, num_covs = NULL, cov_name = NULL, cov_val
       return("no CATE for such combination is available using this procedure")
     }
     else {
+      rownames(CATE_df) <- NULL
       return(CATE_df[L,])
     }
   }
@@ -87,6 +88,7 @@ all_CATE <- function(FLAME_object, cov_name, cov_val) {
 
   return_df <- sapply(all_df, find_match, cov_name, cov_val)
   return_df <- return_df[sapply(return_df, function(x) return(!is.null(x)))]
+  rownames(return_df) <- NULL
 
   if (length(return_df) == 0) {
     return("no CATE for such combination is available using this procedure")
@@ -108,6 +110,7 @@ find_match <- function(df, cov_name, cov_val) {
     isTRUE(all.equal(cov_val_sort,CATE_df[x,],check.attributes = FALSE)))
 
   if (nrow(df[L,]) != 0) {
+    rownames(df) <- NULL
     return(df[L,])
   }
 }

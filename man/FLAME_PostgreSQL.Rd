@@ -4,7 +4,9 @@
 \alias{FLAME_PostgreSQL}
 \title{PostgreSQL database implementation}
 \usage{
-FLAME_PostgreSQL(db, data, holdout, num_covs, tradeoff)
+FLAME_PostgreSQL(db, data, holdout, num_covs, tradeoff = 0.1,
+  PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
+  tree_depth = NULL)
 }
 \arguments{
 \item{db}{name of the database connection (\strong{must name the connection as
@@ -16,7 +18,17 @@ db})}
 
 \item{num_covs}{number of covariates}
 
-\item{tradeoff}{tradeoff parameter to compute Matching Quality}
+\item{tradeoff}{tradeoff parameter to compute Matching Quality (default = 0.1)}
+
+\item{PE_function}{user defined function to compute predivtive error (optional)}
+
+\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)}
+
+\item{ridge_reg}{L2 regularization parameter if model = Ridge (optional)}
+
+\item{lasso_reg}{L1 regularization parameter if model = Lasso (optional)}
+
+\item{tree_depth}{maximum depth of decision tree if model = DecisionTree (optional)}
 }
 \value{
 (1) list of covariates used for matching at each iteration (2) list of

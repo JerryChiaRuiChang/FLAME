@@ -6,7 +6,7 @@
 #' @return (weighted) average CATE
 #' @export
 
-CATE_AVG <- function(FLAME_object,num_covs) {
+CATE_AVG <- function(CATE_object,num_covs) {
 
   if(is.data.frame(CATE_object)) {
     effect <- CATE_object[,which(colnames(CATE_object) == "effect")]

@@ -4,7 +4,7 @@
 \alias{CATE_AVG}
 \title{compute average CATE}
 \usage{
-CATE_AVG(FLAME_object, num_covs)
+CATE_AVG(CATE_object, num_covs)
 }
 \arguments{
 \item{CATE_object}{object returned by applying \code{\link{CATE}} function}

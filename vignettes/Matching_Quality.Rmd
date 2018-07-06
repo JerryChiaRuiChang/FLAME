@@ -1,0 +1,242 @@
+---
+title: "Matching Quality"
+author: "Jerry Chia-Rui Chang"
+date: "7/3/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(FLAME)
+library(RSQLite)
+library(RPostgreSQL)
+library(reticulate)
+library(latticeExtra)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+set.seed(500)
+```
+
+
+## Overview of Matching Quality
+
+The FLAME algorithm determines which unimportant covariate to drop based on Matching Quality, consisting of two components - Balancing Factor ($BF$) and Predictive Error ($PE$). Given a list of covariate subsets at a specific iteration, the algorithm chooses the covariate subset such that it maximizes Matching Quality, computed through $-PE + tradeoff * BF$. Balancing factor assesses the proportion of units that can be matched. Predictive error evaluates the predictive quality of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a bias-variance tradeoff between producing more matched groups and having better prediction.  
+
+The implementation of the FLAME algorithm allows users to choose both tradeoff parameter and statistical model that computes predictive error. First, users who prefer covariate subset that produces more matched units should choose higher tradeoff parameter, whereas users who prefer covariate subset that produces better predictive accuracy should choose lower tradeoff parameter. The default tradeoff parameter is set to 0.1. Second, users can choose appropriate statistical model to compute predictive error. The FLAME package currently provides four models; respectively they are Linear Regression, Ridge Regression, LASSO, and Decision Tree. The default model is set to ridge regression with L2 regularization parameter of 0.1. If users would like to use models not supported by the package, they can provide an input R function that computes predictive error.
+
+## Specify models to compute predictive errors
+
+Predictive error ($PE$), in the FLAME algorithm, is defined as the sum of mean squared error for treated units and mean squared error for control units. Denote holdout training set $D^{H} = [X^{H}, Y^{H}, T^{H}]$, where $X^{H}$ represents values of the covariates, $Y^{H}$ is the outcome, and $T^{H}$ indicates whether a unit is in treated group or in control group (1 = treated, 0 = control). Given a predictive model, denote $\hat{Y}^{H}_{u}$ as the predicted value of a unit $u$. The computation of $PE$ is: 
+
+$$
+PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}_{u})^2 + \frac{1}{\sum(T^{H}_{u})} \sum_{u:T^{H}_{u} = 1} (Y^{H}_{u} - \hat{Y}^{H}_{u})^2
+$$
+
+\newline
+
+We demonstrate how to select various predictive models based on bit vectors implementation. Note that model specification for database systems implementation is the same as bit vectors implementation. We applied `Data_Generation` function to create a synthetic data. There are 1000 treated units and 1000 control units with 10 important covariates and 5 unimportant covariates. Assume holdout training set is the same as the input data.  
+
+```{r, echo=FALSE}
+data <- FLAME::Data_Generation(num_control = 1000, num_treated = 1000,
+                               num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
+holdout <- data 
+head(data)
+```
+
+### package provided models
+
+1. Linear Regression - R argument requires **model = "Linear"**
+```{r}
+linear <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
+                           model = "Linear")
+```
+
+\newline
+
+2. Ridge Regression with L2 regularization parameter of 0.1 - R argument requires **model = "Ridge", ridge_reg = 0.1**
+```{r}
+ridge <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
+                           model = "Ridge", ridge_reg = 0.1)
+```
+
+\newline
+
+3. Lasso with L1 regularization regularization parameter of 0.1 - R argument requires **model = "Lasso", lasso_reg = 0.1**
+```{r}
+lasso <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
+                           model = "Lasso", lasso_reg = 0.1)
+```
+
+\newline
+
+4. Decision Tree with maximum depth of 8 - R argument requires **model = "DecisionTree", tree_depth = 8**  
+```{r}
+tree <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
+                           model = "DecisionTree", tree_depth = 8)
+```
+
+### user defined model
+
+If users would like to compute predictive error with models not supported by the package, users can provide their own R function. The package requires the input of the function to have four arguments; respectively, they are (1) outcome for treated units (**outcome_treated**), (2) outcome for control units (**outcome_control**), (3) covariate values for treated units in a matrix form (**covs_treated**), and (4) covariate values for control units in a matrix form (**covs_control**). The function should compute MSE for treated units with argument (1) and (3), and MSE for control units with argument (2) and (4). 
+
+We wrote a R function that computes predictive error based on support vector machine (SVM). The function is called `SVM_PE` based on SVM model in `e1071` package.
+```{r}
+SVM_PE <- function(outcome_treated, outcome_control, covs_treated, covs_control) {
+  
+  library(e1071) #load e1071 library
+  
+  # MSE for treated
+  model_svm <- svm(outcome_treated ~ covs_treated) # fit the data to SVM model
+  pred_treated <- predict(model_svm, covs_treated) #get predicted values
+  MSE_treated <- sum((outcome_treated - pred_treated)^2)/length(outcome_treated) # compute mean squared error
+  
+  # MSE for control
+  model_svm <- svm(outcome_control ~ covs_control) # fit the data to SVM model
+  pred_control <- predict(model_svm, covs_control) #get predicted values
+  MSE_control <- sum((outcome_control - pred_control)^2)/length(outcome_control) # compute mean squared error
+  
+  return(MSE_treated + MSE_control)
+}
+```
+
+\newline
+
+Apply the model as **PE_function = SVM_PE** to the package.
+```{r}
+SVM <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15), PE_function = SVM_PE)
+```
+
+
+## Effect of tradeoff parameter
+
+We explore how the tradeoff parameter affects matching quality. We created a simulated data with 15,000 control units and 15,000 treated units, where variables that are more important to outcome prediction are less balanced. There are 20 covariates with $x_{i} \sim Bernoulli(0.1 + \frac{3i}{190})$ for the control group and $x_{i} \sim Bernoulli(0.9 - \frac{3i}{190})$ for the treated group. The outcome variable is given by $y = \sum_{i = 1}^{20} \frac{1}{i}x_{i}+10T$, where $T \in {0, 1}$ is the treatment indicator. We expect that the algorithm would choose covariate subset that yields higher balancing factor for larger tradeoff parameter.  
+
+
+```{r, echo = FALSE}
+control_random <- function(i) {
+  rbinom(15000,1, 0.1 + 3*i/190)
+}
+
+treated_random <- function(i) {
+  rbinom(15000,1, 0.9 - 3*i/190)
+}
+
+outcome <- function(lst) {
+  return(sapply(1:20, function(x) 1/x) %*% lst[1:20] + 10 * lst[21])
+}
+
+treated_x <- sapply(1:20, treated_random)
+treated_y <- apply(cbind(treated_x,rep(1, 15000)), 1, outcome)
+
+control_x <- sapply(1:20, control_random)
+control_y <- apply(cbind(control_x, rep(0, 15000)), 1, outcome)
+
+data <- as.data.frame(rbind(as.matrix(cbind(treated_x, treated_y, rep(1, 15000))), 
+                            as.matrix(cbind(control_x, control_y, rep(0, 15000)))))
+colnames(data) <- c(paste("x",seq(1,20), sep = ""), "outcome","treated")
+head(data)
+```
+
+\newline
+
+We ran the experiment with three distinct tradeoff parameters - 0.1, 0.5, and 1.  
+```{r, results="hide"}
+#Connect to PostgreSQL
+drv <- dbDriver('PostgreSQL')
+
+#Name the connection as db
+db <- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
+             port=5432, password = 'new_password')
+
+#Run FLAME_PostgreSQL 
+ridge_1 <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = data, num_covs = 20, tradeoff = 0.1)
+ridge_5 <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = data, num_covs = 20, tradeoff = 0.5)
+ridge_10 <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = data, num_covs = 20, tradeoff = 1)
+
+#Disconnect from db
+dbDisconnect(db)
+```
+
+\newline
+
+We examined the percentage of units being matched as the algorithm eliminates covariates. The x-axis denotes the number of remaining covariates, and y-axis denotes the percentage of units matched (cumulative). Larger tradeoff parameter yields more matched units.  
+```{r, echo = FALSE}
+plot1_tradeoff <- function(FLAME_object, tradeoff) {
+  return_df <- FLAME_object[[4]]
+  num_cov_remain <- sort(unique(return_df$matched),decreasing = TRUE)
+  num_cov_remain <- num_cov_remain[num_cov_remain != 0]
+  percent_matched <- sapply(num_cov_remain, function(x) nrow(return_df[return_df$matched >= x,])/30000)
+  
+  plot_data <- data.frame(cbind(num_cov_remain, percent_matched))
+  ggplot(plot_data, aes(reorder(num_cov_remain, percent_matched), percent_matched, group = 1)) + geom_line() + 
+  geom_point() + xlab("Num. of Covariates Remaining") + ylab("% of Units Matched") + ylim(0,1) + 
+    ggtitle(paste("Tradeoff = ", tradeoff, sep = ""))
+}
+
+plot1_1 <- plot1_tradeoff(ridge_1,0.1)
+plot1_2 <- plot1_tradeoff(ridge_5,0.5)
+plot1_3 <- plot1_tradeoff(ridge_10,1)
+
+
+ggarrange(plot1_1, plot1_2, plot1_3, ncol = 3, nrow = 1)
+```
+
+\newline
+
+We also examined the effect of tradeoff parameter on estimated treatment effect. The x-axis denotes the number of remaining covariates, and y-axis denotes the estimated treatment effect. The bias increases as tradeoff parameter increases.  
+```{r, echo = FALSE, warning=FALSE}
+plot2_tradeoff <- function(FLAME_object, tradeoff) {
+  return_df <- FLAME_object[[4]]
+  num_cov_remain <- sort(unique(return_df$matched),decreasing = TRUE)
+  num_cov_remain <- num_cov_remain[num_cov_remain != 0]
+  size <- sapply(num_cov_remain, function(x) nrow(return_df[return_df$matched >= x,]))
+  Est_TE <- sapply(num_cov_remain, function(x) CATE_AVG(FLAME_object[[2]][1:which(num_cov_remain == x)], x))
+
+  
+  plot_data <- data.frame(x = num_cov_remain, y = Est_TE, matched_size = size)
+  plot_data$x <- factor(plot_data$x, levels = plot_data$x[order(plot_data$x, decreasing = TRUE)])
+  
+  
+  ggplot(plot_data, aes(x, y)) + geom_point(aes(size =  matched_size)) + 
+    xlab("Num. of Covariates Remaining") + ylab("Estimated Treatment Effect") + ylim(8,14) + 
+    ggtitle(paste("Tradeoff = ", tradeoff, sep = "")) + theme(legend.position="none")
+}
+
+plot2_1 <- plot2_tradeoff(ridge_1,0.1)
+plot2_2 <- plot2_tradeoff(ridge_5,0.5)
+plot2_3 <- plot2_tradeoff(ridge_10,1)
+
+
+ggarrange(plot2_1, plot2_2, plot2_3, ncol = 3, nrow = 1)
+```
+
+\newline
+
+In summary, tradeoff parameter is the tradeoff between finding more matched units (higher balancing factor) and having lower bias (lower predictive error). In the summary plot below, the x-axis denotes the percentage of units matched, and the y-axis denotes the estimated treatment effect.
+```{r, echo = FALSE, warning=FALSE}
+plot3_tradeoff <- function(FLAME_object, tradeoff){
+  return_df <- FLAME_object[[4]]
+  num_cov_remain <- sort(unique(return_df$matched),decreasing = TRUE)
+  num_cov_remain <- num_cov_remain[num_cov_remain != 0]
+  Est_TE <- sapply(num_cov_remain, function(x) CATE_AVG(FLAME_object[[2]][1:which(num_cov_remain == x)], x))
+  percent_matched <- sapply(num_cov_remain, function(x) nrow(return_df[return_df$matched >= x,])/30000)
+
+  plot_data <- data.frame(x = percent_matched, y = Est_TE)
+  
+  ggplot(plot_data, aes(x, y)) + geom_point() + xlim(0,1) + ylim(8,14) +
+    ylab("Estimated Treatment Effect") + xlab("% of Units Matched")  + 
+    ggtitle(paste("Tradeoff = ", tradeoff, sep = "")) 
+}
+  
+plot3_1 <- plot3_tradeoff(ridge_1,0.1)
+plot3_2 <- plot3_tradeoff(ridge_5,0.5)
+plot3_3 <- plot3_tradeoff(ridge_10,1)
+
+
+ggarrange(plot3_1, plot3_2, plot3_3, ncol = 3, nrow = 1)
+```

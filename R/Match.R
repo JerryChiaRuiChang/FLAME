@@ -34,7 +34,7 @@ MATCH <- function(FLAME_object, cov_name, cov_val) {
   cov_val_sort <- data.frame(t(unlist(cov_val_sort)))
   colnames(cov_val_sort) <- cov_matched
 
-  df <- FLAME_object[[3]]
+  df <- FLAME_object[[4]]
   df <- df[df$matched == length(cov_name),]
 
   L <- sapply(1:nrow(df), function(x) identical(unlist(df[x,cov_matched]),unlist(cov_val_sort)))

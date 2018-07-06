@@ -92,6 +92,9 @@ host='your_localhost', port='your_port', user='your_username', password =
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+    </li>
+    <li>
       <a href="../articles/Synthetic_Data.html">Modeling Synthetic Data</a>
     </li>
   </ul>
@@ -136,7 +139,9 @@ host='your_localhost', port='your_port', user='your_username', password =
     
     </div>
 
-    <pre class="usage"><span class='fu'>FLAME_PostgreSQL</span>(<span class='no'>db</span>, <span class='no'>data</span>, <span class='no'>holdout</span>, <span class='no'>num_covs</span>, <span class='no'>tradeoff</span>)</pre>
+    <pre class="usage"><span class='fu'>FLAME_PostgreSQL</span>(<span class='no'>db</span>, <span class='no'>data</span>, <span class='no'>holdout</span>, <span class='no'>num_covs</span>, <span class='kw'>tradeoff</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>PE_function</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ridge_reg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>lasso_reg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tree_depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,7 +165,27 @@ db</strong>)</p></td>
     </tr>
     <tr>
       <th>tradeoff</th>
-      <td><p>tradeoff parameter to compute Matching Quality</p></td>
+      <td><p>tradeoff parameter to compute Matching Quality (default = 0.1)</p></td>
+    </tr>
+    <tr>
+      <th>PE_function</th>
+      <td><p>user defined function to compute predivtive error (optional)</p></td>
+    </tr>
+    <tr>
+      <th>model</th>
+      <td><p>user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)</p></td>
+    </tr>
+    <tr>
+      <th>ridge_reg</th>
+      <td><p>L2 regularization parameter if model = Ridge (optional)</p></td>
+    </tr>
+    <tr>
+      <th>lasso_reg</th>
+      <td><p>L1 regularization parameter if model = Lasso (optional)</p></td>
+    </tr>
+    <tr>
+      <th>tree_depth</th>
+      <td><p>maximum depth of decision tree if model = DecisionTree (optional)</p></td>
     </tr>
     </table>
     

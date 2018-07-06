@@ -68,6 +68,8 @@ get_CATE_SQLite <- function(cur_covs, level,column) {
   } else {
     CATE <- data.frame(data.matrix(CATE)) # convert all columns into numeric
     colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
+    CATE <- CATE[order(CATE$effect),]
+    rownames(CATE) = NULL
   }
 
   return(CATE)
@@ -78,7 +80,8 @@ get_CATE_SQLite <- function(cur_covs, level,column) {
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
 #returning Match Quality.
 
-match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff) {
+match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff,
+                                 PE_function, model, ridge_reg, lasso_reg, tree_depth) {
 
   #temporarly remove covariate c
 
@@ -88,6 +91,12 @@ match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff) {
 
   covariates <- toString(sprintf("x%s", covs_to_match, covs_to_match))
   equalcovariates <- paste(sprintf("S.x%s = data.x%s", covs_to_match, covs_to_match), collapse = " AND ")
+
+  # Calculate number of units unmatched (available)
+
+  num_control <- as.integer(dbGetQuery(db, "SELECT count(*) FROM data WHERE matched = 0 AND treated = 0")[1,1])
+  num_treated <- as.integer(dbGetQuery(db, "SELECT count(*) FROM data WHERE matched = 0 AND treated = 1")[1,1])
+
 
   #get matched group for covariate list that exclude c
 
@@ -109,52 +118,72 @@ match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff) {
 
   dbWriteTable(db,"match",match, overwrite = TRUE) #write match dataframe into db
 
-  #get unmatched group for covariate list that exclude c
-
-  unmatch <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ",
-                                 sprintf("SELECT *
-                                         FROM data
-                                         WHERE matched = 0
-                                         AND NOT EXISTS
-                                         (SELECT *
-                                         FROM match S
-                                         WHERE %s)",
-                                         equalcovariates)))
-
-  dbWriteTable(db,"unmatch",unmatch, overwrite = TRUE) # write unmatch dataframe into db
-
-  #Get number of units in each following group to calculate Balancing Factor
-  #(1) units that have been matched and belong to control group (match_control)
-  #(2) units that have been matched and belong to treated group (match_treated)
-  #(3) units that haven't been matched and belong to control group (unmatch_control)
-  #(4) units that haven't been matched and belong to treated group (unmatch_treated)
-
-  match_control <- as.integer(dbGetQuery(db, "SELECT count(*) FROM match WHERE treated = 0")[1,1])
-  match_treated <- as.integer(dbGetQuery(db, "SELECT count(*) FROM match WHERE treated = 1")[1,1])
-  unmatch_control <- as.integer(dbGetQuery(db, "SELECT count(*) FROM unmatch WHERE treated = 0")[1,1])
-  unmatch_treated <- as.integer(dbGetQuery(db, "SELECT count(*) FROM unmatch WHERE treated = 1")[1,1])
-
-
-  #Run python script PE.py to get Predictive Error
-  source_python(system.file("PE.py",package = "FLAME"))
-
-  #source_python("PE.py")
-  #Compute Predictive Error
-  if (length(covs_to_match) == 1) {
-    PE <- predictive_error(r_to_py(holdout),seq(0,num_covs - 1),list(covs_to_match))
+  if (nrow(match) == 0) {
+    num_control_matched <- 0
+    num_treated_matched <- 0
+  } else {
+    # Number of matched units
+    num_control_matched <- as.integer(dbGetQuery(db, "SELECT count(*) FROM match WHERE treated = 0")[1,1])
+    num_treated_matched <- as.integer(dbGetQuery(db, "SELECT count(*) FROM match WHERE treated = 1")[1,1])
   }
+
+  #Compute Predictive Error
+
+  if (!is.null(PE_function)) {
+    # Compute -PE based on user defined PE_function
+    outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
+    outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']
+    covs_treated <- as.matrix(holdout[holdout[,'treated'] == 1,][,covs_to_match + 1])
+    covs_control <- as.matrix(holdout[holdout[,'treated'] == 0,][,covs_to_match + 1])
+    PE <- -PE_function(outcome_treated, outcome_control, covs_treated, covs_control)
+  }
+
   else {
-    PE <- predictive_error(r_to_py(holdout),seq(0,num_covs - 1),covs_to_match)
+    if (!is.null(model)) {
+
+      # Linear Regression
+      if (model == "Linear") {
+        source_python(system.file("Linear.py",package = "FLAME"))
+        parameter = 0
+      }
+
+      # Ridge Regression
+      if (model == "Ridge" && !is.null(ridge_reg)) {
+        source_python(system.file("Ridge.py",package = "FLAME"))
+        parameter = ridge_reg
+      }
+
+      # Lasso
+      if (model == "Lasso" && !is.null(lasso_reg)) {
+        source_python(system.file("Lasso.py",package = "FLAME"))
+        parameter = lasso_reg
+      }
+
+      # Decision Tree
+      if (model == "DecisionTree" && !is.null(tree_depth)) {
+        source_python(system.file("DecisionTree.py",package = "FLAME"))
+        parameter = tree_depth
+      }
+    } else {
+      # Default Model is Ridge Regression with L2 Regularization = 0.1
+      source_python(system.file("Ridge.py",package = "FLAME"))
+      parameter = 0.1
+    }
+
+    #Compute PE based on Python scikit learn function
+    if (length(covs_to_match) == 1) {
+      PE <- predictive_error(r_to_py(holdout), as.integer(num_covs), list(covs_to_match), parameter)
+    } else {
+      PE <- predictive_error(r_to_py(holdout),as.integer(num_covs),covs_to_match, parameter)
+    }
   }
 
   #If the unmatched group does not have any control/treated units then return PE
 
-  if (unmatch_control == 0 | unmatch_treated == 0) {
+  if (num_control == 0 | num_treated == 0) {
     return(PE)
-  }
-
-  else {
-    BF <- match_control/unmatch_control + match_treated/unmatch_treated #Compute Balancing Factor
+  } else {
+    BF <- num_control_matched/num_control + num_treated_matched/num_treated #Compute Balancing Factor
     return(tradeoff * BF + PE)
   }
 }
@@ -173,7 +202,12 @@ match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff) {
 #'@param data input data
 #'@param holdout holdout training data
 #'@param num_covs number of covariates
-#'@param tradeoff tradeoff parameter to compute Matching Quality
+#'@param tradeoff tradeoff parameter to compute Matching Quality (default = 0.1)
+#'@param PE_function user defined function to compute predivtive error (optional)
+#'@param model user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)
+#'@param ridge_reg L2 regularization parameter if model = Ridge (optional)
+#'@param lasso_reg L1 regularization parameter if model = Lasso (optional)
+#'@param tree_depth maximum depth of decision tree if model = DecisionTree (optional)
 #'@return (1) List of covariates matched at each iteration (2) List of data
 #'  frame showing matched groups, conditional average treatment effect (CATE),
 #'  and the size of each matched group
@@ -181,7 +215,8 @@ match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff) {
 #'@import RSQLite
 #'@export
 
-FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
+FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = NULL,
+                         model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
 
   data <- data.frame(data) #Convert input data to data.frame if not already converted
   holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
@@ -233,18 +268,8 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
     #Temporarily drop one covariate at a time to calculate Match Quality
     #Drop the covariate that returns highest Match Quality Score
 
-    #quality = -Inf
-    #covs_to_drop = NULL
-
-    #for (c in cur_covs) {
-    #  score = match_quality_SQLite(holdout, num_covs, cur_covs, c, tradeoff)
-    #  if (score > quality) {
-    #    quality = score
-    #    covs_to_drop = c
-    #  }
-    #}
-
-    list_score <- unlist(lapply(cur_covs,match_quality_SQLite,holdout, num_covs, cur_covs, tradeoff))
+    list_score <- unlist(lapply(cur_covs,match_quality_SQLite,holdout, num_covs, cur_covs, tradeoff,
+                                PE_function, model, ridge_reg, lasso_reg, tree_depth))
     quality <- max(list_score)
     covs_to_drop <- cur_covs[which(list_score == quality)]
 
@@ -258,38 +283,19 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff) {
 
   }
 
-  return_list <- NULL
-  return_list[[1]] <- covs_list
-  return_list[[2]] <- CATE
   return_df <- dbGetQuery(db, "SELECT * FROM data")
   colnames(return_df) <- column
-  return_list[[3]] <- return_df
 
-  return(return_list)
+  return(list(covs_list, CATE, unlist(SCORE), return_df))
 }
-
-#data <- data.frame(FLAME::Data_Generation(100,100,10,0))
-#holdout <- data
-#num_covs <- 10
-#tradeoff <- 0.1
-
-
-
-#result.FLAME <- FLAME::FLAME_bit(data,holdout,seq(0,9),rep(2,10),100,100)
-
-
-#library('RPostgreSQL')
-
-
 
 
 #db <- dbConnect(SQLite(),"tempdb")
 
 
-#result.db <- FLAME::FLAME_db(conn,data,holdout,10,0.1)
+#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout,
+#                                           num_covs = 15, tradeoff = 0.1, model = "Ridge", ridge_reg = 0.1)
+
 #dbDisconnect(db)
-
-
-
 
 

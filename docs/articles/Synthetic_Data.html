@@ -52,6 +52,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+    </li>
+    <li>
       <a href="../articles/Synthetic_Data.html">Modeling Synthetic Data</a>
     </li>
   </ul>
@@ -79,7 +82,7 @@
       <h1>Modeling Synthetic Data</h1>
                         <h4 class="author">Jerry Chia-Rui Chang</h4>
             
-            <h4 class="date">2018-06-30</h4>
+            <h4 class="date">2018-07-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chiarui424/FLAME/blob/master/vignettes/Synthetic_Data.Rmd"><code>vignettes/Synthetic_Data.Rmd</code></a></small>
       <div class="hidden name"><code>Synthetic_Data.Rmd</code></div>
@@ -115,15 +118,13 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/Data_Generation">Data_Generation</a></span>(<span class="dt">num_control =</span> <span class="dv">1000</span>, <span class="dt">num_treated =</span> <span class="dv">1000</span>,
                                <span class="dt">num_cov_dense =</span> <span class="dv">10</span>, <span class="dt">num_cov_unimportant =</span> <span class="dv">5</span>, <span class="dt">U =</span> <span class="dv">5</span>)
 holdout &lt;-<span class="st"> </span>data </code></pre></div>
-
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data)
-<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated</span>
-<span class="co">#&gt; 1  0  1  0  0  0  0  0  0  0   1   0   1   0   1   1  -2.996484       0</span>
-<span class="co">#&gt; 2  0  1  0  1  0  0  1  1  1   0   1   1   1   0   1   6.699281       0</span>
-<span class="co">#&gt; 3  1  1  1  1  1  0  1  0  0   0   1   0   0   0   0  15.173103       0</span>
-<span class="co">#&gt; 4  1  0  1  1  1  0  0  0  1   1   0   0   1   1   1 -16.340285       0</span>
-<span class="co">#&gt; 5  1  1  1  1  1  0  0  1  0   0   1   0   0   1   0  -2.886323       0</span>
-<span class="co">#&gt; 6  0  1  1  1  1  1  0  0  1   0   0   1   0   0   1  -6.562262       0</span></code></pre></div>
+<pre><code>#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated
+#&gt; 1  1  0  0  0  0  1  1  1  0   0   1   1   0   0   0 -25.326354       0
+#&gt; 2  1  1  1  1  0  0  0  1  0   1   0   1   1   1   0   5.172278       0
+#&gt; 3  1  0  0  0  0  1  1  0  1   0   1   0   1   1   0 -11.501727       0
+#&gt; 4  0  0  0  1  1  0  1  1  1   1   0   0   1   1   0   8.840892       0
+#&gt; 5  1  1  1  0  1  1  0  0  0   0   1   0   0   0   1   3.435872       0
+#&gt; 6  0  1  0  0  1  0  0  0  1   1   1   0   1   1   1  20.460055       0</code></pre>
 </div>
 <div id="bit-vectors-implementation" class="section level2">
 <h2 class="hasAnchor">
@@ -134,9 +135,7 @@ covs_max_list
 <span class="co">#&gt;  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</span></code></pre></div>
 
 <p>Run <code>FLAME_bit</code> function with the following command. The output contains two elements (1) list of covariates used for matching at each iteration (2) list of dataframe showing all matched units, size of each matched group, and its conditional average treatment effect (CATE).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result_bit &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>,
-                               <span class="dt">num_treated =</span> <span class="dv">1000</span>, <span class="dt">num_control =</span> <span class="dv">1000</span>, 
-                               <span class="dt">covs_max_list =</span> covs_max_list, <span class="dt">tradeoff =</span> <span class="fl">0.1</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result_bit &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">covs_max_list =</span> covs_max_list)</code></pre></div>
 </div>
 <div id="database-systems-implementation" class="section level2">
 <h2 class="hasAnchor">
@@ -156,12 +155,10 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(drv, <span cl
              <span class="dt">port=</span><span class="dv">5432</span>, <span class="dt">password =</span> <span class="st">'new_password'</span>)
 
 <span class="co">#Run FLAME_PostgreSQL </span>
-result_PostgreSQL &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_PostgreSQL">FLAME_PostgreSQL</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout,
-                                             <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">tradeoff =</span> <span class="fl">0.1</span>)
+result_PostgreSQL &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_PostgreSQL">FLAME_PostgreSQL</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>)
 
 <span class="co">#Disconnect from db</span>
-<span class="kw">dbDisconnect</span>(db)
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<span class="kw">dbDisconnect</span>(db)</code></pre></div>
 </div>
 <div id="sqlite" class="section level3">
 <h3 class="hasAnchor">
@@ -171,8 +168,8 @@ result_PostgreSQL &lt;-<span class="st"> </span>FLAME<span class="op">::</span><
 db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(),<span class="st">"tempdb"</span>) 
 
 <span class="co">#Run FLAME_SQLite</span>
-result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_SQLite">FLAME_SQLite</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout,
-                                             <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">tradeoff =</span> <span class="fl">0.1</span>)
+result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_SQLite">FLAME_SQLite</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>)
+
 <span class="co">#Disconnect from db</span>
 <span class="kw">dbDisconnect</span>(db)</code></pre></div>
 </div>
@@ -186,11 +183,11 @@ result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span
 <h3 class="hasAnchor">
 <a href="#compare-average-treatment-effect-ate-by-applying-ate-function-" class="anchor"></a>compare average treatment effect (ATE) by applying <code>ATE</code> function.</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/ATE">ATE</a></span>(result_bit) <span class="co">#bit vectors</span>
-<span class="co">#&gt; [1] 20.88597</span>
+<span class="co">#&gt; [1] 19.62978</span>
 FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/ATE">ATE</a></span>(result_PostgreSQL) <span class="co">#PostgreSQL</span>
-<span class="co">#&gt; [1] 20.88597</span>
+<span class="co">#&gt; [1] 19.62978</span>
 FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/ATE">ATE</a></span>(result_SQLite) <span class="co">#SQLite</span>
-<span class="co">#&gt; [1] 20.88597</span></code></pre></div>
+<span class="co">#&gt; [1] 19.62978</span></code></pre></div>
 
 </div>
 <div id="get-conditional-average-treatment-effect-cate" class="section level3">
@@ -201,187 +198,188 @@ FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentati
 <li>When 8 covariates are used for matching, apply <code>CATE</code> function to see details of all matched units, including the size and CATE of each matched group. Note that if no units are matched, <code>CATE</code> will return nothing.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> <span class="dv">8</span>)) <span class="co">#bit vectors</span>
-<span class="co">#&gt;   x1 x2 x4 x5 x7 x8 x9 x10    effect size</span>
-<span class="co">#&gt; 1  0  0  0  0  0  0  1   0  8.948777    4</span>
-<span class="co">#&gt; 2  0  0  0  0  1  0  1   0 -2.298133    4</span>
-<span class="co">#&gt; 3  0  0  0  0  1  0  1   1 12.057443    4</span>
-<span class="co">#&gt; 4  0  0  0  0  1  1  1   0 13.027446    3</span>
-<span class="co">#&gt; 5  0  0  0  1  0  0  0   1  2.310525    6</span>
-<span class="co">#&gt; 6  0  0  0  1  1  0  1   0  4.392689    4</span>
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x9     effect size</span>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0 -0.5776111    3</span>
+<span class="co">#&gt; 2  0  0  1  0  0  0  1  0  0.8006740    8</span>
+<span class="co">#&gt; 3  0  0  0  1  0  1  1  0  2.4382442    2</span>
+<span class="co">#&gt; 4  0  1  1  0  0  0  0  0  3.9943531    4</span>
+<span class="co">#&gt; 5  0  1  0  0  1  0  0  0  4.0817665    5</span>
+<span class="co">#&gt; 6  0  1  1  0  0  1  0  0  5.5163183    3</span>
 <span class="kw">head</span>(FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_PostgreSQL, <span class="dt">num_covs =</span> <span class="dv">8</span>)) <span class="co">#PostgreSQL</span>
-<span class="co">#&gt;   x1 x2 x4 x5 x7 x8 x9 x10    effect size</span>
-<span class="co">#&gt; 1  0  0  0  0  0  0  1   0  8.948777    4</span>
-<span class="co">#&gt; 2  0  0  0  0  1  0  1   0 -2.298133    4</span>
-<span class="co">#&gt; 3  0  0  0  0  1  0  1   1 12.057443    4</span>
-<span class="co">#&gt; 4  0  0  0  0  1  1  1   0 13.027446    3</span>
-<span class="co">#&gt; 5  0  0  0  1  0  0  0   1  2.310525    6</span>
-<span class="co">#&gt; 6  0  0  0  1  1  0  1   0  4.392689    4</span>
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x9     effect size</span>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0 -0.5776111    3</span>
+<span class="co">#&gt; 2  0  0  1  0  0  0  1  0  0.8006740    8</span>
+<span class="co">#&gt; 3  0  0  0  1  0  1  1  0  2.4382442    2</span>
+<span class="co">#&gt; 4  0  1  1  0  0  0  0  0  3.9943531    4</span>
+<span class="co">#&gt; 5  0  1  0  0  1  0  0  0  4.0817665    5</span>
+<span class="co">#&gt; 6  0  1  1  0  0  1  0  0  5.5163183    3</span>
 <span class="kw">head</span>(FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_SQLite, <span class="dt">num_covs =</span> <span class="dv">8</span>)) <span class="co">#SQLite</span>
-<span class="co">#&gt;   x1 x2 x4 x5 x7 x8 x9 x10    effect size</span>
-<span class="co">#&gt; 1  0  0  0  0  0  0  1   0  8.948777    4</span>
-<span class="co">#&gt; 2  0  0  0  0  1  0  1   0 -2.298133    4</span>
-<span class="co">#&gt; 3  0  0  0  0  1  0  1   1 12.057443    4</span>
-<span class="co">#&gt; 4  0  0  0  0  1  1  1   0 13.027446    3</span>
-<span class="co">#&gt; 5  0  0  0  1  0  0  0   1  2.310525    6</span>
-<span class="co">#&gt; 6  0  0  0  1  1  0  1   0  4.392689    4</span></code></pre></div>
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x9     effect size</span>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0 -0.5776111    3</span>
+<span class="co">#&gt; 2  0  0  1  0  0  0  1  0  0.8006740    8</span>
+<span class="co">#&gt; 3  0  0  0  1  0  1  1  0  2.4382442    2</span>
+<span class="co">#&gt; 4  0  1  1  0  0  0  0  0  3.9943531    4</span>
+<span class="co">#&gt; 5  0  1  0  0  1  0  0  0  4.0817665    5</span>
+<span class="co">#&gt; 6  0  1  1  0  0  1  0  0  5.5163183    3</span></code></pre></div>
 
 <ol start="2" style="list-style-type: lower-alpha">
-<li>To see the CATE for (x1 = 1, x2 = 1, x3 = 0,…) when exactly <span class="math inline">\(n\)</span> covariates are used for matching, apply <code>CATE</code> function as below. Note that (x1 = 1, x2 = 1, x3 = 0, …) is represented by input cov_name = c(“x1”, x2“,”x3“, …) and cov_val = c(1, 1, 0, …).</li>
+<li>When 8 covariates are used for matching, one matched unit has the following covariate combination.</li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">8</span>
-cov_name &lt;-<span class="st"> </span>result_bit[[<span class="dv">1</span>]][[<span class="dv">8</span>]]
-  
-FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> n, <span class="dt">cov_name =</span> cov_name, 
-     <span class="dt">cov_val =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
-<span class="co">#&gt; [1] "no CATE for such combination is available using this procedure"</span>
+<pre><code>#&gt; x1 x2 x3 x4 x5 x6 x7 x9 
+#&gt;  0  0  0  1  0  1  0  0</code></pre>
+<p>If we would like to see which the CATE and size of this covariate combination, apply <code>CATE</code> function by providing (1) number of covaraites (<strong>num_covs</strong>), (2) names of covariates (<strong>cov_name</strong>), and (3) corresponding values (<strong>cov_val</strong>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> <span class="dv">8</span>, <span class="dt">cov_name =</span> cov_name, 
+     <span class="dt">cov_val =</span> cov_val)
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x9     effect size</span>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0 -0.5776111    3</span></code></pre></div>
 
-FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> n, <span class="dt">cov_name =</span> cov_name, 
-     <span class="dt">cov_val =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>))
-<span class="co">#&gt; [1] "no CATE for such combination is available using this procedure"</span>
-
-FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> n, <span class="dt">cov_name =</span> cov_name, 
-     <span class="dt">cov_val =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>))
-<span class="co">#&gt;    x1 x2 x4 x5 x7 x8 x9 x10   effect size</span>
-<span class="co">#&gt; 13  0  0  1  0  1  1  0   0 12.36142    6</span>
-
-FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> n, <span class="dt">cov_name =</span> cov_name, 
-     <span class="dt">cov_val =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
-<span class="co">#&gt; [1] "no CATE for such combination is available using this procedure"</span>
-
-FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> n, <span class="dt">cov_name =</span> cov_name, 
-     <span class="dt">cov_val =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>))
-<span class="co">#&gt;    x1 x2 x4 x5 x7 x8 x9 x10  effect size</span>
-<span class="co">#&gt; 52  1  1  1  1  1  0  0   1 46.5548    4</span></code></pre></div>
 <ol start="3" style="list-style-type: lower-alpha">
-<li>To see the all matched groups where the unit contains the covariate combination (x2 = 1, x3 = 0, x5 = 1), apply <code>CATE</code> function as below. Note that (x2 = 1, x3 = 0, x5 = 1) is represented by input cov_name = c(“x2”, “x3”, “x5”) and cov_val = c(1, 0, 1).</li>
+<li>If we would like to see all matched units of (x2 = 1, x3 = 0, x5 = 1) even when there are way more covariates than (x2, x3, x5), we can still apply <code>CATE</code> function to outputall possible matches. The input requirements are the same as (b), but <strong>num_covs</strong> argument should not be specified.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CATE_object &lt;-<span class="st"> </span><span class="kw"><a href="../reference/CATE.html">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">cov_name =</span> <span class="kw">c</span>(<span class="st">"x2"</span>, <span class="st">"x3"</span>, <span class="st">"x5"</span>), <span class="dt">cov_val =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))
 CATE_object
 <span class="co">#&gt; [[1]]</span>
 <span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15   effect size</span>
-<span class="co">#&gt; 10  0  1  0  0  1  0  0  1  0   1   0   0   1   1   1 10.96145    2</span>
-<span class="co">#&gt; 11  0  1  0  0  1  1  1  0  1   0   0   1   1   1   1 13.05425    2</span>
-<span class="co">#&gt; 12  0  1  0  0  1  1  1  1  1   0   0   0   1   1   0 14.55807    2</span>
-<span class="co">#&gt; 13  0  1  0  1  1  1  0  1  0   1   0   0   1   1   0 24.33396    2</span>
-<span class="co">#&gt; 22  1  1  0  1  1  1  1  1  1   1   0   0   0   1   0 43.91656    2</span>
+<span class="co">#&gt; 25  1  1  0  1  1  0  0  1  0   1   1   0   0   0   1 38.43478    2</span>
+<span class="co">#&gt; 27  1  1  0  1  1  1  1  1  0   1   1   0   1   0   0 41.25151    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[2]]</span>
 <span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x14 x15   effect size</span>
-<span class="co">#&gt; 8   0  1  0  0  1  1  1  1  0   0   1   1   0   0 12.88176    2</span>
-<span class="co">#&gt; 9   0  1  0  0  1  1  1  1  0   1   1   1   0   1 14.14262    2</span>
-<span class="co">#&gt; 10  0  1  0  1  1  1  0  1  0   1   1   0   0   0 24.33396    2</span>
-<span class="co">#&gt; 21  1  1  0  0  1  0  1  1  0   1   0   1   1   0 23.86773    2</span>
-<span class="co">#&gt; 22  1  1  0  1  1  1  0  0  1   0   1   0   0   0 39.54553    2</span>
+<span class="co">#&gt; 29  1  1  0  1  1  1  0  0  0   0   1   1   1   0 37.11590    2</span>
+<span class="co">#&gt; 30  1  1  0  1  1  0  0  1  0   1   0   0   0   0 38.43478    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[3]]</span>
-<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x14   effect size</span>
-<span class="co">#&gt; 12  0  1  0  0  1  1  1  1  1   0   1   1   1 14.55807    2</span>
-<span class="co">#&gt; 39  1  1  0  1  1  1  0  1  1   0   1   0   1 41.04935    2</span>
-<span class="co">#&gt; 40  1  1  0  1  1  1  1  0  1   0   0   0   0 41.15188    2</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x15   effect size</span>
+<span class="co">#&gt; 9   0  1  0  0  1  0  0  1  0   1   1   0   0 10.57548    2</span>
+<span class="co">#&gt; 22  1  1  0  0  1  0  0  1  0   1   0   1   1 21.88148    2</span>
+<span class="co">#&gt; 25  0  1  0  1  1  0  1  0  1   0   1   1   1 22.17912    2</span>
+<span class="co">#&gt; 28  1  1  0  0  1  1  0  0  1   1   1   1   0 23.56991    2</span>
+<span class="co">#&gt; 33  0  1  0  1  1  0  1  1  1   1   0   0   0 25.01995    2</span>
+<span class="co">#&gt; 36  1  1  0  1  1  0  0  0  0   1   0   1   1 37.00483    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[4]]</span>
-<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12   effect size</span>
-<span class="co">#&gt; 25  0  1  0  0  1  1  0  1  0   1   1   1 12.53627    3</span>
-<span class="co">#&gt; 26  0  1  0  0  1  1  1  1  0   1   1   0 14.14262    2</span>
-<span class="co">#&gt; 31  0  1  0  1  1  1  0  0  0   1   0   1 22.83015    2</span>
-<span class="co">#&gt; 32  0  1  0  1  1  1  0  1  1   0   0   1 24.74942    2</span>
-<span class="co">#&gt; 33  0  1  0  1  1  1  1  1  0   0   1   1 24.67945    2</span>
-<span class="co">#&gt; 75  1  1  0  0  1  1  0  1  0   1   1   0 23.83620    2</span>
-<span class="co">#&gt; 79  1  1  0  1  1  0  0  1  1   1   1   1 40.73539    2</span>
-<span class="co">#&gt; 80  1  1  0  1  1  0  1  0  0   0   0   1 37.90075    2</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x12 x15   effect size</span>
+<span class="co">#&gt; 27  0  1  0  0  1  0  0  1  0   1   0   1 10.57548    3</span>
+<span class="co">#&gt; 29  0  1  0  0  1  1  0  0  1   0   1   1 10.85301    2</span>
+<span class="co">#&gt; 32  0  1  0  0  1  0  1  0  1   1   1   1 12.03671    3</span>
+<span class="co">#&gt; 44  0  1  0  0  1  1  1  1  1   0   1   0 13.57773    2</span>
+<span class="co">#&gt; 51  0  1  0  1  1  0  0  0  0   0   1   0 19.28794    2</span>
+<span class="co">#&gt; 64  0  1  0  1  1  0  1  1  0   1   0   0 23.42355    3</span>
+<span class="co">#&gt; 68  1  1  0  0  1  1  0  1  1   0   0   1 23.58895    2</span>
+<span class="co">#&gt; 69  1  1  0  0  1  1  0  1  1   0   1   1 23.58895    2</span>
+<span class="co">#&gt; 72  0  1  0  1  1  1  0  1  0   1   1   1 23.65074    2</span>
+<span class="co">#&gt; 78  1  1  0  0  1  1  1  1  1   0   0   0 24.88372    2</span>
+<span class="co">#&gt; 80  0  1  0  1  1  1  1  1  1   1   1   1 26.54192    2</span>
+<span class="co">#&gt; 82  1  1  0  1  1  0  0  0  1   0   1   0 37.19035    2</span>
+<span class="co">#&gt; 84  1  1  0  1  1  0  1  0  1   0   1   1 38.48512    2</span>
+<span class="co">#&gt; 85  1  1  0  1  1  1  0  1  0   0   0   0 38.54585    2</span>
+<span class="co">#&gt; 91  1  1  0  1  1  1  1  1  0   0   1   1 39.84062    2</span>
+<span class="co">#&gt; 97  1  1  0  1  1  1  1  0  1   1   0   0 41.41798    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[5]]</span>
-<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11   effect size</span>
-<span class="co">#&gt; 28  0  1  0  0  1  0  0  0  0   1   0  9.45763    2</span>
-<span class="co">#&gt; 29  0  1  0  0  1  0  1  1  1   1   1 14.24411    3</span>
-<span class="co">#&gt; 30  0  1  0  0  1  1  0  1  0   0   1 11.27541    3</span>
-<span class="co">#&gt; 34  0  1  0  1  1  0  0  0  0   0   1 19.99446    2</span>
-<span class="co">#&gt; 35  0  1  0  1  1  0  0  0  1   1   1 22.93164    2</span>
-<span class="co">#&gt; 36  0  1  0  1  1  0  1  0  1   1   0 24.53799    2</span>
-<span class="co">#&gt; 37  0  1  0  1  1  0  1  1  0   0   1 23.10463    2</span>
-<span class="co">#&gt; 38  0  1  0  1  1  0  1  1  0   1   0 24.36549    2</span>
-<span class="co">#&gt; 39  0  1  0  1  1  0  1  1  1   0   0 24.78094    2</span>
-<span class="co">#&gt; 40  0  1  0  1  1  1  0  0  1   0   1 23.24560    3</span>
-<span class="co">#&gt; 41  0  1  0  1  1  1  1  0  1   1   0 26.11281    2</span>
-<span class="co">#&gt; 42  0  1  0  1  1  1  1  1  1   0   0 26.35576    2</span>
-<span class="co">#&gt; 84  1  1  0  0  1  0  1  1  1   0   0 24.28318    2</span>
-<span class="co">#&gt; 85  1  1  0  0  1  1  0  0  1   0   0 22.74784    2</span>
-<span class="co">#&gt; 86  1  1  0  0  1  1  1  0  0   0   0 22.67787    3</span>
-<span class="co">#&gt; 90  1  1  0  1  1  0  1  1  1   0   0 41.08087    2</span>
-<span class="co">#&gt; 91  1  1  0  1  1  1  0  0  1   1   1 40.80639    3</span>
-<span class="co">#&gt; 92  1  1  0  1  1  1  1  0  1   0   1 41.15188    4</span>
+<span class="co">#&gt;     x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x15   effect size</span>
+<span class="co">#&gt; 24   0  1  0  0  1  1  0  0  0   1   0 10.66750    2</span>
+<span class="co">#&gt; 25   0  1  0  0  1  0  0  0  1   1   1 10.74194    2</span>
+<span class="co">#&gt; 34   0  1  0  0  1  0  1  1  0   1   0 11.87025    3</span>
+<span class="co">#&gt; 36   0  1  0  0  1  1  1  1  0   0   1 11.98132    2</span>
+<span class="co">#&gt; 41   0  1  0  0  1  1  0  1  1   0   1 12.28295    2</span>
+<span class="co">#&gt; 54   1  1  0  0  1  0  1  0  0   1   0 21.74631    3</span>
+<span class="co">#&gt; 55   1  1  0  0  1  1  1  0  0   0   0 21.85738    2</span>
+<span class="co">#&gt; 57   0  1  0  1  1  0  0  1  0   1   0 22.12878    2</span>
+<span class="co">#&gt; 59   0  1  0  1  1  1  0  0  0   1   0 22.22080    2</span>
+<span class="co">#&gt; 61   0  1  0  1  1  0  0  0  1   1   0 22.29524    2</span>
+<span class="co">#&gt; 62   0  1  0  1  1  1  0  0  1   0   1 22.40631    2</span>
+<span class="co">#&gt; 64   1  1  0  0  1  0  1  1  0   1   1 23.17625    2</span>
+<span class="co">#&gt; 65   1  1  0  0  1  0  1  0  1   1   0 23.34271    2</span>
+<span class="co">#&gt; 66   1  1  0  0  1  0  1  0  1   1   1 23.34271    2</span>
+<span class="co">#&gt; 89   1  1  0  1  1  0  0  1  0   0   1 37.02388    2</span>
+<span class="co">#&gt; 99   1  1  0  1  1  1  0  1  1   0   1 40.14225    2</span>
+<span class="co">#&gt; 101  1  1  0  1  1  0  1  1  1   1   0 41.32595    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[6]]</span>
-<span class="co">#&gt;     x1 x2 x3 x4 x5 x6 x7 x8 x9 x10    effect size</span>
-<span class="co">#&gt; 39   0  1  0  0  1  0  0  0  0   0  8.196769    2</span>
-<span class="co">#&gt; 40   0  1  0  0  1  1  1  0  1   0 13.054253    4</span>
-<span class="co">#&gt; 46   0  1  0  1  1  0  1  0  1   0 23.277125    2</span>
-<span class="co">#&gt; 109  1  1  0  0  1  0  1  0  0   0 21.103050    3</span>
-<span class="co">#&gt; 110  1  1  0  0  1  0  1  0  1   1 24.040223    3</span>
-<span class="co">#&gt; 111  1  1  0  0  1  1  0  1  0   0 22.575341    2</span>
-<span class="co">#&gt; 119  1  1  0  1  1  0  0  1  0   0 37.798214    2</span>
-<span class="co">#&gt; 120  1  1  0  1  1  0  1  0  1   1 40.837918    2</span>
-<span class="co">#&gt; 121  1  1  0  1  1  0  1  1  1   1 42.341735    4</span>
-<span class="co">#&gt; 122  1  1  0  1  1  1  0  1  0   0 39.373036    2</span>
-<span class="co">#&gt; 123  1  1  0  1  1  1  0  1  0   1 40.633897    2</span>
-<span class="co">#&gt; 124  1  1  0  1  1  1  0  1  1   1 42.310209    4</span>
-<span class="co">#&gt; 125  1  1  0  1  1  1  1  1  1   1 43.916558    2</span>
+<span class="co">#&gt;     x1 x2 x3 x4 x5 x6 x7 x8 x9 x10   effect size</span>
+<span class="co">#&gt; 42   0  1  0  0  1  0  1  0  0   1 10.44031    2</span>
+<span class="co">#&gt; 43   0  1  0  0  1  1  1  0  0   0 10.55138    2</span>
+<span class="co">#&gt; 44   0  1  0  0  1  1  0  1  0   0 10.68655    2</span>
+<span class="co">#&gt; 45   0  1  0  0  1  0  0  1  1   0 10.76099    2</span>
+<span class="co">#&gt; 59   0  1  0  0  1  1  1  0  0   1 11.96227    2</span>
+<span class="co">#&gt; 70   0  1  0  0  1  1  0  1  1   1 13.69385    2</span>
+<span class="co">#&gt; 75   1  1  0  0  1  0  0  0  0   0 19.04064    2</span>
+<span class="co">#&gt; 91   1  1  0  0  1  1  0  1  0   1 23.40344    4</span>
+<span class="co">#&gt; 93   0  1  0  1  1  1  1  1  0   0 23.53462    2</span>
+<span class="co">#&gt; 99   0  1  0  1  1  1  1  0  1   0 23.70108    3</span>
+<span class="co">#&gt; 100  0  1  0  1  1  0  0  1  1   1 23.72518    4</span>
+<span class="co">#&gt; 106  1  1  0  1  1  1  0  0  0   0 37.11590    2</span>
+<span class="co">#&gt; 108  1  1  0  1  1  0  1  1  0   0 38.31865    2</span>
+<span class="co">#&gt; 112  1  1  0  1  1  1  0  1  0   0 38.54585    2</span>
+<span class="co">#&gt; 115  1  1  0  1  1  1  1  0  0   1 39.82157    2</span>
+<span class="co">#&gt; 116  1  1  0  1  1  1  0  1  0   1 39.95674    3</span>
+<span class="co">#&gt; 117  1  1  0  1  1  1  1  0  1   0 40.00708    2</span>
+<span class="co">#&gt; 119  1  1  0  1  1  0  0  1  1   1 40.03118    4</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[7]]</span>
-<span class="co">#&gt;     x1 x2 x3 x4 x5 x7 x8 x9 x10   effect size</span>
-<span class="co">#&gt; 36   0  1  0  0  1  0  0  1   0 10.23527    4</span>
-<span class="co">#&gt; 37   0  1  0  0  1  0  0  1   1 12.34658    2</span>
-<span class="co">#&gt; 38   0  1  0  0  1  0  1  1   1 13.85040    2</span>
-<span class="co">#&gt; 39   0  1  0  0  1  1  0  0   0 10.16530    2</span>
-<span class="co">#&gt; 40   0  1  0  0  1  1  0  0   1 12.27662    3</span>
-<span class="co">#&gt; 41   0  1  0  0  1  1  1  0   0 11.66912    3</span>
-<span class="co">#&gt; 44   0  1  0  1  1  0  1  0   0 21.86047    2</span>
-<span class="co">#&gt; 45   0  1  0  1  1  0  1  1   1 25.64809    4</span>
-<span class="co">#&gt; 46   0  1  0  1  1  1  1  0   1 25.57813    3</span>
-<span class="co">#&gt; 89   1  1  0  0  1  0  0  0   0 19.85889    4</span>
-<span class="co">#&gt; 90   1  1  0  0  1  0  0  1   1 22.79606    2</span>
-<span class="co">#&gt; 91   1  1  0  0  1  1  0  1   0 23.14155    3</span>
-<span class="co">#&gt; 92   1  1  0  0  1  1  1  1   0 25.49582    3</span>
-<span class="co">#&gt; 99   1  1  0  1  1  0  0  0   0 37.50704    4</span>
-<span class="co">#&gt; 100  1  1  0  1  1  1  0  0   0 38.26293    4</span></code></pre></div>
+<span class="co">#&gt;     x1 x2 x3 x4 x5 x6 x7 x8 x9    effect size</span>
+<span class="co">#&gt; 29   0  1  0  0  1  1  0  0  0  8.636228    3</span>
+<span class="co">#&gt; 43   0  1  0  0  1  0  1  1  0 12.490627    3</span>
+<span class="co">#&gt; 44   0  1  0  0  1  0  1  0  1 12.657093    4</span>
+<span class="co">#&gt; 49   0  1  0  0  1  1  0  0  1 12.884288    3</span>
+<span class="co">#&gt; 60   0  1  0  0  1  1  1  1  1 15.609000    2</span>
+<span class="co">#&gt; 72   1  1  0  0  1  0  1  0  0 22.366685    2</span>
+<span class="co">#&gt; 73   1  1  0  0  1  0  1  1  1 22.741380    2</span>
+<span class="co">#&gt; 75   0  1  0  1  1  1  0  0  0 22.841179    3</span>
+<span class="co">#&gt; 87   0  1  0  1  1  1  0  1  1 25.867528    3</span>
+<span class="co">#&gt; 97   1  1  0  1  1  1  0  1  1 39.521874    5</span>
+<span class="co">#&gt; 103  1  1  0  1  1  0  1  1  1 41.946332    3</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[8]]</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x9    effect size</span>
+<span class="co">#&gt; 5   0  1  0  0  1  0  0  0  4.081766    5</span>
+<span class="co">#&gt; 11  0  1  0  0  1  0  0  1  7.709448    6</span>
+<span class="co">#&gt; 20  1  1  0  0  1  0  0  0 15.077576    2</span>
+<span class="co">#&gt; 29  1  1  0  0  1  1  0  0 17.219920    5</span>
+<span class="co">#&gt; 30  0  1  0  1  1  0  0  1 17.386567    6</span>
+<span class="co">#&gt; 38  0  1  0  1  1  1  1  0 26.256923    3</span>
+<span class="co">#&gt; 42  0  1  0  1  1  0  1  1 27.860319    7</span>
+<span class="co">#&gt; 48  1  1  0  1  1  0  0  0 40.366565    4</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[9]]</span>
+<span class="co">#&gt;    x2 x3 x4 x5 x6 x7 x9   effect size</span>
+<span class="co">#&gt; 10  1  0  0  1  0  1  1 11.27354    3</span>
+<span class="co">#&gt; 22  1  0  0  1  1  0  1 23.18119    4</span>
+<span class="co">#&gt; 26  1  0  1  1  1  1  1 27.30790    5</span>
+<span class="co">#&gt; 29  1  0  1  1  1  0  1 34.72190    3</span>
+<span class="co">#&gt; 30  1  0  1  1  0  1  0 36.52045    4</span>
+<span class="co">#&gt; 32  1  0  1  1  1  0  0 39.61921    3</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[10]]</span>
+<span class="co">#&gt;   x2 x3 x4 x5 x9    effect size</span>
+<span class="co">#&gt; 2  1  0  0  1  1  7.880654   11</span>
+<span class="co">#&gt; 3  1  0  0  1  0 10.494521   15</span></code></pre></div>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>Apply <code>CATE_plot</code> to visualize CATE of all matched groups in boxplot.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/CATE_plot.html">CATE_plot</a></span>(CATE_object)</code></pre></div>
-<p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 
 <ol start="5" style="list-style-type: lower-alpha">
 <li>Apply <code>CATE_AVG</code> to compute average CATE. Note that average CATE is the weighted average of all matched groups.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/CATE_AVG.html">CATE_AVG</a></span>(CATE_object) 
-<span class="co">#&gt; [1] 25.18165</span></code></pre></div>
+<span class="co">#&gt; [1] 22.57365</span></code></pre></div>
 
 </div>
 <div id="get-detailed-information-of-all-matched-units-given-specific-covariate-combination" class="section level3">
 <h3 class="hasAnchor">
 <a href="#get-detailed-information-of-all-matched-units-given-specific-covariate-combination" class="anchor"></a>Get detailed information of all matched units given specific covariate combination</h3>
 <p>The following is a specific covariate combination when eight covariates are used for matching.</p>
-<pre><code>#&gt;   x1 x2 x4 x5 x7 x8 x9 x10   effect size
-#&gt; 1  0  0  0  0  0  0  1   0 8.948777    4</code></pre>
+<pre><code>#&gt;   x1 x2 x3 x4 x5 x6 x7 x9     effect size
+#&gt; 1  0  0  0  1  0  1  0  0 -0.5776111    3</code></pre>
 <p>If we would like to see all units given this specific covariate combination, apply the following comand.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/MATCH">MATCH</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">cov_name =</span> cov_name, <span class="dt">cov_val =</span> cov_val)
-<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated</span>
-<span class="co">#&gt; 1  0  0  1  0  0  0  0  0  1   0   1   0   0   0   0 -15.347843       0</span>
-<span class="co">#&gt; 2  0  0  0  0  0  0  0  0  1   0   1   1   1   0   1  -6.399065       1</span>
-<span class="co">#&gt; 3  0  0  0  0  0  0  0  0  1   0   0   1   0   0   1  -6.399065       1</span>
-<span class="co">#&gt; 4  0  0  0  0  0  0  0  0  1   0   1   1   1   0   1  -6.399065       1</span>
-FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/MATCH">MATCH</a></span>(<span class="dt">FLAME_object =</span> result_PostgreSQL, <span class="dt">cov_name =</span> cov_name, <span class="dt">cov_val =</span> cov_val)
-<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated</span>
-<span class="co">#&gt; 1  0  0  1  0  0  0  0  0  1   0   1   0   0   0   0 -15.347843       0</span>
-<span class="co">#&gt; 2  0  0  0  0  0  0  0  0  1   0   1   1   1   0   1  -6.399065       1</span>
-<span class="co">#&gt; 3  0  0  0  0  0  0  0  0  1   0   0   1   0   0   1  -6.399065       1</span>
-<span class="co">#&gt; 4  0  0  0  0  0  0  0  0  1   0   1   1   1   0   1  -6.399065       1</span>
-FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/MATCH">MATCH</a></span>(<span class="dt">FLAME_object =</span> result_SQLite, <span class="dt">cov_name =</span> cov_name, <span class="dt">cov_val =</span> cov_val)
-<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated</span>
-<span class="co">#&gt; 1  0  0  1  0  0  0  0  0  1   0   1   0   0   0   0 -15.347843       0</span>
-<span class="co">#&gt; 2  0  0  0  0  0  0  0  0  1   0   1   1   1   0   1  -6.399065       1</span>
-<span class="co">#&gt; 3  0  0  0  0  0  0  0  0  1   0   0   1   0   0   1  -6.399065       1</span>
-<span class="co">#&gt; 4  0  0  0  0  0  0  0  0  1   0   1   1   1   0   1  -6.399065       1</span></code></pre></div>
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15   outcome treated</span>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0  0   0   1   1   1   0   0 -6.491438       0</span>
+<span class="co">#&gt; 2  0  0  0  1  0  1  0  0  0   1   1   0   0   1   0 -5.871060       0</span>
+<span class="co">#&gt; 3  0  0  0  1  0  1  0  1  0   0   0   1   0   0   1 -6.758860       1</span></code></pre></div>
 </div>
 </div>
 <div id="summary-visualization" class="section level2">
@@ -389,7 +387,7 @@ FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentati
 <a href="#summary-visualization" class="anchor"></a>Summary Visualization</h2>
 <p>Apply <code>summary_plot</code> function to visualize matching process, including covariate dropped, total number of matched units, and average CATE at each iteration. Note that nothing is dropped in the beginning since all covariates are used for matching. It is represented by NA in the covariate dropped axis.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/summary_plot">summary_plot</a></span>(result_bit)</code></pre></div>
-<p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 </div>
   </div>
 

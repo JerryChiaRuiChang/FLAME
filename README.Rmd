@@ -37,4 +37,5 @@ devtools::install_github("chiarui424/FLAME")
 
 ### Some examples 
 
-[Modeling Synthetic Data](articles/Synthetic_Data.html)
+[Modeling Synthetic Data](articles/Synthetic_Data.html)  
+[Matching Quality](articles/Matching_Quality.html)
