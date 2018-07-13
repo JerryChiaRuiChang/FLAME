@@ -2,7 +2,7 @@
 % Please edit documentation in R/ATE.R
 \name{ATE}
 \alias{ATE}
-\title{compute average treatment effect}
+\title{Compute Average Treatment Effect}
 \usage{
 ATE(FLAME_object)
 }
@@ -15,5 +15,7 @@ ATE(FLAME_object)
 average treatment effect (ATE)
 }
 \description{
-\code{ATE} computes average treatment effect for all matched units.
+\code{ATE} computes average treatment effect for each given sub-population by
+a weighted average of the estimated treatment effects in each matched group.
+The weight is the number of units matched.
 }

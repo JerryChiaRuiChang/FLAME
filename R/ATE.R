@@ -3,9 +3,11 @@
 simp <- function(x) {
   return(x[,which(colnames(x) == "effect"):which(colnames(x) == "size")])}
 
-#' compute average treatment effect
+#' Compute Average Treatment Effect
 #'
-#' \code{ATE} computes average treatment effect for all matched units.
+#' \code{ATE} computes average treatment effect for each given sub-population by
+#' a weighted average of the estimated treatment effects in each matched group.
+#' The weight is the number of units matched.
 #'
 #' @param FLAME_object object returned by applying the FLAME algorithm
 #'   (\code{\link{FLAME_bit}}, \code{\link{FLAME_PostgreSQL}}, or

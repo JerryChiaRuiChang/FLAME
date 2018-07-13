@@ -2,7 +2,7 @@
 % Please edit documentation in R/CATE.R
 \name{CATE}
 \alias{CATE}
-\title{get matched units and its CATE}
+\title{Get the Size and CATE of Matched Group(s)}
 \usage{
 CATE(FLAME_object, num_covs = NULL, cov_name = NULL, cov_val = NULL)
 }
@@ -16,21 +16,23 @@ CATE(FLAME_object, num_covs = NULL, cov_name = NULL, cov_val = NULL)
 \item{cov_name}{a vector of covariate names}
 
 \item{cov_val}{a vector of covariate values, where the value position should
-match cov_name position}
+match cov_name position. In addition, it has to be in character R data
+type.}
 }
 \value{
 data frame with covariate values, CATE, and size of each matched
   group
 }
 \description{
-\code{CATE} provides detailed information of matched units and its CATE.
-First, given number of covariates used for matching, \code{CATE(FLAME_object,
-num_covs = x)} returns the covariate values, CATE and size of each matched
-group. Second, if user would like to see a specific matched group given a
-specific covariate combination, \code{CATE(FLAME_object, num_covs = x,
+\code{CATE} provides detailed information of each matched group's CATE and
+size. First, given number of covariates used for matching,
+\code{CATE(FLAME_object, num_covs = x)} returns the covariate values, size
+and CATE of each matched group. Second, to see a specific matched group given
+a specific covariate combination, \code{CATE(FLAME_object, num_covs = x,
 cov_name = c("x1", "x2", ...), cov_val = c(0,1,...))} returns the CATE and
 size of this specific matched group. Third, if user would like to see all
-matched groups given a specific covariate combination,
-\code{CATE(FLAME_object, cov_name = c("x1", "x2", ...), cov_val =
-c(0,1,...))} returns all matched group containing the covariate combination.
+matched groups given a specific covariate combination even when the FLAME
+algorithm performs matching with more than the number of covariates
+specified, \code{CATE(FLAME_object, cov_name = c("x1", "x2", ...), cov_val =
+c(0,1,...))} returns all matched groups containing the covariate combination.
 }

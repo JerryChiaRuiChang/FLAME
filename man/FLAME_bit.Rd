@@ -2,7 +2,7 @@
 % Please edit documentation in R/FLAME_bit.R
 \name{FLAME_bit}
 \alias{FLAME_bit}
-\title{bit vectors implementation}
+\title{Bit Vectors Implementation}
 \usage{
 FLAME_bit(data, holdout, num_covs, covs_max_list, tradeoff = 0.1,
   PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
@@ -17,22 +17,29 @@ FLAME_bit(data, holdout, num_covs, covs_max_list, tradeoff = 0.1,
 
 \item{covs_max_list}{list indicates each covariate is binary/ternary/...}
 
-\item{tradeoff}{tradeoff parameter to compute Matching Quality (default = 0.1)}
+\item{tradeoff}{tradeoff parameter to compute Matching Quality (default =
+0.1)}
 
-\item{PE_function}{user defined function to compute predivtive error (optional)}
+\item{PE_function}{user defined function to compute predivtive error
+(optional)}
 
-\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)}
+\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree
+(optional)}
 
 \item{ridge_reg}{L2 regularization parameter if model = Ridge (optional)}
 
 \item{lasso_reg}{L1 regularization parameter if model = Lasso (optional)}
 
-\item{tree_depth}{maximum depth of decision tree if model = DecisionTree (optional)}
+\item{tree_depth}{maximum depth of decision tree if model = DecisionTree
+(optional)}
 }
 \value{
-(1) list of covariates used for matching at each iteration (2) list
-  of dataframe showing all matched units, size of each matched group, and its
-  conditional average treatment effect (CATE).
+(1) list of covariates FLAME performs matching at each iteration, (2)
+list of dataframe showing matched groups' sizes and conditional average
+treatment effects (CATEs) at each iteration, (3) matching quality at each
+iteration, and (4) the original data with additional column *matched*,
+indicating the number of covariates each unit is matched. If a unit is never
+matched, then *matched* will be 0.
 }
 \description{
 \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors

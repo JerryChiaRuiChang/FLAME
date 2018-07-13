@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>bit vectors implementation — FLAME_bit • FLAME</title>
+<title>Bit Vectors Implementation — FLAME_bit • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,7 +30,7 @@
 
 
 
-<meta property="og:title" content="bit vectors implementation — FLAME_bit" />
+<meta property="og:title" content="Bit Vectors Implementation — FLAME_bit" />
 
 <meta property="og:description" content="FLAME_bit applies FLAME matching algorithm based on bit vectors
 implementation." />
@@ -62,7 +62,7 @@ implementation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">FLAME</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
       </span>
     </div>
 
@@ -85,10 +85,16 @@ implementation." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
+    </li>
+    <li>
       <a href="../articles/Matching_Quality.html">Matching Quality</a>
     </li>
     <li>
-      <a href="../articles/Synthetic_Data.html">Modeling Synthetic Data</a>
+      <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
+    </li>
+    <li>
+      <a href="../articles/Tradeoff.html">Effect of Tradeoff Parameter</a>
     </li>
   </ul>
 </li>
@@ -113,7 +119,7 @@ implementation." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>bit vectors implementation</h1>
+    <h1>Bit Vectors Implementation</h1>
     <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/FLAME_bit.R'><code>R/FLAME_bit.R</code></a></small>
     <div class="hidden name"><code>FLAME_bit.Rd</code></div>
     </div>
@@ -150,15 +156,18 @@ implementation.</p>
     </tr>
     <tr>
       <th>tradeoff</th>
-      <td><p>tradeoff parameter to compute Matching Quality (default = 0.1)</p></td>
+      <td><p>tradeoff parameter to compute Matching Quality (default =
+0.1)</p></td>
     </tr>
     <tr>
       <th>PE_function</th>
-      <td><p>user defined function to compute predivtive error (optional)</p></td>
+      <td><p>user defined function to compute predivtive error
+(optional)</p></td>
     </tr>
     <tr>
       <th>model</th>
-      <td><p>user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)</p></td>
+      <td><p>user defined model - Linear, Ridge, Lasso, or DecisionTree
+(optional)</p></td>
     </tr>
     <tr>
       <th>ridge_reg</th>
@@ -170,15 +179,19 @@ implementation.</p>
     </tr>
     <tr>
       <th>tree_depth</th>
-      <td><p>maximum depth of decision tree if model = DecisionTree (optional)</p></td>
+      <td><p>maximum depth of decision tree if model = DecisionTree
+(optional)</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>(1) list of covariates used for matching at each iteration (2) list
-  of dataframe showing all matched units, size of each matched group, and its
-  conditional average treatment effect (CATE).</p>
+    <p>(1) list of covariates FLAME performs matching at each iteration, (2)
+list of dataframe showing matched groups' sizes and conditional average
+treatment effects (CATEs) at each iteration, (3) matching quality at each
+iteration, and (4) the original data with additional column *matched*,
+indicating the number of covariates each unit is matched. If a unit is never
+matched, then *matched* will be 0.</p>
     
 
   </div>

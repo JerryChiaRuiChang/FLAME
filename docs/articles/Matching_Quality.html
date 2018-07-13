@@ -29,7 +29,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">FLAME</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
       </span>
     </div>
 
@@ -52,10 +52,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
+    </li>
+    <li>
       <a href="../articles/Matching_Quality.html">Matching Quality</a>
     </li>
     <li>
-      <a href="../articles/Synthetic_Data.html">Modeling Synthetic Data</a>
+      <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
+    </li>
+    <li>
+      <a href="../articles/Tradeoff.html">Effect of Tradeoff Parameter</a>
     </li>
   </ul>
 </li>
@@ -82,7 +88,7 @@
       <h1>Matching Quality</h1>
                         <h4 class="author">Jerry Chia-Rui Chang</h4>
             
-            <h4 class="date">7/3/2018</h4>
+            <h4 class="date">2018-07-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chiarui424/FLAME/blob/master/vignettes/Matching_Quality.Rmd"><code>vignettes/Matching_Quality.Rmd</code></a></small>
       <div class="hidden name"><code>Matching_Quality.Rmd</code></div>
@@ -107,38 +113,38 @@ PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}
 
 <p>We demonstrate how to select various predictive models based on bit vectors implementation. Note that model specification for database systems implementation is the same as bit vectors implementation. We applied <code>Data_Generation</code> function to create a synthetic data. There are 1000 treated units and 1000 control units with 10 important covariates and 5 unimportant covariates. Assume holdout training set is the same as the input data.</p>
 <pre><code>#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated
-#&gt; 1  1  0  0  0  0  1  1  1  0   0   1   1   0   0   0 -25.326354       0
-#&gt; 2  1  1  1  1  0  0  0  1  0   1   0   1   1   1   0   5.172278       0
-#&gt; 3  1  0  0  0  0  1  1  0  1   0   1   0   1   1   0 -11.501727       0
-#&gt; 4  0  0  0  1  1  0  1  1  1   1   0   0   1   1   0   8.840892       0
-#&gt; 5  1  1  1  0  1  1  0  0  0   0   1   0   0   0   1   3.435872       0
-#&gt; 6  0  1  0  0  1  0  0  0  1   1   1   0   1   1   1  20.460055       0</code></pre>
+#&gt; 1  1  1  0  0  0  1  0  1  1   0   0   1   0   0   1  -4.792601       0
+#&gt; 2  0  0  1  1  1  0  0  1  1   1   0   0   1   0   0 -21.411542       0
+#&gt; 3  0  0  1  0  1  1  1  1  1   0   1   0   1   1   0 -31.660203       0
+#&gt; 4  1  1  1  1  0  1  0  0  0   1   0   0   1   0   0 -21.426192       0
+#&gt; 5  1  1  1  0  1  0  1  0  1   0   1   0   1   0   0 -21.652994       0
+#&gt; 6  0  0  1  0  0  0  0  1  0   0   1   0   1   0   0  -6.406110       0</code></pre>
 <div id="package-provided-models" class="section level3">
 <h3 class="hasAnchor">
 <a href="#package-provided-models" class="anchor"></a>package provided models</h3>
 <ol style="list-style-type: decimal">
-<li>Linear Regression - R argument requires <strong>model = “Linear”</strong>
+<li>Linear Regression - R argument requires <code>model = "Linear"</code>
 </li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">linear &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">covs_max_list =</span> <span class="kw">rep</span>(<span class="dv">2</span>,<span class="dv">15</span>),
                            <span class="dt">model =</span> <span class="st">"Linear"</span>)</code></pre></div>
 
 <ol start="2" style="list-style-type: decimal">
-<li>Ridge Regression with L2 regularization parameter of 0.1 - R argument requires <strong>model = “Ridge”, ridge_reg = 0.1</strong>
+<li>Ridge Regression with L2 regularization parameter of 0.1 - R argument requires <code>model = "Ridge", ridge_reg = 0.1</code>
 </li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ridge &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">covs_max_list =</span> <span class="kw">rep</span>(<span class="dv">2</span>,<span class="dv">15</span>),
                            <span class="dt">model =</span> <span class="st">"Ridge"</span>, <span class="dt">ridge_reg =</span> <span class="fl">0.1</span>)</code></pre></div>
 
 <ol start="3" style="list-style-type: decimal">
-<li>Lasso with L1 regularization regularization parameter of 0.1 - R argument requires <strong>model = “Lasso”, lasso_reg = 0.1</strong>
+<li>Lasso with L1 regularization regularization parameter of 0.1 - R argument requires <code>model = "Lasso", lasso_reg = 0.1</code>
 </li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lasso &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">covs_max_list =</span> <span class="kw">rep</span>(<span class="dv">2</span>,<span class="dv">15</span>),
                            <span class="dt">model =</span> <span class="st">"Lasso"</span>, <span class="dt">lasso_reg =</span> <span class="fl">0.1</span>)</code></pre></div>
 
 <ol start="4" style="list-style-type: decimal">
-<li>Decision Tree with maximum depth of 8 - R argument requires <strong>model = “DecisionTree”, tree_depth = 8</strong>
+<li>Decision Tree with maximum depth of 8 - R argument requires <code>model = "DecisionTree", tree_depth = 8</code>
 </li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tree &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">covs_max_list =</span> <span class="kw">rep</span>(<span class="dv">2</span>,<span class="dv">15</span>),
@@ -147,7 +153,7 @@ PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}
 <div id="user-defined-model" class="section level3">
 <h3 class="hasAnchor">
 <a href="#user-defined-model" class="anchor"></a>user defined model</h3>
-<p>If users would like to compute predictive error with models not supported by the package, users can provide their own R function. The package requires the input of the function to have four arguments; respectively, they are (1) outcome for treated units (<strong>outcome_treated</strong>), (2) outcome for control units (<strong>outcome_control</strong>), (3) covariate values for treated units in a matrix form (<strong>covs_treated</strong>), and (4) covariate values for control units in a matrix form (<strong>covs_control</strong>). The function should compute MSE for treated units with argument (1) and (3), and MSE for control units with argument (2) and (4).</p>
+<p>If users would like to compute predictive error with models not supported by the package, users can provide their own R function. The package requires the input of the function to have four arguments; respectively, they are (1) outcome for treated units (<em>outcome_treated</em>), (2) outcome for control units (<em>outcome_control</em>), (3) covariate values for treated units in a matrix form (<em>covs_treated</em>), and (4) covariate values for control units in a matrix form (<em>covs_control</em>). The function should compute MSE for treated units with argument (1) and (3), and MSE for control units with argument (2) and (4).</p>
 <p>We wrote a R function that computes predictive error based on support vector machine (SVM). The function is called <code>SVM_PE</code> based on SVM model in <code>e1071</code> package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SVM_PE &lt;-<span class="st"> </span><span class="cf">function</span>(outcome_treated, outcome_control, covs_treated, covs_control) {
   
@@ -166,50 +172,10 @@ PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}
   <span class="kw">return</span>(MSE_treated <span class="op">+</span><span class="st"> </span>MSE_control)
 }</code></pre></div>
 
-<p>Apply the model as <strong>PE_function = SVM_PE</strong> to the package.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SVM &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">covs_max_list =</span> <span class="kw">rep</span>(<span class="dv">2</span>,<span class="dv">15</span>), <span class="dt">PE_function =</span> SVM_PE)</code></pre></div>
+<p>Apply the model as <code>PE_function = SVM_PE</code> to the package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SVM &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">num_covs =</span> <span class="dv">15</span>, <span class="dt">covs_max_list =</span> <span class="kw">rep</span>(<span class="dv">2</span>,<span class="dv">15</span>), 
+                        <span class="dt">PE_function =</span> SVM_PE)</code></pre></div>
 </div>
-</div>
-<div id="effect-of-tradeoff-parameter" class="section level2">
-<h2 class="hasAnchor">
-<a href="#effect-of-tradeoff-parameter" class="anchor"></a>Effect of tradeoff parameter</h2>
-<p>We explore how the tradeoff parameter affects matching quality. We created a simulated data with 15,000 control units and 15,000 treated units, where variables that are more important to outcome prediction are less balanced. There are 20 covariates with <span class="math inline">\(x_{i} \sim Bernoulli(0.1 + \frac{3i}{190})\)</span> for the control group and <span class="math inline">\(x_{i} \sim Bernoulli(0.9 - \frac{3i}{190})\)</span> for the treated group. The outcome variable is given by <span class="math inline">\(y = \sum_{i = 1}^{20} \frac{1}{i}x_{i}+10T\)</span>, where <span class="math inline">\(T \in {0, 1}\)</span> is the treatment indicator. We expect that the algorithm would choose covariate subset that yields higher balancing factor for larger tradeoff parameter.</p>
-<pre><code>#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20
-#&gt; 1  1  0  1  1  1  1  1  1  0   1   1   1   1   1   1   0   0   1   1   0
-#&gt; 2  1  1  1  1  1  1  1  1  1   1   1   0   1   1   1   1   0   0   0   0
-#&gt; 3  1  1  1  0  0  1  1  1  1   1   0   0   0   1   1   1   1   1   1   1
-#&gt; 4  1  0  1  1  1  1  1  1  1   1   0   1   0   1   0   1   1   0   1   0
-#&gt; 5  1  0  1  1  0  1  1  1  1   1   1   1   1   0   1   1   1   0   1   1
-#&gt; 6  0  1  1  1  1  1  1  1  1   1   1   1   0   0   1   0   1   1   0   0
-#&gt;    outcome treated
-#&gt; 1 12.81531       1
-#&gt; 2 13.29740       1
-#&gt; 3 12.89657       1
-#&gt; 4 12.75769       1
-#&gt; 5 12.77076       1
-#&gt; 6 12.28426       1</code></pre>
-
-<p>We ran the experiment with three distinct tradeoff parameters - 0.1, 0.5, and 1.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Connect to PostgreSQL</span>
-drv &lt;-<span class="st"> </span><span class="kw">dbDriver</span>(<span class="st">'PostgreSQL'</span>)
-
-<span class="co">#Name the connection as db</span>
-db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(drv, <span class="dt">user=</span><span class="st">"postgres"</span>, <span class="dt">dbname=</span><span class="st">"FLAME"</span>, <span class="dt">host=</span><span class="st">'localhost'</span>,
-             <span class="dt">port=</span><span class="dv">5432</span>, <span class="dt">password =</span> <span class="st">'new_password'</span>)
-
-<span class="co">#Run FLAME_PostgreSQL </span>
-ridge_<span class="dv">1</span> &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_PostgreSQL">FLAME_PostgreSQL</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> data, <span class="dt">num_covs =</span> <span class="dv">20</span>, <span class="dt">tradeoff =</span> <span class="fl">0.1</span>)
-ridge_<span class="dv">5</span> &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_PostgreSQL">FLAME_PostgreSQL</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> data, <span class="dt">num_covs =</span> <span class="dv">20</span>, <span class="dt">tradeoff =</span> <span class="fl">0.5</span>)
-ridge_<span class="dv">10</span> &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_PostgreSQL">FLAME_PostgreSQL</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> data, <span class="dt">num_covs =</span> <span class="dv">20</span>, <span class="dt">tradeoff =</span> <span class="dv">1</span>)
-
-<span class="co">#Disconnect from db</span>
-<span class="kw">dbDisconnect</span>(db)</code></pre></div>
-
-<p>We examined the percentage of units being matched as the algorithm eliminates covariates. The x-axis denotes the number of remaining covariates, and y-axis denotes the percentage of units matched (cumulative). Larger tradeoff parameter yields more matched units.<br><img src="Matching_Quality_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-
-<p>We also examined the effect of tradeoff parameter on estimated treatment effect. The x-axis denotes the number of remaining covariates, and y-axis denotes the estimated treatment effect. The bias increases as tradeoff parameter increases.<br><img src="Matching_Quality_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
-
-<p>In summary, tradeoff parameter is the tradeoff between finding more matched units (higher balancing factor) and having lower bias (lower predictive error). In the summary plot below, the x-axis denotes the percentage of units matched, and the y-axis denotes the estimated treatment effect. <img src="Matching_Quality_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 </div>
   </div>
 
@@ -220,7 +186,6 @@ ridge_<span class="dv">10</span> &lt;-<span class="st"> </span>FLAME<span class=
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#overview-of-matching-quality">Overview of Matching Quality</a></li>
       <li><a href="#specify-models-to-compute-predictive-errors">Specify models to compute predictive errors</a></li>
-      <li><a href="#effect-of-tradeoff-parameter">Effect of tradeoff parameter</a></li>
       </ul>
 </div>
       </div>

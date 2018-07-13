@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>compute average treatment effect — ATE • FLAME</title>
+<title>Compute Average Treatment Effect — ATE • FLAME</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,11 @@
 
 
 
-<meta property="og:title" content="compute average treatment effect — ATE" />
+<meta property="og:title" content="Compute Average Treatment Effect — ATE" />
 
-<meta property="og:description" content="ATE computes average treatment effect for all matched units." />
+<meta property="og:description" content="ATE computes average treatment effect for each given sub-population by
+a weighted average of the estimated treatment effects in each matched group.
+The weight is the number of units matched." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -61,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">FLAME</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
       </span>
     </div>
 
@@ -84,10 +86,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
+    </li>
+    <li>
       <a href="../articles/Matching_Quality.html">Matching Quality</a>
     </li>
     <li>
-      <a href="../articles/Synthetic_Data.html">Modeling Synthetic Data</a>
+      <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
+    </li>
+    <li>
+      <a href="../articles/Tradeoff.html">Effect of Tradeoff Parameter</a>
     </li>
   </ul>
 </li>
@@ -112,14 +120,16 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>compute average treatment effect</h1>
+    <h1>Compute Average Treatment Effect</h1>
     <small class="dont-index">Source: <a href='https://github.com/chiarui424/FLAME/blob/master/R/ATE.R'><code>R/ATE.R</code></a></small>
     <div class="hidden name"><code>ATE.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>ATE</code> computes average treatment effect for all matched units.</p>
+    <p><code>ATE</code> computes average treatment effect for each given sub-population by
+a weighted average of the estimated treatment effects in each matched group.
+The weight is the number of units matched.</p>
     
     </div>
 

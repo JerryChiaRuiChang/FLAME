@@ -1,7 +1,9 @@
 pandoc: 1.19.2.1
-pkgdown: 1.1.0.9000
-pkgdown_sha: 977646146af6df860111f6438de0d33ae585b342
+pkgdown: 1.1.0
+pkgdown_sha: ~
 articles:
+  CATE: CATE.html
   Matching_Quality: Matching_Quality.html
   Synthetic_Data: Synthetic_Data.html
+  Tradeoff: Tradeoff.html
 

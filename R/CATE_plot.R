@@ -1,6 +1,6 @@
-#' summarize CATE of all matched groups by boxplot
+#' Summarize CATEs of All Matched Groups by Boxplot
 #'
-#' Given CATE_object, \code{CATE_plot} visualizes CATE of all matched groups by
+#' Given CATE_object, \code{CATE_plot} visualizes CATEs of all matched groups by
 #' boxplot
 #'
 #' @param CATE_object object returned by applying \code{\link{CATE}} function

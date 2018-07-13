@@ -53,7 +53,7 @@ num_2_vector <- function(num, covs_max_list) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, column) {
+get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, column, factor_level) {
   if (length(index) == 0) {
     CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
                      c(column[(cur_covs + 1)],"effect","size"))
@@ -69,6 +69,7 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
     CATE$size = summary$size
     CATE <- CATE[order(CATE$effect),]
     colnames(CATE) = c(column[(cur_covs + 1)],"effect","size")
+    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[x,][CATE[,y]+1], cur_covs + 1, 1:length(cur_covs))
     rownames(CATE) = NULL
   }
 
@@ -160,7 +161,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 }
 
 
-#' bit vectors implementation
+#' Bit Vectors Implementation
 #'
 #' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors
 #' implementation.
@@ -169,34 +170,62 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' @param holdout holdout training data
 #' @param num_covs number of covariates
 #' @param covs_max_list list indicates each covariate is binary/ternary/...
-#' @param tradeoff tradeoff parameter to compute Matching Quality (default = 0.1)
-#' @param PE_function user defined function to compute predivtive error (optional)
-#' @param model user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)
+#' @param tradeoff tradeoff parameter to compute Matching Quality (default =
+#'   0.1)
+#' @param PE_function user defined function to compute predivtive error
+#'   (optional)
+#' @param model user defined model - Linear, Ridge, Lasso, or DecisionTree
+#'   (optional)
 #' @param ridge_reg L2 regularization parameter if model = Ridge (optional)
 #' @param lasso_reg L1 regularization parameter if model = Lasso (optional)
-#' @param tree_depth maximum depth of decision tree if model = DecisionTree (optional)
-#' @return (1) list of covariates used for matching at each iteration (2) list
-#'   of dataframe showing all matched units, size of each matched group, and its
-#'   conditional average treatment effect (CATE).
-#' @import reticulate
+#' @param tree_depth maximum depth of decision tree if model = DecisionTree
+#'   (optional)
+#' @return (1) list of covariates FLAME performs matching at each iteration, (2)
+#' list of dataframe showing matched groups' sizes and conditional average
+#' treatment effects (CATEs) at each iteration, (3) matching quality at each
+#' iteration, and (4) the original data with additional column *matched*,
+#' indicating the number of covariates each unit is matched. If a unit is never
+#' matched, then *matched* will be 0.
 #' @import dplyr
+#' @import reticulate
 #' @export
 
 FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE_function = NULL,
                              model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
 
-  # Setup DataFrame format
+  if (Reduce("|", sapply(1:num_covs, function(x) !is.factor(data[,x] ))) |
+      Reduce("|", sapply(1:num_covs, function(x) !is.factor(holdout[,x] )))) {
+    stop("Covariates are not factor data type.")
+  }
 
-  data <- data.frame(data) #Convert input data to data.frame if not already converted
-  holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
+  if (!is.factor(data[,num_covs + 2]) | !is.factor(holdout[,num_covs + 2])) {
+    stop("Treatment variable is not factor data type")
+  }
 
-  data$matched <- 0 #add column matched to input data
+  if (!is.numeric(data[,num_covs + 1]) | !is.numeric(holdout[,num_covs + 1])) {
+    stop("Outcome variable is not numeric data type")
+  }
+
+
+  data$matched <- as.integer(0) #add column matched to input data
   column <- colnames(data)
+
+  factor_level <- t(sapply(data[,1:num_covs], levels)) # Get levels of each factor
+
+  # Convert each covariate and treated into type integer
+  data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x) - 1)
+  data[,num_covs + 2] <- as.integer(levels(data[,num_covs+2])[data[,num_covs+2]])
+
+  holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],function(x) as.integer(x) - 1)
+  holdout[,num_covs + 2] <- as.integer(levels(holdout[,num_covs+2])[holdout[,num_covs+2]])
+
+  # Convert outcome variable to numeric
+  data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
+  holdout[,num_covs + 1] <- as.numeric(holdout[,num_covs + 1])
 
   #change input data and holdout training data column name
   colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
   colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
-
 
   #Set up return objects
 
@@ -220,7 +249,7 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
   return_df = data[match_index,]
 
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column)
+  CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level)
 
   # Remove matched_units
   data = data[!match_index,]
@@ -255,7 +284,7 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
     # Set matched = num_covs and get those matched units
     data[match_index,'matched'] = length(cur_covs)
     return_df = rbind(return_df,data[match_index,])
-    CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column)
+    CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level)
 
     # Remove matched_units
     data = data[!match_index,]
@@ -263,6 +292,7 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
 
   colnames(return_df) <- column
   rownames(return_df) <- NULL
+  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[x,][return_df[,y]+1], 1:num_covs, 1:num_covs)
   return(list(covs_list, CATE, unlist(SCORE), return_df))
 }
 

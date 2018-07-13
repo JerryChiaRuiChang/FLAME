@@ -2,7 +2,7 @@
 % Please edit documentation in R/CATE_plot.R
 \name{CATE_plot}
 \alias{CATE_plot}
-\title{summarize CATE of all matched groups by boxplot}
+\title{Summarize CATEs of All Matched Groups by Boxplot}
 \usage{
 CATE_plot(CATE_object)
 }
@@ -13,6 +13,6 @@ CATE_plot(CATE_object)
 boxplot
 }
 \description{
-Given CATE_object, \code{CATE_plot} visualizes CATE of all matched groups by
+Given CATE_object, \code{CATE_plot} visualizes CATEs of all matched groups by
 boxplot
 }

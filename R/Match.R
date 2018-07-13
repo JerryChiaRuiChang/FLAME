@@ -1,4 +1,4 @@
-#' get all matched units given certain covariate combination
+#' Get Matched Units Given Certain Covariate Combination
 #'
 #' @param FLAME_object object returned by applying the FLAME algorithm
 #'   (\code{\link{FLAME_bit}} or \code{\link{FLAME_PostgreSQL}} or
@@ -30,8 +30,8 @@ MATCH <- function(FLAME_object, cov_name, cov_val) {
   }
 
   # Sort the covariate values by column order
-  cov_val_sort <- as.integer(cov_val[match(cov_matched,cov_name)])
-  cov_val_sort <- data.frame(t(unlist(cov_val_sort)))
+  cov_val_sort <- cov_val[match(cov_matched,cov_name)]
+  cov_val_sort <- as.data.frame(t(cov_val_sort), stringsAsFactors=FALSE)
   colnames(cov_val_sort) <- cov_matched
 
   df <- FLAME_object[[4]]

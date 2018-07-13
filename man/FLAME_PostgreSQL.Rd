@@ -2,7 +2,7 @@
 % Please edit documentation in R/FLAME_PostgreSQL.R
 \name{FLAME_PostgreSQL}
 \alias{FLAME_PostgreSQL}
-\title{PostgreSQL database implementation}
+\title{PostgreSQL Database Implementation}
 \usage{
 FLAME_PostgreSQL(db, data, holdout, num_covs, tradeoff = 0.1,
   PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
@@ -20,20 +20,26 @@ db})}
 
 \item{tradeoff}{tradeoff parameter to compute Matching Quality (default = 0.1)}
 
-\item{PE_function}{user defined function to compute predivtive error (optional)}
+\item{PE_function}{user defined function to compute predivtive error
+(optional)}
 
-\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)}
+\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree
+(optional)}
 
 \item{ridge_reg}{L2 regularization parameter if model = Ridge (optional)}
 
 \item{lasso_reg}{L1 regularization parameter if model = Lasso (optional)}
 
-\item{tree_depth}{maximum depth of decision tree if model = DecisionTree (optional)}
+\item{tree_depth}{maximum depth of decision tree if model = DecisionTree
+(optional)}
 }
 \value{
-(1) list of covariates used for matching at each iteration (2) list of
- dataframe showing all matched units, size of each matched group, and its
- conditional average treatment effect (CATE).
+(1) list of covariates FLAME performs matching at each iteration, (2)
+ list of dataframe showing matched groups' sizes and conditional average
+ treatment effects (CATEs) at each iteration, (3) matching quality at each
+ iteration, and (4) the original data with additional column *matched*,
+ indicating the number of covariates each unit is matched. If a unit is never
+ matched, then *matched* will be 0.
 }
 \description{
 \code{FLAME_PostgreSQL} applies the FLAME algorithm based on PostgreSQL. If
@@ -45,4 +51,16 @@ User must connect to PostgreSQL server in R using the command
 \code{dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
 host='your_localhost', port='your_port', user='your_username', password =
 'your_password')} and name the connection as \strong{db}
+}
+\examples{
+\dontrun{
+drv <- dbDriver('PostgreSQL')
+
+db <- dbConnect(drv, dbname="FLAME", host='localhost',
+port=5432, user="postgres", password = 'new_password')
+
+FLAME_PostgreSQL(db = db, data = data, holdout = holdout, num_covs = 15, tradeoff = 0.1)
+
+dbDisconnect(db)
+}
 }

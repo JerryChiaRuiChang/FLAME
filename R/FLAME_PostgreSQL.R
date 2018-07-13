@@ -33,7 +33,7 @@ update_matched_PostgreSQL <- function(cur_covs, level) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_PostgreSQL <- function(cur_covs, level, column) {
+get_CATE_PostgreSQL <- function(cur_covs, level, column, factor_level) {
 
   #Convert column names to dynamic strings
 
@@ -68,6 +68,7 @@ get_CATE_PostgreSQL <- function(cur_covs, level, column) {
                      c(column[(cur_covs + 1)],"effect","size"))
   } else {
     CATE <- data.frame(data.matrix(CATE)) # convert all columns into numeric
+    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[x,][CATE[,y]], cur_covs + 1, 1:length(cur_covs))
     colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
     CATE <- CATE[order(CATE$effect),]
     rownames(CATE) = NULL
@@ -191,7 +192,7 @@ match_quality_PostgreSQL <- function(c, holdout, num_covs, cur_covs, tradeoff,
   }
 }
 
-#'PostgreSQL database implementation
+#'PostgreSQL Database Implementation
 #'
 #'\code{FLAME_PostgreSQL} applies the FLAME algorithm based on PostgreSQL. If
 #'your computer system does not have PostgreSQL installed, install from
@@ -209,30 +210,62 @@ match_quality_PostgreSQL <- function(c, holdout, num_covs, cur_covs, tradeoff,
 #'@param holdout holdout training data
 #'@param num_covs number of covariates
 #'@param tradeoff tradeoff parameter to compute Matching Quality (default = 0.1)
-#'@param PE_function user defined function to compute predivtive error (optional)
-#'@param model user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)
+#'@param PE_function user defined function to compute predivtive error
+#'  (optional)
+#'@param model user defined model - Linear, Ridge, Lasso, or DecisionTree
+#'  (optional)
 #'@param ridge_reg L2 regularization parameter if model = Ridge (optional)
 #'@param lasso_reg L1 regularization parameter if model = Lasso (optional)
-#'@param tree_depth maximum depth of decision tree if model = DecisionTree (optional)
-#'@return (1) list of covariates used for matching at each iteration (2) list of
-#'  dataframe showing all matched units, size of each matched group, and its
-#'  conditional average treatment effect (CATE).
-#'@import reticulate
+#'@param tree_depth maximum depth of decision tree if model = DecisionTree
+#'  (optional)
+#'@return (1) list of covariates FLAME performs matching at each iteration, (2)
+#'  list of dataframe showing matched groups' sizes and conditional average
+#'  treatment effects (CATEs) at each iteration, (3) matching quality at each
+#'  iteration, and (4) the original data with additional column *matched*,
+#'  indicating the number of covariates each unit is matched. If a unit is never
+#'  matched, then *matched* will be 0.
+#'@examples
+#'\dontrun{
+#'drv <- dbDriver('PostgreSQL')
+#'
+#'db <- dbConnect(drv, dbname="FLAME", host='localhost',
+#'port=5432, user="postgres", password = 'new_password')
+#'
+#'FLAME_PostgreSQL(db = db, data = data, holdout = holdout, num_covs = 15, tradeoff = 0.1)
+#'
+#'dbDisconnect(db)
+#'}
 #'@import RPostgreSQL
+#'@import reticulate
 #'@export
 
 FLAME_PostgreSQL <- function(db, data, holdout, num_covs, tradeoff = 0.1, PE_function = NULL,
                              model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
 
-  data <- data.frame(data) #Convert input data to data.frame if not already converted
-  holdout <- data.frame(holdout) #Convert holdout data to data.frame if not already converted
+  if (Reduce("|", sapply(1:num_covs, function(x) !is.factor(data[,x] ))) |
+      Reduce("|", sapply(1:num_covs, function(x) !is.factor(holdout[,x] )))) {
+    stop("Covariates are not factor data type")
+  }
 
-  data$matched <- 0 #add column matched to input data
+  if (!is.factor(data[,num_covs + 2]) | !is.factor(holdout[,num_covs + 2])) {
+    stop("Treatment variable is not factor data type")
+  }
+
+  if (!is.numeric(data[,num_covs + 1]) | !is.numeric(holdout[,num_covs + 1])) {
+    stop("Outcome variable is not numeric data type")
+  }
+
+  data$matched <- as.integer(0) #add column matched to input data
   column <- colnames(data)
 
+  factor_level <- t(sapply(data[,1:num_covs], levels)) # Get levels of each factor
+
   # Convert each covariate and treated into type integer
-  data[,c(1:num_covs, num_covs+2, num_covs+3)] <- sapply(data[,c(1:num_covs, num_covs+2, num_covs+3)],as.integer)
-  holdout[,c(1:num_covs,num_covs+2)] <- sapply(holdout[,c(1:num_covs,num_covs+2)],as.integer)
+  data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)],as.integer)
+  data[,num_covs + 2] <- as.integer(levels(data[,num_covs+2])[data[,num_covs+2]])
+
+  holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],as.integer)
+  holdout[,num_covs + 2] <- as.integer(levels(holdout[,num_covs+2])[holdout[,num_covs+2]])
 
   # Convert outcome variable to numeric
   data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
@@ -259,7 +292,7 @@ FLAME_PostgreSQL <- function(db, data, holdout, num_covs, tradeoff = 0.1, PE_fun
 
   update_matched_PostgreSQL(cur_covs,length(cur_covs))
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,length(cur_covs),column)
+  CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,length(cur_covs),column, factor_level)
 
 
   #while there are still covariates for matching
@@ -285,11 +318,12 @@ FLAME_PostgreSQL <- function(db, data, holdout, num_covs, tradeoff = 0.1, PE_fun
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
     update_matched_PostgreSQL(cur_covs,length(cur_covs))
-    CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,length(cur_covs),column)
+    CATE[[level]] <- get_CATE_PostgreSQL(cur_covs,length(cur_covs),column, factor_level)
   }
 
 
   return_df <- dbGetQuery(db, "SELECT * FROM data")[,-1]
+  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[x,][return_df[,y]], 1:num_covs, 1:num_covs)
   colnames(return_df) <- column
 
   return(list(covs_list, CATE, unlist(SCORE), return_df))

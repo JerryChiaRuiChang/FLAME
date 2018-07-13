@@ -2,7 +2,7 @@
 % Please edit documentation in R/FLAME_SQLite.R
 \name{FLAME_SQLite}
 \alias{FLAME_SQLite}
-\title{SQLite database implementation}
+\title{SQLite Database Implementation}
 \usage{
 FLAME_SQLite(db, data, holdout, num_covs, tradeoff = 0.1,
   PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
@@ -20,20 +20,26 @@ connection as db})}
 
 \item{tradeoff}{tradeoff parameter to compute Matching Quality (default = 0.1)}
 
-\item{PE_function}{user defined function to compute predivtive error (optional)}
+\item{PE_function}{user defined function to compute predivtive error
+(optional)}
 
-\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree  (optional)}
+\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree
+(optional)}
 
 \item{ridge_reg}{L2 regularization parameter if model = Ridge (optional)}
 
 \item{lasso_reg}{L1 regularization parameter if model = Lasso (optional)}
 
-\item{tree_depth}{maximum depth of decision tree if model = DecisionTree (optional)}
+\item{tree_depth}{maximum depth of decision tree if model = DecisionTree
+(optional)}
 }
 \value{
-(1) List of covariates matched at each iteration (2) List of data
- frame showing matched groups, conditional average treatment effect (CATE),
- and the size of each matched group
+(1) list of covariates FLAME performs matching at each iteration, (2)
+ list of dataframe showing matched groups' sizes and conditional average
+ treatment effects (CATEs) at each iteration, (3) matching quality at each
+ iteration, and (4) the original data with additional column *matched*,
+ indicating the number of covariates each unit is matched. If a unit is never
+ matched, then *matched* will be 0.
 }
 \description{
 \code{FLAME_SQLite} applies the FLAME algorithm based on SQLite.
@@ -41,4 +47,13 @@ connection as db})}
 user should connect to a temporary database with command
 \code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
 \strong{db}.
+}
+\examples{
+\dontrun{
+db <- dbConnect(SQLite(),"tempdb")
+
+FLAME_SQLite(db = db, data = data, holdout = holdout, num_covs = 15, tradeoff = 0.1)
+
+dbDisconnect(db)
+}
 }

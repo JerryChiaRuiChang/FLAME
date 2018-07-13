@@ -54,8 +54,8 @@ summary_plot <- function(FLAME_object) {
   summary$covs_dropped <- factor(summary$covs_dropped, levels=unique( as.character(summary$covs_dropped)))
 
   # construct separate plots for each series
-  obj1 <- barchart(size ~ covs_dropped, data = summary, xlab="covariate dropped", ylab = "number of matched units", main = "Summary Plot")
-  obj2 <- xyplot(CATE ~ covs_dropped, summary, type = "p", pch = 20, lwd=5, xlab="covariate dropped", ylab = "average CATE", main = "Summary Plot")
+  obj1 <- barchart(size ~ covs_dropped, data = summary, xlab="covariate dropped", ylab = "number of units matched", main = "Summary Plot")
+  obj2 <- xyplot(CATE ~ covs_dropped, summary, type = "p", pch = 20, lwd=5, xlab="covariate dropped", ylab = "estimated treatment effects", main = "Summary Plot")
 
   # make the plot with second y axis
   doubleYScale(obj1, obj2, add.ylab2 = TRUE)

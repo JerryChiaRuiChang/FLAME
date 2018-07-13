@@ -2,7 +2,7 @@
 % Please edit documentation in R/Match.R
 \name{MATCH}
 \alias{MATCH}
-\title{get all matched units given certain covariate combination}
+\title{Get Matched Units Given Certain Covariate Combination}
 \usage{
 MATCH(FLAME_object, cov_name, cov_val)
 }
@@ -19,5 +19,5 @@ MATCH(FLAME_object, cov_name, cov_val)
 data frame with all matched units
 }
 \description{
-get all matched units given certain covariate combination
+Get Matched Units Given Certain Covariate Combination
 }

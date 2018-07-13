@@ -1,0 +1,12 @@
+base
+reticulate
+lattice
+RColorBrewer
+latticeExtra
+dplyr
+DBI
+RPostgreSQL
+RSQLite
+ggplot2
+FLAME
+bindrcpp
