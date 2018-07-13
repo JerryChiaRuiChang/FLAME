@@ -53,7 +53,7 @@ devtools::install_github("chiarui424/FLAME")
 
 ### Some examples 
 
-[Apply the FLAME Algorithm to Synthetic Data](articles/Synthetic_Data.html)  
+[Apply the FLAME Algorithm to Synthetic Data](articles/Synthetic_Data.html)   
 [Get Detailed Information After Matching](articles/CATE.html)  
 [Matching Quality](articles/Matching_Quality.html)  
-[Effect of Tradeoff Parameter](articles/tradeoff.html)
+[Effect of Tradeoff Parameter](articles/tradeoff.html)  
