@@ -62,8 +62,8 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
   else {
     d = data[match_index,]
     d[,'b_u'] = index
-    summary = data.frame(d %>% group_by(b_u,treated) %>% summarise(size = length(outcome), mean = mean(outcome)))
-    summary = data.frame(summary %>% group_by(b_u) %>% summarize(size = sum(size), treated_lst = list(treated), mean_lst = list(mean)))
+    summary = data.frame(d %>% group_by(.data$b_u,.data$treated) %>% summarise(size = length(.data$outcome), mean = mean(.data$outcome)))
+    summary = data.frame(summary %>% group_by(.data$b_u) %>% summarize(size = sum(.data$size), treated_lst = list(.data$treated), mean_lst = list(.data$mean)))
     CATE = data.frame(t(sapply(summary$b_u, num_2_vector, covs_max_list)))
     CATE$effect = mapply(function(x,y) x[which(y == 1)] - x[which(y == 0)], summary$mean_lst, summary$treated_lst)
     CATE$size = summary$size
@@ -113,6 +113,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
   }
 
   else {
+    predictive_error  <- NULL
     if (!is.null(model)) {
 
       # Linear Regression
@@ -188,6 +189,9 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' matched, then *matched* will be 0.
 #' @import dplyr
 #' @import reticulate
+#' @importFrom rlang .data
+#' @importFrom graphics boxplot
+#' @importFrom stats rbinom rnorm runif setNames
 #' @export
 
 FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE_function = NULL,

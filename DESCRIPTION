@@ -31,7 +31,9 @@ Depends:
     RSQLite
 Imports:
     graphics,
-    stats
+    stats,
+    lattice,
+    rlang
 Suggests: 
     knitr,
     rmarkdown,

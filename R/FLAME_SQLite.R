@@ -1,7 +1,7 @@
 #update_matched function takes list of covariates (cur_covs) to match
 #and update column matched = 0 to matched = l (level) for matched units
 
-update_matched_SQLite <- function(cur_covs, level) {
+update_matched_SQLite <- function(db, cur_covs, level) {
 
   #Convert column names to dynamic strings
 
@@ -33,7 +33,7 @@ update_matched_SQLite <- function(cur_covs, level) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_SQLite <- function(cur_covs, level,column, factor_level) {
+get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level) {
 
   #Convert column names to dynamic strings
 
@@ -81,7 +81,7 @@ get_CATE_SQLite <- function(cur_covs, level,column, factor_level) {
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
 #returning Match Quality.
 
-match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff,
+match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
                                  PE_function, model, ridge_reg, lasso_reg, tree_depth) {
 
   #temporarly remove covariate c
@@ -140,6 +140,7 @@ match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff,
   }
 
   else {
+    predictive_error  <- NULL
     if (!is.null(model)) {
 
       # Linear Regression
@@ -228,6 +229,8 @@ match_quality_SQLite <- function(c, holdout, num_covs, cur_covs, tradeoff,
 #'}
 #'@import RSQLite
 #'@import reticulate
+#'@importFrom graphics boxplot
+#'@importFrom stats rbinom rnorm runif setNames
 #'@export
 
 FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = NULL,
@@ -282,9 +285,9 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = 
 
   #Get matched units without dropping anything
 
-  update_matched_SQLite(cur_covs,length(cur_covs))
+  update_matched_SQLite(db, cur_covs,length(cur_covs))
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_SQLite(cur_covs,length(cur_covs),column, factor_level)
+  CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level)
 
 
   #while there are still covariates for matching
@@ -298,7 +301,7 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = 
     #Temporarily drop one covariate at a time to calculate Match Quality
     #Drop the covariate that returns highest Match Quality Score
 
-    list_score <- unlist(lapply(cur_covs,match_quality_SQLite,holdout, num_covs, cur_covs, tradeoff,
+    list_score <- unlist(lapply(cur_covs,match_quality_SQLite, db, holdout, num_covs, cur_covs, tradeoff,
                                 PE_function, model, ridge_reg, lasso_reg, tree_depth))
     quality <- max(list_score)
     covs_to_drop <- cur_covs[which(list_score == quality)]
@@ -308,8 +311,8 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = 
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
-    update_matched_SQLite(cur_covs,length(cur_covs))
-    CATE[[level]] <- get_CATE_SQLite(cur_covs,length(cur_covs),column, factor_level)
+    update_matched_SQLite(db, cur_covs,length(cur_covs))
+    CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level)
 
   }
 

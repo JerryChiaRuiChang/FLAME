@@ -31,6 +31,7 @@ summary_data <- function(num_covs,FLAME_object) {
 #'   \code{\link{FLAME_SQLite}})
 #' @return summary plot of the FLAME algorithm
 #' @import latticeExtra
+#' @importFrom lattice xyplot barchart
 #' @export
 
 summary_plot <- function(FLAME_object) {
