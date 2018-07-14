@@ -1,4 +1,10 @@
 base
+methods
+datasets
+utils
+grDevices
+graphics
+stats
 reticulate
 lattice
 RColorBrewer
@@ -7,6 +13,4 @@ dplyr
 DBI
 RPostgreSQL
 RSQLite
-ggplot2
 FLAME
-bindrcpp

@@ -29,6 +29,9 @@ Depends:
     dplyr,
     RPostgreSQL,
     RSQLite
+Imports:
+    graphics,
+    stats
 Suggests: 
     knitr,
     rmarkdown,

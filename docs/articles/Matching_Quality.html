@@ -60,9 +60,6 @@
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
     </li>
-    <li>
-      <a href="../articles/Tradeoff.html">Effect of Tradeoff Parameter</a>
-    </li>
   </ul>
 </li>
       </ul>
@@ -88,7 +85,7 @@
       <h1>Matching Quality</h1>
                         <h4 class="author">Jerry Chia-Rui Chang</h4>
             
-            <h4 class="date">2018-07-13</h4>
+            <h4 class="date">2018-07-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chiarui424/FLAME/blob/master/vignettes/Matching_Quality.Rmd"><code>vignettes/Matching_Quality.Rmd</code></a></small>
       <div class="hidden name"><code>Matching_Quality.Rmd</code></div>
@@ -113,12 +110,12 @@ PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}
 
 <p>We demonstrate how to select various predictive models based on bit vectors implementation. Note that model specification for database systems implementation is the same as bit vectors implementation. We applied <code>Data_Generation</code> function to create a synthetic data. There are 1000 treated units and 1000 control units with 10 important covariates and 5 unimportant covariates. Assume holdout training set is the same as the input data.</p>
 <pre><code>#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated
-#&gt; 1  1  1  0  0  0  1  0  1  1   0   0   1   0   0   1  -4.792601       0
-#&gt; 2  0  0  1  1  1  0  0  1  1   1   0   0   1   0   0 -21.411542       0
-#&gt; 3  0  0  1  0  1  1  1  1  1   0   1   0   1   1   0 -31.660203       0
-#&gt; 4  1  1  1  1  0  1  0  0  0   1   0   0   1   0   0 -21.426192       0
-#&gt; 5  1  1  1  0  1  0  1  0  1   0   1   0   1   0   0 -21.652994       0
-#&gt; 6  0  0  1  0  0  0  0  1  0   0   1   0   1   0   0  -6.406110       0</code></pre>
+#&gt; 1  1  0  0  0  0  1  1  1  0   0   1   1   0   0   0 -25.326354       0
+#&gt; 2  1  1  1  1  0  0  0  1  0   1   0   1   1   1   0   5.172278       0
+#&gt; 3  1  0  0  0  0  1  1  0  1   0   1   0   1   1   0 -11.501727       0
+#&gt; 4  0  0  0  1  1  0  1  1  1   1   0   0   1   1   0   8.840892       0
+#&gt; 5  1  1  1  0  1  1  0  0  0   0   1   0   0   0   1   3.435872       0
+#&gt; 6  0  1  0  0  1  0  0  0  1   1   1   0   1   1   1  20.460055       0</code></pre>
 <div id="package-provided-models" class="section level3">
 <h3 class="hasAnchor">
 <a href="#package-provided-models" class="anchor"></a>package provided models</h3>

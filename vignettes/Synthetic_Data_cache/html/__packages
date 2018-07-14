@@ -1,4 +1,10 @@
 base
+methods
+datasets
+utils
+grDevices
+graphics
+stats
 reticulate
 lattice
 RColorBrewer
@@ -8,4 +14,3 @@ DBI
 RPostgreSQL
 RSQLite
 FLAME
-bindrcpp

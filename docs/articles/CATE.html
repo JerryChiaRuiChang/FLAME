@@ -60,9 +60,6 @@
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
     </li>
-    <li>
-      <a href="../articles/Tradeoff.html">Effect of Tradeoff Parameter</a>
-    </li>
   </ul>
 </li>
       </ul>
@@ -88,7 +85,7 @@
       <h1>Get Detailed Information After Matching</h1>
                         <h4 class="author">Jerry Chia-Rui Chang</h4>
             
-            <h4 class="date">2018-07-13</h4>
+            <h4 class="date">2018-07-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chiarui424/FLAME/blob/master/vignettes/CATE.Rmd"><code>vignettes/CATE.Rmd</code></a></small>
       <div class="hidden name"><code>CATE.Rmd</code></div>
@@ -111,41 +108,42 @@ result_bit &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span cl
 <h2 class="hasAnchor">
 <a href="#conditional-average-treatment-effect-cate" class="anchor"></a>Conditional Average Treatment Effect (CATE)</h2>
 <p>We can get each matched group’s conditional average treatment effect (CATE) and other related information from functions <code>CATE</code>, <code>MATCH</code>, and <code>CATE_AVG</code>. Let’s use an example when the FLAME algorithm performs matching with 8 covariates at a particular iteration. These 8 covariates are as below.</p>
-<pre><code>#&gt; [1] "x1"  "x2"  "x3"  "x4"  "x5"  "x7"  "x8"  "x10"</code></pre>
+<pre><code>#&gt; [1] "x1" "x2" "x3" "x4" "x5" "x6" "x7" "x9"</code></pre>
 <p><strong>a.</strong><br>
 If we want to see all matched groups at this iteration, apply <code>CATE</code> function to get the summary by providing inputs including (1) object returned by applying the FLAME matching algorithm, and (2) number of covariates used for matching with argument <code>num_covs</code>. Note that if there is no matched group, <code>CATE</code> function will return nothing.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> <span class="dv">8</span>)) 
-<span class="co">#&gt;   x1 x2 x3 x4 x5 x7 x8 x10   effect size</span>
-<span class="co">#&gt; 1  0  0  0  1  0  0  0   0 2.573053    2</span>
-<span class="co">#&gt; 2  0  0  0  0  1  0  0   0 2.817811    2</span>
-<span class="co">#&gt; 3  0  0  0  0  0  0  0   1 2.866477    2</span>
-<span class="co">#&gt; 4  0  1  0  0  0  0  0   0 3.111413    5</span>
-<span class="co">#&gt; 5  0  0  0  1  0  1  0   0 3.514424    5</span>
-<span class="co">#&gt; 6  1  0  0  0  0  0  0   0 3.865535    5</span></code></pre></div>
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x9     effect size</span>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0 -0.5776111    3</span>
+<span class="co">#&gt; 2  0  0  1  0  0  0  1  0  0.8006740    8</span>
+<span class="co">#&gt; 3  0  0  0  1  0  1  1  0  2.4382442    2</span>
+<span class="co">#&gt; 4  0  1  1  0  0  0  0  0  3.9943531    4</span>
+<span class="co">#&gt; 5  0  1  0  0  1  0  0  0  4.0817665    5</span>
+<span class="co">#&gt; 6  0  1  1  0  0  1  0  0  5.5163183    3</span></code></pre></div>
 <p>Let’s look at one of the matched groups. This matched group has the following covariate combination.</p>
-<pre><code>#&gt;  x1  x2  x3  x4  x5  x7  x8 x10 
-#&gt; "0" "0" "0" "1" "0" "0" "0" "0"</code></pre>
+<pre><code>#&gt;  x1  x2  x3  x4  x5  x6  x7  x9 
+#&gt; "0" "0" "0" "1" "0" "1" "0" "0"</code></pre>
 
 <p><strong>b.</strong><br>
 If we want to see the conditional average treatment effect and matched size of this covariate combination, apply <code>CATE</code> function by providing inputs including (1) object returned by applying the FLAME matching algorithm, (2) number of covariates used for matching with argument <code>num_covs</code>, (3) covariate names with argument <code>cov_name</code>, and (4) corresponding covariate values with argument <code>cov_val</code> (Note that covariate values have to be <em>character</em> R data type).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#covariate names</span>
 cov_name 
-<span class="co">#&gt; [1] "x1"  "x2"  "x3"  "x4"  "x5"  "x7"  "x8"  "x10"</span>
+<span class="co">#&gt; [1] "x1" "x2" "x3" "x4" "x5" "x6" "x7" "x9"</span>
 
 <span class="co">#covariate values in character R data type</span>
 cov_val 
-<span class="co">#&gt; [1] "0" "0" "0" "1" "0" "0" "0" "0"</span>
+<span class="co">#&gt; [1] "0" "0" "0" "1" "0" "1" "0" "0"</span>
 
 FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/CATE">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">num_covs  =</span> <span class="dv">8</span>, <span class="dt">cov_name =</span> cov_name,<span class="dt">cov_val =</span> cov_val)
-<span class="co">#&gt;   x1 x2 x3 x4 x5 x7 x8 x10   effect size</span>
-<span class="co">#&gt; 1  0  0  0  1  0  0  0   0 2.573053    2</span></code></pre></div>
+<span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x9     effect size</span>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0 -0.5776111    3</span></code></pre></div>
 
 <p><strong>c.</strong><br>
 If we to know which observations/units produce this covariate combination, apply <code>MATCH</code> function with three inputs including (1) object returned by applying the FLAME matching algorithm, (2) covariate names with argument <code>cov_name</code>, and (3) corresponding covariate values with argument <code>cov_val</code> (Note that covariates values have to be <em>character</em> R data type).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/MATCH">MATCH</a></span>(<span class="dt">FLAME_object =</span> result_bit, <span class="dt">cov_name =</span> cov_name, <span class="dt">cov_val =</span> cov_val)
 <span class="co">#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15   outcome treated</span>
-<span class="co">#&gt; 1  0  0  0  1  0  0  0  0  1   0   1   1   0   0   1 -1.470818       0</span>
-<span class="co">#&gt; 2  0  0  0  1  0  1  0  0  0   0   0   0   1   0   1  1.102235       1</span></code></pre></div>
+<span class="co">#&gt; 1  0  0  0  1  0  1  0  0  0   0   1   1   1   0   0 -6.491438       0</span>
+<span class="co">#&gt; 2  0  0  0  1  0  1  0  0  0   1   1   0   0   1   0 -5.871060       0</span>
+<span class="co">#&gt; 3  0  0  0  1  0  1  0  1  0   0   0   1   0   0   1 -6.758860       1</span></code></pre></div>
 
 <p><strong>c.</strong> Assume we want to see all matched groups containing the covariate combination <strong>x1 = 1, x3 = 0, x5 = 1, x7 = 0, x9 = 1</strong>. Specifically, even when the FLAME algorithm performs matching with more than 5 covariates, we can still apply <code>CATE</code> function to output all possible matches as long as it contains the specified covariate combination. The input requirements are the same as (b), but <code>num_covs</code> argument does not need to be specified.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CATE_object &lt;-<span class="st"> </span><span class="kw"><a href="../reference/CATE.html">CATE</a></span>(<span class="dt">FLAME_object =</span> result_bit, 
@@ -153,49 +151,50 @@ If we to know which observations/units produce this covariate combination, apply
                     <span class="dt">cov_val =</span> <span class="kw">c</span>(<span class="st">"1"</span>, <span class="st">"0"</span>, <span class="st">"1"</span>, <span class="st">"0"</span>, <span class="st">"1"</span>))
 CATE_object
 <span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x13 x14   effect size</span>
-<span class="co">#&gt; 31  1  0  0  1  1  1  0  0  1   1   1   1   0 24.72229    3</span>
-<span class="co">#&gt; 32  1  0  0  1  1  0  0  1  1   1   0   1   1 24.72271    2</span>
-<span class="co">#&gt; 36  1  0  0  1  1  1  0  1  1   1   1   0   0 26.22993    3</span>
-<span class="co">#&gt; 40  1  1  0  1  1  0  0  1  1   0   1   1   0 39.47243    2</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x14 x15   effect size</span>
+<span class="co">#&gt; 16  1  0  0  0  1  1  0  0  1   1   0   0   0   1 12.23097    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x13   effect size</span>
-<span class="co">#&gt; 28  1  0  0  0  1  0  0  1  1   0   1   0 11.51423    2</span>
-<span class="co">#&gt; 51  1  0  0  1  1  0  0  1  1   0   0   1 22.98254    2</span>
-<span class="co">#&gt; 52  1  1  0  0  1  0  0  1  1   0   0   1 23.00412    2</span>
-<span class="co">#&gt; 64  1  0  0  1  1  0  0  1  1   1   1   0 24.72271    2</span>
-<span class="co">#&gt; 68  1  1  0  0  1  1  0  1  1   1   0   0 26.25151    2</span>
-<span class="co">#&gt; 69  1  1  0  0  1  1  0  1  1   1   1   0 26.25151    2</span>
-<span class="co">#&gt; 76  1  1  0  1  1  1  0  0  1   0   0   0 39.47200    2</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x15   effect size</span>
+<span class="co">#&gt; 10  1  0  0  0  1  0  0  1  1   0   1   1   0 10.72805    2</span>
+<span class="co">#&gt; 28  1  1  0  0  1  1  0  0  1   1   1   1   0 23.56991    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[3]]</span>
-<span class="co">#&gt;     x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x13   effect size</span>
-<span class="co">#&gt; 41   1  0  0  0  1  1  0  0  1   0   1 11.51380    3</span>
-<span class="co">#&gt; 63   1  0  0  0  1  1  0  0  1   1   1 13.25398    2</span>
-<span class="co">#&gt; 64   1  0  0  0  1  0  0  1  1   1   0 13.25440    2</span>
-<span class="co">#&gt; 86   1  0  0  1  1  0  0  0  1   1   1 23.21507    4</span>
-<span class="co">#&gt; 103  1  1  0  0  1  1  0  1  1   1   1 26.25151    3</span>
-<span class="co">#&gt; 120  1  1  0  1  1  1  0  1  1   0   1 40.97964    2</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x12 x15   effect size</span>
+<span class="co">#&gt; 68  1  1  0  0  1  1  0  1  1   0   0   1 23.58895    2</span>
+<span class="co">#&gt; 69  1  1  0  0  1  1  0  1  1   0   1   1 23.58895    2</span>
+<span class="co">#&gt; 73  1  0  0  1  1  0  0  1  1   1   1   0 23.69225    3</span>
+<span class="co">#&gt; 74  1  0  0  1  1  1  0  1  1   0   0   0 23.80332    2</span>
+<span class="co">#&gt; 79  1  0  0  1  1  1  0  1  1   1   1   0 25.21421    2</span>
+<span class="co">#&gt; 82  1  1  0  1  1  0  0  0  1   0   1   0 37.19035    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[4]]</span>
-<span class="co">#&gt;     x1 x2 x3 x4 x5 x6 x7 x8 x9 x10   effect size</span>
-<span class="co">#&gt; 34   1  0  0  0  1  0  0  0  1   0 10.00659    3</span>
-<span class="co">#&gt; 73   1  0  0  1  1  0  0  0  1   0 21.47490    2</span>
-<span class="co">#&gt; 118  1  1  0  1  1  0  0  0  1   1 39.70496    2</span>
-<span class="co">#&gt; 130  1  1  0  1  1  1  0  1  1   1 42.71982    2</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x15   effect size</span>
+<span class="co">#&gt; 39  1  0  0  0  1  1  0  0  1   1   1 12.23097    2</span>
+<span class="co">#&gt; 99  1  1  0  1  1  1  0  1  1   0   1 40.14225    2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[5]]</span>
-<span class="co">#&gt;    x1 x2 x3 x4 x5 x7 x8 x9 x10   effect size</span>
-<span class="co">#&gt; 62  1  0  0  1  1  0  1  1   0 23.72537    2</span>
-<span class="co">#&gt; 76  1  0  0  1  1  0  1  1   1 25.48710    2</span>
-<span class="co">#&gt; 84  1  1  0  1  1  0  0  1   0 38.70762    4</span></code></pre></div>
+<span class="co">#&gt;     x1 x2 x3 x4 x5 x6 x7 x8 x9 x10   effect size</span>
+<span class="co">#&gt; 68   1  0  0  0  1  1  0  1  1   1 13.66091    2</span>
+<span class="co">#&gt; 80   1  0  0  1  1  0  0  0  1   0 20.85141    2</span>
+<span class="co">#&gt; 119  1  1  0  1  1  0  0  1  1   1 40.03118    4</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[6]]</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x8 x9   effect size</span>
+<span class="co">#&gt; 47  1  0  0  0  1  1  0  0  1 12.85135    2</span>
+<span class="co">#&gt; 68  1  0  0  1  1  1  0  0  1 21.75300    3</span>
+<span class="co">#&gt; 79  1  0  0  1  1  1  0  1  1 23.18294    2</span>
+<span class="co">#&gt; 97  1  1  0  1  1  1  0  1  1 39.52187    5</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[7]]</span>
+<span class="co">#&gt;    x1 x2 x3 x4 x5 x6 x7 x9   effect size</span>
+<span class="co">#&gt; 31  1  0  0  1  1  0  0  1 17.90398    5</span></code></pre></div>
 
 <p><strong>e.</strong><br>
 We can compute estimated treatment effects of all matched groups in (d) with <code>AVG_EFFECT</code> function. Note that estimated treatment effect is the weighted average of CATEs, with weight being the number of units in each matched group. In addition, we can visualize the distribution of all CATEs in boxplot by applying <code>CATE_plot</code> function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Estimated treatment effects </span>
 <span class="kw"><a href="../reference/AVG_EFFECT.html">AVG_EFFECT</a></span>(CATE_object) 
-<span class="co">#&gt; [1] 25.64651</span>
+<span class="co">#&gt; [1] 24.77623</span>
 
 <span class="kw"><a href="../reference/CATE_plot.html">CATE_plot</a></span>(CATE_object)</code></pre></div>
 <p><img src="CATE_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
@@ -205,7 +204,7 @@ We can compute estimated treatment effects of all matched groups in (d) with <co
 <a href="#average-treatment-effect-ate-and-summary-visualization" class="anchor"></a>Average Treatment Effect (ATE) and Summary Visualization</h2>
 <p>We can compute average treatment effect for each given sub-population by a weighted average of the estimated treatment effects in each matched group. The weight is the number of units in each matched group.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/ATE">ATE</a></span>(result_bit)
-<span class="co">#&gt; [1] 19.8222</span></code></pre></div>
+<span class="co">#&gt; [1] 19.62978</span></code></pre></div>
 
 <p>Apply <code>summary_plot</code> function to visualize the process of matching as the algorithm drops covariate iteratively. The x-axis is the covariate dropped at each iteration. The y-axis on the left is the number of units matched, and the y-axis on the right is the estimated treatment effects. Note that since all covariates are used for matching in the beginning, no covariate is dropped and is represented by NA in the covariate dropped axis.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/summary_plot">summary_plot</a></span>(result_bit)</code></pre></div>
