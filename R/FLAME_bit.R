@@ -1,7 +1,7 @@
 # Aggregate Function for getting number of times each value occurs
 aggregate_table <- function(tab, list_val) {
   tab = unclass(tab)
-  name = as.integer(names(tab))
+  name = as.numeric(names(tab))
   return(as.vector(tab[sapply(list_val, function(x) which(name ==  x))]))
 }
 
@@ -69,7 +69,7 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
     CATE$size = summary$size
     CATE <- CATE[order(CATE$effect),]
     colnames(CATE) = c(column[(cur_covs + 1)],"effect","size")
-    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[x,][CATE[,y]+1], cur_covs + 1, 1:length(cur_covs))
+    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]+1], cur_covs + 1, 1:length(cur_covs))
     rownames(CATE) = NULL
   }
 
@@ -214,7 +214,7 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
   data$matched <- as.integer(0) #add column matched to input data
   column <- colnames(data)
 
-  factor_level <- t(sapply(data[,1:num_covs], levels)) # Get levels of each factor
+  factor_level <- lapply(data[,1:num_covs], levels) # Get levels of each factor
 
   # Convert each covariate and treated into type integer
   data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x) - 1)
@@ -296,9 +296,9 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
 
   colnames(return_df) <- column
   rownames(return_df) <- NULL
-  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[x,][return_df[,y]+1], 1:num_covs, 1:num_covs)
+  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]+1], 1:num_covs, 1:num_covs)
   return(list(covs_list, CATE, unlist(SCORE), return_df))
 }
 
-#result_bit <- FLAME_bit(data, holdout, 15, covs_max_list, 0.1)
+
 

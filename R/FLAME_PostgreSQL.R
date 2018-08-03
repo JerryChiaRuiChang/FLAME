@@ -68,7 +68,7 @@ get_CATE_PostgreSQL <- function(db, cur_covs, level, column, factor_level) {
                      c(column[(cur_covs + 1)],"effect","size"))
   } else {
     CATE <- data.frame(data.matrix(CATE)) # convert all columns into numeric
-    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[x,][CATE[,y]], cur_covs + 1, 1:length(cur_covs))
+    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]], cur_covs + 1, 1:length(cur_covs))
     colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
     CATE <- CATE[order(CATE$effect),]
     rownames(CATE) = NULL
@@ -261,7 +261,7 @@ FLAME_PostgreSQL <- function(db, data, holdout, num_covs, tradeoff = 0.1, PE_fun
   data$matched <- as.integer(0) #add column matched to input data
   column <- colnames(data)
 
-  factor_level <- t(sapply(data[,1:num_covs], levels)) # Get levels of each factor
+  factor_level <- lapply(data[,1:num_covs],levels) # Get levels of each factor
 
   # Convert each covariate and treated into type integer
   data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)],as.integer)
@@ -326,7 +326,7 @@ FLAME_PostgreSQL <- function(db, data, holdout, num_covs, tradeoff = 0.1, PE_fun
 
 
   return_df <- dbGetQuery(db, "SELECT * FROM data")[,-1]
-  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[x,][return_df[,y]], 1:num_covs, 1:num_covs)
+  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]], 1:num_covs, 1:num_covs)
   colnames(return_df) <- column
 
   return(list(covs_list, CATE, unlist(SCORE), return_df))
@@ -342,6 +342,7 @@ FLAME_PostgreSQL <- function(db, data, holdout, num_covs, tradeoff = 0.1, PE_fun
 #result_Postgres <- FLAME_PostgreSQL(db = db, data = data, holdout = holdout,
 #                                    num_covs = 15, tradeoff = 0.1)
 #dbDisconnect(db)
+
 
 
 
