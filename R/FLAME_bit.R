@@ -1,7 +1,7 @@
 # Aggregate Function for getting number of times each value occurs
 aggregate_table <- function(tab, list_val) {
   tab = unclass(tab)
-  name = as.numeric(names(tab))
+  name = as.integer(names(tab))
   return(as.vector(tab[sapply(list_val, function(x) which(name ==  x))]))
 }
 
