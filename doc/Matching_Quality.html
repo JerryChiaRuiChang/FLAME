@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Jerry Chia-Rui Chang" />
+
+<meta name="date" content="2018-09-13" />
+
+<title>Matching Quality</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Matching Quality</h1>
+<h4 class="author"><em>Jerry Chia-Rui Chang</em></h4>
+<h4 class="date"><em>2018-09-13</em></h4>
+
+
+
+<div id="overview-of-matching-quality" class="section level2">
+<h2>Overview of Matching Quality</h2>
+<p>The FLAME algorithm determines which unimportant covariate to drop based on Matching Quality, consisting of two components - Balancing Factor (<span class="math inline">\(BF\)</span>) and Predictive Error (<span class="math inline">\(PE\)</span>). Given a list of covariate subsets at a specific iteration, the algorithm chooses the covariate subset such that it maximizes Matching Quality, computed through <span class="math inline">\(-PE + tradeoff * BF\)</span>. Balancing factor assesses the proportion of units that can be matched. Predictive error evaluates the predictive quality of current sets of covariates, built upon machine learning algorithms such as ridge regression, LASSO, and decision tree. In short, matching quality is a bias-variance tradeoff between producing more matched groups and having better prediction.</p>
+<p>The implementation of the FLAME algorithm allows users to choose both tradeoff parameter and statistical model that computes predictive error. First, users who prefer covariate subset that produces more matched units should choose higher tradeoff parameter, whereas users who prefer covariate subset that produces better predictive accuracy should choose lower tradeoff parameter. The default tradeoff parameter is set to 0.1. Second, users can choose appropriate statistical model to compute predictive error. The FLAME package currently provides four models; respectively they are Linear Regression, Ridge Regression, LASSO, and Decision Tree. The default model is set to ridge regression with L2 regularization parameter of 0.1. If users would like to use models not supported by the package, they can provide an input R function that computes predictive error.</p>
+</div>
+<div id="specify-models-to-compute-predictive-errors" class="section level2">
+<h2>Specify models to compute predictive errors</h2>
+<p>Predictive error (<span class="math inline">\(PE\)</span>), in the FLAME algorithm, is defined as the sum of mean squared error for treated units and mean squared error for control units. Denote holdout training set <span class="math inline">\(D^{H} = [X^{H}, Y^{H}, T^{H}]\)</span>, where <span class="math inline">\(X^{H}\)</span> represents values of the covariates, <span class="math inline">\(Y^{H}\)</span> is the outcome, and <span class="math inline">\(T^{H}\)</span> indicates whether a unit is in treated group or in control group (1 = treated, 0 = control). Given a predictive model, denote <span class="math inline">\(\hat{Y}^{H}_{u}\)</span> as the predicted value of a unit <span class="math inline">\(u\)</span>. The computation of <span class="math inline">\(PE\)</span> is:</p>
+<p><span class="math display">\[
+PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}_{u})^2 + \frac{1}{\sum(T^{H}_{u})} \sum_{u:T^{H}_{u} = 1} (Y^{H}_{u} - \hat{Y}^{H}_{u})^2
+\]</span></p>
+
+<p>We demonstrate how to select various predictive models based on bit vectors implementation. Note that model specification for database systems implementation is the same as bit vectors implementation. We applied <code>Data_Generation</code> function to create a synthetic data. There are 1000 treated units and 1000 control units with 10 important covariates and 5 unimportant covariates. Assume holdout training set is the same as the input data.</p>
+<pre><code>#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated
+#&gt; 1  1  0  0  0  0  1  1  1  0   0   1   1   0   0   0 -25.326354       0
+#&gt; 2  1  1  1  1  0  0  0  1  0   1   0   1   1   1   0   5.172278       0
+#&gt; 3  1  0  0  0  0  1  1  0  1   0   1   0   1   1   0 -11.501727       0
+#&gt; 4  0  0  0  1  1  0  1  1  1   1   0   0   1   1   0   8.840892       0
+#&gt; 5  1  1  1  0  1  1  0  0  0   0   1   0   0   0   1   3.435872       0
+#&gt; 6  0  1  0  0  1  0  0  0  1   1   1   0   1   1   1  20.460055       0</code></pre>
+<div id="package-provided-models" class="section level3">
+<h3>package provided models</h3>
+<ol style="list-style-type: decimal">
+<li>Linear Regression - R argument requires <code>model = &quot;Linear&quot;</code></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">linear &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw">FLAME_bit</span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">&quot;Linear&quot;</span>)
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1938&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1873&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1784&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1568&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1321&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1012&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  688&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  453&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  280&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  231&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  150&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  108&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  68&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  68&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  26&quot;</span></code></pre></div>
+
+<ol start="2" style="list-style-type: decimal">
+<li>Ridge Regression with L2 regularization parameter of 0.1 - R argument requires <code>model = &quot;Ridge&quot;, ridge_reg = 0.1</code></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ridge &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw">FLAME_bit</span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">&quot;Ridge&quot;</span>, <span class="dt">ridge_reg =</span> <span class="fl">0.1</span>)
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1938&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1873&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1784&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1568&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1321&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1012&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  688&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  453&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  280&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  231&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  150&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  108&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  68&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  68&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  26&quot;</span></code></pre></div>
+
+<ol start="3" style="list-style-type: decimal">
+<li>Lasso with L1 regularization regularization parameter of 0.1 - R argument requires <code>model = &quot;Lasso&quot;, lasso_reg = 0.1</code></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lasso &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw">FLAME_bit</span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">&quot;Lasso&quot;</span>, <span class="dt">lasso_reg =</span> <span class="fl">0.1</span>)
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1938&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1873&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1756&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1565&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1318&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1009&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  685&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  449&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  276&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  229&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  149&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  108&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  68&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  68&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  26&quot;</span></code></pre></div>
+
+<ol start="4" style="list-style-type: decimal">
+<li>Decision Tree with maximum depth of 8 - R argument requires <code>model = &quot;DecisionTree&quot;, tree_depth = 8</code></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tree &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw">FLAME_bit</span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">&quot;DecisionTree&quot;</span>, <span class="dt">tree_depth =</span> <span class="dv">8</span>)
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1938&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1887&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1780&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1612&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1338&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  992&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  687&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  441&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  313&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  194&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  150&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  112&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  95&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  72&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  10&quot;</span></code></pre></div>
+</div>
+<div id="user-defined-model" class="section level3">
+<h3>user defined model</h3>
+<p>If users would like to compute predictive error with models not supported by the package, users can provide their own R function. The package requires the input of the function to have four arguments; respectively, they are (1) outcome for treated units (<em>outcome_treated</em>), (2) outcome for control units (<em>outcome_control</em>), (3) covariate values for treated units in a matrix form (<em>covs_treated</em>), and (4) covariate values for control units in a matrix form (<em>covs_control</em>). The function should compute MSE for treated units with argument (1) and (3), and MSE for control units with argument (2) and (4).</p>
+<p>We wrote a R function that computes predictive error based on support vector machine (SVM). The function is called <code>SVM_PE</code> based on SVM model in <code>e1071</code> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SVM_PE &lt;-<span class="st"> </span><span class="cf">function</span>(outcome_treated, outcome_control, covs_treated, covs_control) {
+  
+  <span class="kw">library</span>(e1071) <span class="co">#load e1071 library</span>
+  
+  <span class="co"># MSE for treated</span>
+  model_svm &lt;-<span class="st"> </span><span class="kw">svm</span>(outcome_treated <span class="op">~</span><span class="st"> </span>covs_treated) <span class="co"># fit the data to SVM model</span>
+  pred_treated &lt;-<span class="st"> </span><span class="kw">predict</span>(model_svm, covs_treated) <span class="co">#get predicted values</span>
+  MSE_treated &lt;-<span class="st"> </span><span class="kw">sum</span>((outcome_treated <span class="op">-</span><span class="st"> </span>pred_treated)<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span><span class="kw">length</span>(outcome_treated) <span class="co"># compute mean squared error</span>
+  
+  <span class="co"># MSE for control</span>
+  model_svm &lt;-<span class="st"> </span><span class="kw">svm</span>(outcome_control <span class="op">~</span><span class="st"> </span>covs_control) <span class="co"># fit the data to SVM model</span>
+  pred_control &lt;-<span class="st"> </span><span class="kw">predict</span>(model_svm, covs_control) <span class="co">#get predicted values</span>
+  MSE_control &lt;-<span class="st"> </span><span class="kw">sum</span>((outcome_control <span class="op">-</span><span class="st"> </span>pred_control)<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span><span class="kw">length</span>(outcome_control) <span class="co"># compute mean squared error</span>
+  
+  <span class="kw">return</span>(MSE_treated <span class="op">+</span><span class="st"> </span>MSE_control)
+}</code></pre></div>
+
+<p>Apply the model as <code>PE_function = SVM_PE</code> to the package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SVM &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw">FLAME_bit</span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">PE_function =</span> SVM_PE)
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1938&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1897&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1795&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1632&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1299&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  1004&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  686&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  423&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  307&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  218&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  128&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  116&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  38&quot;</span>
+<span class="co">#&gt; [1] &quot;number of unmatched units =  16&quot;</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
