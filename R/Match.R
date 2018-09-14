@@ -10,6 +10,14 @@
 
 MATCH <- function(FLAME_object, cov_name, cov_val) {
 
+  if (typeof(cov_name) != "character") {
+    stop("Please specify cov_name as a vector with character data type")
+  }
+
+  if (typeof(cov_val) != "character") {
+    stop("Please specify cov_val as a vector with character data type")
+  }
+
   len <- lengths(FLAME_object[[1]])
   index <- which(len == length(cov_name))
 

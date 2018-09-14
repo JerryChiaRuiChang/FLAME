@@ -18,17 +18,17 @@ knitr::opts_chunk$set(
 library(FLAME)
 ```
 
-This vignette demonstrates how to get detailed information such as conditional average treatment effect (CATE) and average treatment effect (ATE) from the `FLAME` package after matching.
+This vignette demonstrates how to get detailed information such as conditional average treatment effect (CATE), variance, and average treatment effect (ATE) from the `FLAME` package after matching.
 
 ## Setup
 
-First, we applied `Data_Generation` function to generate 1000 treated units and 1000 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data. Second, we ran `FLAME_bit` function for matching.
+First, we applied `Data_Generation` function to generate 1000 treated units and 1000 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data. Second, we ran `FLAME_bit` function for matching, where `compute_var` is specified to be true.
 
 ```{r}
 data <- FLAME::Data_Generation(num_control = 1000, num_treated = 1000,
                                num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
 holdout <- data #Assume holdout training data is the same as input data
-result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15))
+result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, compute_var = TRUE)
 ```
 
 ## Conditional Average Treatment Effect (CATE)
@@ -41,7 +41,7 @@ result_bit[[1]][[8]]
 **a.**   
 If we want to see all matched groups at this iteration, apply `CATE` function to get the summary by providing inputs including (1) object returned by applying the FLAME matching algorithm, and (2) number of covariates used for matching with argument `num_covs`. Note that if there is no matched group, `CATE` function will return nothing.  
 ```{r}
-head(FLAME::CATE(FLAME_object = result_bit, num_covs  = 8)) 
+head(FLAME::CATE(FLAME_object = result_bit, num_covs  = 8))
 ```
 
 
@@ -56,7 +56,7 @@ cov_df[,1:8]
 \newline
 
 **b.**  
-If we want to see the conditional average treatment effect and matched size of this covariate combination, apply `CATE` function by providing inputs including (1) object returned by applying the FLAME matching algorithm, (2) number of covariates used for matching with argument `num_covs`, (3) covariate names with argument `cov_name`, and (4) corresponding covariate values with argument `cov_val` (Note that covariate values have to be *character* R data type).  
+If we want to see the conditional average treatment effect, matched size, and variance of this covariate combination, apply `CATE` function by providing inputs including (1) object returned by applying the FLAME matching algorithm, (2) number of covariates used for matching with argument `num_covs`, (3) covariate names with argument `cov_name`, and (4) corresponding covariate values with argument `cov_val` (Note that covariate values have to be *character* R data type).  
 ```{r}
 #covariate names
 cov_name 
@@ -64,7 +64,7 @@ cov_name
 #covariate values in character R data type
 cov_val 
 
-FLAME::CATE(FLAME_object = result_bit, num_covs  = 8, cov_name = cov_name,cov_val = cov_val)
+FLAME::CATE(FLAME_object = result_bit, num_covs  = 8, cov_name = cov_name, cov_val = cov_val)
 ```
 
 \newline

@@ -143,6 +143,14 @@ find_match <- function(df, cov_name, cov_val) {
 
 CATE <- function(FLAME_object, num_covs = NULL, cov_name = NULL, cov_val = NULL) {
 
+  if (!is.null(cov_name) && typeof(cov_name) != "character") {
+    stop("Please specify cov_name as a vector with character data type")
+  }
+
+  if (!is.null(cov_val) && typeof(cov_val) != "character") {
+    stop("Please specify cov_val as a vector with character data type")
+  }
+
   # If num_covs is provided but not cov_name or cov_val
   # ==> dataframe with all matched units given number of covariates used for matching
   # If num_covs, cov_name, and cov_val are provided

@@ -4,7 +4,7 @@
 \alias{FLAME_bit}
 \title{Bit Vectors Implementation}
 \usage{
-FLAME_bit(data, holdout, num_covs, covs_max_list, tradeoff = 0.1,
+FLAME_bit(data, holdout, tradeoff = 0.1, compute_var = FALSE,
   PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
   tree_depth = NULL)
 }
@@ -13,12 +13,10 @@ FLAME_bit(data, holdout, num_covs, covs_max_list, tradeoff = 0.1,
 
 \item{holdout}{holdout training data}
 
-\item{num_covs}{number of covariates}
-
-\item{covs_max_list}{list indicates each covariate is binary/ternary/...}
-
-\item{tradeoff}{tradeoff parameter to compute Matching Quality (default =
+\item{tradeoff}{tradeoff parameter to compute Matching Quality (optional, default =
 0.1)}
+
+\item{compute_var}{indicator variable of computing variance (optional, default = FALSE)}
 
 \item{PE_function}{user defined function to compute predivtive error
 (optional)}
@@ -35,13 +33,19 @@ FLAME_bit(data, holdout, num_covs, covs_max_list, tradeoff = 0.1,
 }
 \value{
 (1) list of covariates FLAME performs matching at each iteration, (2)
-list of dataframe showing matched groups' sizes and conditional average
-treatment effects (CATEs) at each iteration, (3) matching quality at each
-iteration, and (4) the original data with additional column *matched*,
+list of dataframe showing matched groups' sizes, conditional average treatment
+effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
+quality at each iteration, and (4) the original data with additional column *matched*,
 indicating the number of covariates each unit is matched. If a unit is never
 matched, then *matched* will be 0.
 }
 \description{
 \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors
-implementation.
+implementation. The required arguments include (1) data and (2) holdout.
+The rest of the arguments are optional.
+}
+\examples{
+\dontrun{
+FLAME_bit(data = data, holdout = holdout)
+}
 }

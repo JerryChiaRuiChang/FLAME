@@ -4,7 +4,7 @@
 \alias{FLAME_PostgreSQL}
 \title{PostgreSQL Database Implementation}
 \usage{
-FLAME_PostgreSQL(db, data, holdout, num_covs, tradeoff = 0.1,
+FLAME_PostgreSQL(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
   tree_depth = NULL)
 }
@@ -16,9 +16,9 @@ db})}
 
 \item{holdout}{holdout training data}
 
-\item{num_covs}{number of covariates}
+\item{compute_var}{indicator variable of computing variance (optional, default = FALSE)}
 
-\item{tradeoff}{tradeoff parameter to compute Matching Quality (default = 0.1)}
+\item{tradeoff}{tradeoff parameter to compute Matching Quality (optional, default = 0.1)}
 
 \item{PE_function}{user defined function to compute predivtive error
 (optional)}
@@ -35,8 +35,8 @@ db})}
 }
 \value{
 (1) list of covariates FLAME performs matching at each iteration, (2)
- list of dataframe showing matched groups' sizes and conditional average
- treatment effects (CATEs) at each iteration, (3) matching quality at each
+ list of dataframe showing matched groups' sizes, conditional average treatment
+effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching quality at each
  iteration, and (4) the original data with additional column *matched*,
  indicating the number of covariates each unit is matched. If a unit is never
  matched, then *matched* will be 0.
@@ -59,7 +59,7 @@ drv <- dbDriver('PostgreSQL')
 db <- dbConnect(drv, dbname="FLAME", host='localhost',
 port=5432, user="postgres", password = 'new_password')
 
-FLAME_PostgreSQL(db = db, data = data, holdout = holdout, num_covs = 15, tradeoff = 0.1)
+FLAME_PostgreSQL(db = db, data = data, holdout = holdout)
 
 dbDisconnect(db)
 }

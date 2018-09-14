@@ -4,7 +4,7 @@
 \alias{FLAME_SQLite}
 \title{SQLite Database Implementation}
 \usage{
-FLAME_SQLite(db, data, holdout, num_covs, tradeoff = 0.1,
+FLAME_SQLite(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
   tree_depth = NULL)
 }
@@ -16,9 +16,9 @@ connection as db})}
 
 \item{holdout}{holdout training data}
 
-\item{num_covs}{number of covariates}
+\item{compute_var}{indicator variable of computing variance (optional, default = FALSE)}
 
-\item{tradeoff}{tradeoff parameter to compute Matching Quality (default = 0.1)}
+\item{tradeoff}{tradeoff parameter to compute Matching Quality (optional, default = 0.1)}
 
 \item{PE_function}{user defined function to compute predivtive error
 (optional)}
@@ -35,9 +35,9 @@ connection as db})}
 }
 \value{
 (1) list of covariates FLAME performs matching at each iteration, (2)
- list of dataframe showing matched groups' sizes and conditional average
- treatment effects (CATEs) at each iteration, (3) matching quality at each
- iteration, and (4) the original data with additional column *matched*,
+list of dataframe showing matched groups' sizes, conditional average treatment
+effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
+quality at each iteration, and (4) the original data with additional column *matched*,
  indicating the number of covariates each unit is matched. If a unit is never
  matched, then *matched* will be 0.
 }
@@ -46,13 +46,14 @@ connection as db})}
 \code{FLAME_SQLite} does not require external database installment. However,
 user should connect to a temporary database with command
 \code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
-\strong{db}.
+\strong{db}. The required arguments include (1) db, (2) data, and (3) holdout.
+The rest of the arguments are optional.
 }
 \examples{
 \dontrun{
 db <- dbConnect(SQLite(),"tempdb")
 
-FLAME_SQLite(db = db, data = data, holdout = holdout, num_covs = 15, tradeoff = 0.1)
+FLAME_SQLite(db = db, data = data, holdout = holdout)
 
 dbDisconnect(db)
 }

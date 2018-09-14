@@ -19,6 +19,11 @@ CATE_plot <- function(CATE_object) {
     size <- unlist(sapply(CATE_object, function(x) x[,which(colnames(x) == "size")]))
   }
 
-  boxplot(effect, main = paste("CATE summary with", toString(sum(size)), "matched units",sep = " "),
-          ylab = "CATE" )
+  if (!is.null(effect) & !is.null(size)) {
+    boxplot(effect, main = paste("CATE summary with", toString(sum(size)), "matched units",sep = " "),
+            ylab = "CATE" )
+  }
+  else {
+    print("Incorect input: please provide CATE object.")
+  }
 }

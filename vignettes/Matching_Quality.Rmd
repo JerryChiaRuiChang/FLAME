@@ -48,32 +48,28 @@ head(data)
 
 1. Linear Regression - R argument requires `model = "Linear"`  
 ```{r}
-linear <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
-                           model = "Linear")
+linear <- FLAME::FLAME_bit(data = data, holdout = holdout, model = "Linear")
 ```
 
 \newline
 
 2. Ridge Regression with L2 regularization parameter of 0.1 - R argument requires `model = "Ridge", ridge_reg = 0.1`  
 ```{r}
-ridge <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
-                           model = "Ridge", ridge_reg = 0.1)
+ridge <- FLAME::FLAME_bit(data = data, holdout = holdout, model = "Ridge", ridge_reg = 0.1)
 ```
 
 \newline
 
 3. Lasso with L1 regularization regularization parameter of 0.1 - R argument requires `model = "Lasso", lasso_reg = 0.1`  
 ```{r}
-lasso <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
-                           model = "Lasso", lasso_reg = 0.1)
+lasso <- FLAME::FLAME_bit(data = data, holdout = holdout, model = "Lasso", lasso_reg = 0.1)
 ```
 
 \newline
 
 4. Decision Tree with maximum depth of 8 - R argument requires `model = "DecisionTree", tree_depth = 8`  
 ```{r}
-tree <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15),
-                           model = "DecisionTree", tree_depth = 8)
+tree <- FLAME::FLAME_bit(data = data, holdout = holdout, model = "DecisionTree", tree_depth = 8)
 ```
 
 ### user defined model
@@ -104,7 +100,6 @@ SVM_PE <- function(outcome_treated, outcome_control, covs_treated, covs_control)
 
 Apply the model as `PE_function = SVM_PE` to the package.
 ```{r}
-SVM <- FLAME::FLAME_bit(data = data, holdout = holdout, num_covs = 15, covs_max_list = rep(2,15), 
-                        PE_function = SVM_PE)
+SVM <- FLAME::FLAME_bit(data = data, holdout = holdout, PE_function = SVM_PE)
 ```
 

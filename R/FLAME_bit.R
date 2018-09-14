@@ -11,7 +11,7 @@ aggregate_table <- function(tab, list_val) {
 # it returns the array indicating whether each unit is matched (the first return value),
 # and a list of indices for the matched units (the second return value)
 
-update_matched_bit <- function(data, cur_covs, covs_max_list) {
+update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
 
   data_wo_t = as.matrix(data[,cur_covs+1]) # the covariates values as a matrix
 
@@ -30,7 +30,12 @@ update_matched_bit <- function(data, cur_covs, covs_max_list) {
   # Compute c_u+
   c_u_plus = aggregate_table(table(b_u_plus), b_u_plus)
 
-  match_index = mapply(function(x,y) x != y, c_u, c_u_plus)
+  if (compute_var) {
+    match_index = mapply(function(x,y) (x != y) && (x >= 4) && (y >= 2) && (x - y >= 2), c_u, c_u_plus)
+  }
+  else {
+    match_index = mapply(function(x,y) x != y, c_u, c_u_plus)
+  }
   index = b_u[match_index]
   return(list(match_index, index))
 }
@@ -53,27 +58,58 @@ num_2_vector <- function(num, covs_max_list) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, column, factor_level) {
+get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var) {
   if (length(index) == 0) {
-    CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
-                     c(column[(cur_covs + 1)],"effect","size"))
+    if (compute_var) {
+      CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+3, nrow = 0)),
+                       c(column[(cur_covs + 1)],"effect","size", "variance"))
+    }
+    else {
+      CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
+                       c(column[(cur_covs + 1)],"effect","size"))
+    }
   }
 
   else {
     d = data[match_index,]
     d[,'b_u'] = index
-    summary = data.frame(d %>% group_by(.data$b_u,.data$treated) %>% summarise(size = length(.data$outcome), mean = mean(.data$outcome)))
-    summary = data.frame(summary %>% group_by(.data$b_u) %>% summarize(size = sum(.data$size), treated_lst = list(.data$treated), mean_lst = list(.data$mean)))
-    CATE = data.frame(t(sapply(summary$b_u, num_2_vector, covs_max_list)))
+    summary = data.frame(d %>% group_by(.data$b_u,.data$treated) %>%
+                           summarise(size = length(.data$outcome), mean = mean(.data$outcome), variance= var(.data$outcome)))
+    summary = data.frame(summary %>% group_by(.data$b_u) %>%
+                           summarize(size = sum(.data$size), treated_lst = list(.data$treated), mean_lst = list(.data$mean), var_list = list(.data$variance)))
+
+    if (length(covs_max_list) > 1) {
+      CATE = data.frame(t(sapply(summary$b_u, num_2_vector, covs_max_list)))
+    }
+    else {
+      CATE = data.frame(sapply(summary$b_u, num_2_vector, covs_max_list))
+    }
+
     CATE$effect = mapply(function(x,y) x[which(y == 1)] - x[which(y == 0)], summary$mean_lst, summary$treated_lst)
     CATE$size = summary$size
+
+    if (compute_var) {
+      CATE$variance = mapply(correct_variance, summary$var_list, summary$treated_lst)
+      colnames(CATE) = c(column[(cur_covs + 1)],"effect","size", "variance")
+    }
+    else {
+      colnames(CATE) = c(column[(cur_covs + 1)],"effect","size")
+    }
+
     CATE <- CATE[order(CATE$effect),]
-    colnames(CATE) = c(column[(cur_covs + 1)],"effect","size")
     CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]+1], cur_covs + 1, 1:length(cur_covs))
     rownames(CATE) = NULL
   }
-
   return(CATE)
+}
+
+correct_variance <- function(x,y) {
+  if (is.null(x)) {
+    return(0)
+  }
+  else {
+    return((x[which(y == 1)]) + (x[which(y == 0)]))
+  }
 }
 
 
@@ -83,7 +119,7 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
 #returning Match Quality.
 
 match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_list, tradeoff,
-                              PE_function, model, ridge_reg, lasso_reg, tree_depth) {
+                              PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var) {
 
   # temporarly remove covariate c
   covs_to_match = cur_covs[cur_covs != c]
@@ -96,7 +132,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 
   # Number of matched units
 
-  match_index = update_matched_bit(data, covs_to_match, covs_max_to_match)[[1]]
+  match_index = update_matched_bit(data, covs_to_match, covs_max_to_match, compute_var)[[1]]
 
   num_control_matched = nrow(data[match_index & data[,'treated'] == 0,])
   num_treated_matched = nrow(data[match_index & data[,'treated'] == 1,])
@@ -165,13 +201,13 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' Bit Vectors Implementation
 #'
 #' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors
-#' implementation.
+#' implementation. The required arguments include (1) data and (2) holdout.
+#' The rest of the arguments are optional.
 #'
 #' @param data input data
 #' @param holdout holdout training data
-#' @param num_covs number of covariates
-#' @param covs_max_list list indicates each covariate is binary/ternary/...
-#' @param tradeoff tradeoff parameter to compute Matching Quality (default =
+#' @param compute_var indicator variable of computing variance (optional, default = FALSE)
+#' @param tradeoff tradeoff parameter to compute Matching Quality (optional, default =
 #'   0.1)
 #' @param PE_function user defined function to compute predivtive error
 #'   (optional)
@@ -182,11 +218,15 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' @param tree_depth maximum depth of decision tree if model = DecisionTree
 #'   (optional)
 #' @return (1) list of covariates FLAME performs matching at each iteration, (2)
-#' list of dataframe showing matched groups' sizes and conditional average
-#' treatment effects (CATEs) at each iteration, (3) matching quality at each
-#' iteration, and (4) the original data with additional column *matched*,
+#' list of dataframe showing matched groups' sizes, conditional average treatment
+#' effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
+#' quality at each iteration, and (4) the original data with additional column *matched*,
 #' indicating the number of covariates each unit is matched. If a unit is never
 #' matched, then *matched* will be 0.
+#' @examples
+#' \dontrun{
+#' FLAME_bit(data = data, holdout = holdout)
+#' }
 #' @import dplyr
 #' @import reticulate
 #' @importFrom rlang .data
@@ -194,27 +234,48 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' @importFrom stats rbinom rnorm runif setNames
 #' @export
 
-FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE_function = NULL,
-                             model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
+FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_function = NULL,
+                      model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
 
+  num_covs = ncol(data) - 2
+
+  # If there are more than 31 covariates, then stop
+  if (num_covs >= 31) {
+    stop("WARNING: Integer Overflow. Please consider using FLAME_SQLite or FLAME_PostgreSQL. ")
+  }
+
+  # If covariate(s) are not factor(s), then stop
   if (Reduce("|", sapply(1:num_covs, function(x) !is.factor(data[,x] ))) |
       Reduce("|", sapply(1:num_covs, function(x) !is.factor(holdout[,x] )))) {
     stop("Covariates are not factor data type.")
   }
 
+  # If treatment is not factor, then stop
   if (!is.factor(data[,num_covs + 2]) | !is.factor(holdout[,num_covs + 2])) {
     stop("Treatment variable is not factor data type")
   }
 
+  # If outcome variable is not numeric, then stop
   if (!is.numeric(data[,num_covs + 1]) | !is.numeric(holdout[,num_covs + 1])) {
     stop("Outcome variable is not numeric data type")
   }
 
-
-  data$matched <- as.integer(0) #add column matched to input data
+  # add column "matched" to input data
+  data$matched <- as.integer(0)
   column <- colnames(data)
 
-  factor_level <- lapply(data[,1:num_covs], levels) # Get levels of each factor
+  factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
+  covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
+
+  # If covs_max_list is not sorted in decreasing order, then stop
+  if (is.unsorted(rev(covs_max_list))) {
+    stop("Covariates are not sorted in the correct form: please sort the covariates in decreasing order.")
+  }
+
+  # If any covariate contains more than 31 levels, then stop
+  if (max(covs_max_list) >= 31) {
+    stop("WARNING: Integer Overflow. Please consider using FLAME_SQLite or FLAME_PostgreSQL.")
+  }
 
   # Convert each covariate and treated into type integer
   data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x) - 1)
@@ -232,19 +293,16 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
   colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
 
   #Set up return objects
-
   covs_list = list() #list of covariates for matching at each level
   CATE = list() #list of dataframe that calculates conditional average treatment effect at each level
   SCORE = list()
 
   #Initialize the current covariates to be all covariates and set level to 1
-
   cur_covs = seq(0,num_covs - 1)
   level = 1
 
   # Get matched units without dropping anything
-
-  return_match = update_matched_bit(data, cur_covs, covs_max_list)
+  return_match = update_matched_bit(data, cur_covs, covs_max_list, compute_var)
   match_index = return_match[[1]]
   index = return_match[[2]]
 
@@ -253,10 +311,11 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
   return_df = data[match_index,]
 
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level)
+  CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var)
 
   # Remove matched_units
   data = data[!match_index,]
+  print(paste("number of unmatched units = ", nrow(data)))
 
   #while there are still covariates for matching
 
@@ -271,7 +330,7 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
 
 
     list_score <- unlist(lapply(cur_covs, match_quality_bit, data, holdout, num_covs, cur_covs, covs_max_list,
-                                tradeoff, PE_function, model, ridge_reg, lasso_reg, tree_depth))
+                                tradeoff, PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var))
     quality <- max(list_score)
 
     cur_covs = cur_covs[-which(list_score == quality)] #Dropping one covariate
@@ -281,24 +340,33 @@ FLAME_bit <- function(data, holdout, num_covs, covs_max_list, tradeoff = 0.1, PE
     covs_list[[level]] <- column[(cur_covs + 1)]
 
     # Update Match
-    return_match = update_matched_bit(data, cur_covs, covs_max_list)
+    return_match = update_matched_bit(data, cur_covs, covs_max_list, compute_var)
     match_index = return_match[[1]]
     index = return_match[[2]]
 
     # Set matched = num_covs and get those matched units
     data[match_index,'matched'] = length(cur_covs)
     return_df = rbind(return_df,data[match_index,])
-    CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level)
+    CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var)
 
     # Remove matched_units
     data = data[!match_index,]
+    print(paste("number of unmatched units = ", nrow(data)))
   }
 
+  if (nrow(data) != 0) {
+    return_df = rbind(return_df,data)
+  }
   colnames(return_df) <- column
   rownames(return_df) <- NULL
   return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]+1], 1:num_covs, 1:num_covs)
   return(list(covs_list, CATE, unlist(SCORE), return_df))
 }
 
+#data <- FLAME::Data_Generation(1000,1000,15,5,5)
+#holdout <- data
+#result_bit <- FLAME_bit(data, holdout)
 
-
+#db <- dbConnect(SQLite(),"tempdb")
+#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout)
+#dbDisconnect(db)

@@ -1,7 +1,7 @@
 #update_matched function takes list of covariates (cur_covs) to match
 #and update column matched = 0 to matched = l (level) for matched units
 
-update_matched_SQLite <- function(db, cur_covs, level) {
+update_matched_SQLite <- function(db, cur_covs, level, compute_var) {
 
   #Convert column names to dynamic strings
 
@@ -11,20 +11,42 @@ update_matched_SQLite <- function(db, cur_covs, level) {
 
   #Update Data
 
-  dbExecute(db, gsub("[[:space:]]{2,}"," ",
-            sprintf("WITH tempgroups AS
-                    (SELECT %s
-                    FROM data
-                    WHERE matched = 0
-                    GROUP BY %s
-                    HAVING SUM(treated) > 0 AND SUM(treated) < COUNT(*))
-                    UPDATE data
-                    SET matched = %s
-                    WHERE EXISTS
-                    (SELECT %s
-                    FROM tempgroups S
-                    WHERE %s)
-                    AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+  if (compute_var) {
+    dbExecute(db, gsub("[[:space:]]{2,}"," ",
+                       sprintf("WITH tempgroups AS
+                               (SELECT %s
+                               FROM data
+                               WHERE matched = 0
+                               GROUP BY %s
+                               HAVING SUM(treated) >= 2 AND COUNT(*) >= SUM(treated) + 2)
+                               UPDATE data
+                               SET matched = %s
+                               WHERE EXISTS
+                               (SELECT %s
+                               FROM tempgroups S
+                               WHERE %s)
+                               AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+  }
+
+  else {
+    dbExecute(db, gsub("[[:space:]]{2,}"," ",
+                       sprintf("WITH tempgroups AS
+                               (SELECT %s
+                               FROM data
+                               WHERE matched = 0
+                               GROUP BY %s
+                               HAVING SUM(treated) > 0 AND SUM(treated) < COUNT(*))
+                               UPDATE data
+                               SET matched = %s
+                               WHERE EXISTS
+                               (SELECT %s
+                               FROM tempgroups S
+                               WHERE %s)
+                               AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+  }
+
+  num_unmatched <- as.integer(dbGetQuery(db, "SELECT count(*) FROM data WHERE matched = 0")[1,1])
+  print(paste("number of unmatched units = ", num_unmatched))
 }
 
 #get_CATE function takes list of covariates that are used to
@@ -33,7 +55,7 @@ update_matched_SQLite <- function(db, cur_covs, level) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level) {
+get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level, compute_var) {
 
   #Convert column names to dynamic strings
 
@@ -43,36 +65,68 @@ get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level) {
 
   #Get conditional average treatment effect
 
-  CATE <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ", sprintf(
-    "WITH control AS
-    (SELECT %s, AVG(outcome) AS conout, count(*) AS conc
-    FROM data
-    WHERE matched = %s AND treated = 0
-    GROUP BY %s),
-    treated AS
-    (SELECT %s, AVG(outcome) AS treatout, count(*) AS treatc
-    FROM data
-    WHERE matched = %s AND treated = 1
-    GROUP BY %s)
-    SELECT %s, (treatout - conout) AS effect, (treatc + conc) AS size
-    FROM
-    (control INNER JOIN treated
-    ON %s)",
-    covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
-
-
-  #If the data frame to be returned is empty, convert its column names to covariates at current iteration
-  if (nrow(CATE) == 0) {
-    CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
-                     c(column[(cur_covs + 1)],"effect","size"))
-  } else {
-    CATE <- data.frame(data.matrix(CATE)) # convert all columns into numeric
-    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]], cur_covs + 1, 1:length(cur_covs))
-    colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
-    CATE <- CATE[order(CATE$effect),]
-    rownames(CATE) = NULL
+  if (compute_var) {
+    CATE <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ", sprintf(
+      "WITH control AS
+      (SELECT %s, AVG(outcome) AS conout, count(*) AS conc, VARIANCE(outcome) as convar
+      FROM data
+      WHERE matched = %s AND treated = 0
+      GROUP BY %s),
+      treated AS
+      (SELECT %s, AVG(outcome) AS treatout, count(*) AS treatc, VARIANCE(outcome) as treatvar
+      FROM data
+      WHERE matched = %s AND treated = 1
+      GROUP BY %s)
+      SELECT %s, (treatout - conout) AS effect, (treatc + conc) AS size, (convar + treatvar) AS variance
+      FROM
+      (control INNER JOIN treated
+      ON %s)",
+      covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
+  }
+  else {
+    CATE <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ", sprintf(
+      "WITH control AS
+      (SELECT %s, AVG(outcome) AS conout, count(*) AS conc
+      FROM data
+      WHERE matched = %s AND treated = 0
+      GROUP BY %s),
+      treated AS
+      (SELECT %s, AVG(outcome) AS treatout, count(*) AS treatc
+      FROM data
+      WHERE matched = %s AND treated = 1
+      GROUP BY %s)
+      SELECT %s, (treatout - conout) AS effect, (treatc + conc) AS size
+      FROM
+      (control INNER JOIN treated
+      ON %s)",
+      covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
   }
 
+  if (compute_var) {
+    if (nrow(CATE) == 0) {
+      CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+3, nrow = 0)),
+                       c(column[(cur_covs + 1)],"effect","size", "variance"))
+    } else {
+      CATE <- data.frame(data.matrix(CATE)) # convert all columns into numeric
+      CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]], cur_covs + 1, 1:length(cur_covs))
+      colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size", "variance")
+      CATE <- CATE[order(CATE$effect),]
+      rownames(CATE) = NULL
+    }
+  }
+  else {
+    #If the data frame to be returned is empty, convert its column names to covariates at current iteration
+    if (nrow(CATE) == 0) {
+      CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+2, nrow = 0)),
+                       c(column[(cur_covs + 1)],"effect","size"))
+    } else {
+      CATE <- data.frame(data.matrix(CATE)) # convert all columns into numeric
+      CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]], cur_covs + 1, 1:length(cur_covs))
+      colnames(CATE) <- c(column[(cur_covs + 1)],"effect","size")
+      CATE <- CATE[order(CATE$effect),]
+      rownames(CATE) = NULL
+    }
+  }
   return(CATE)
 }
 
@@ -82,7 +136,7 @@ get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level) {
 #returning Match Quality.
 
 match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
-                                 PE_function, model, ridge_reg, lasso_reg, tree_depth) {
+                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var) {
 
   #temporarly remove covariate c
 
@@ -101,21 +155,41 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 
   #get matched group for covariate list that exclude c
 
-  match <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ",
-                               sprintf("WITH tempgroups AS
-                                       (SELECT *
-                                       FROM data
-                                       WHERE matched = 0
-                                       GROUP BY %s
-                                       HAVING SUM(treated) > 0 AND SUM(treated) < COUNT(*))
-                                       SELECT *
-                                       FROM data
-                                       WHERE EXISTS
-                                       (SELECT *
-                                       FROM tempgroups S
-                                       WHERE %s)
-                                       AND matched = 0",
-                                       covariates,equalcovariates)))
+  if (compute_var) {
+    match <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ",
+                                 sprintf("WITH tempgroups AS
+                                         (SELECT *
+                                         FROM data
+                                         WHERE matched = 0
+                                         GROUP BY %s
+                                         HAVING SUM(treated) >= 2 AND COUNT(*) >= SUM(treated) + 2)
+                                         SELECT *
+                                         FROM data
+                                         WHERE EXISTS
+                                         (SELECT *
+                                         FROM tempgroups S
+                                         WHERE %s)
+                                         AND matched = 0",
+                                         covariates,equalcovariates)))
+  }
+  else {
+    match <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ",
+                                 sprintf("WITH tempgroups AS
+                                         (SELECT *
+                                         FROM data
+                                         WHERE matched = 0
+                                         GROUP BY %s
+                                         HAVING SUM(treated) > 0 AND SUM(treated) < COUNT(*))
+                                         SELECT *
+                                         FROM data
+                                         WHERE EXISTS
+                                         (SELECT *
+                                         FROM tempgroups S
+                                         WHERE %s)
+                                         AND matched = 0",
+                                         covariates,equalcovariates)))
+  }
+
 
   dbWriteTable(db,"match",match, overwrite = TRUE) #write match dataframe into db
 
@@ -196,15 +270,16 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'\code{FLAME_SQLite} does not require external database installment. However,
 #'user should connect to a temporary database with command
 #'\code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
-#'\strong{db}.
+#'\strong{db}. The required arguments include (1) db, (2) data, and (3) holdout.
+#' The rest of the arguments are optional.
 #'
 #'
 #'@param db name of the connection to temporary database  (\strong{must name the
 #'  connection as db})
 #'@param data input data
 #'@param holdout holdout training data
-#'@param num_covs number of covariates
-#'@param tradeoff tradeoff parameter to compute Matching Quality (default = 0.1)
+#'@param compute_var indicator variable of computing variance (optional, default = FALSE)
+#'@param tradeoff tradeoff parameter to compute Matching Quality (optional, default = 0.1)
 #'@param PE_function user defined function to compute predivtive error
 #'  (optional)
 #'@param model user defined model - Linear, Ridge, Lasso, or DecisionTree
@@ -214,16 +289,16 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'@param tree_depth maximum depth of decision tree if model = DecisionTree
 #'  (optional)
 #'@return (1) list of covariates FLAME performs matching at each iteration, (2)
-#'  list of dataframe showing matched groups' sizes and conditional average
-#'  treatment effects (CATEs) at each iteration, (3) matching quality at each
-#'  iteration, and (4) the original data with additional column *matched*,
+#' list of dataframe showing matched groups' sizes, conditional average treatment
+#' effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
+#' quality at each iteration, and (4) the original data with additional column *matched*,
 #'  indicating the number of covariates each unit is matched. If a unit is never
 #'  matched, then *matched* will be 0.
 #'@examples
 #'\dontrun{
 #'db <- dbConnect(SQLite(),"tempdb")
 #'
-#'FLAME_SQLite(db = db, data = data, holdout = holdout, num_covs = 15, tradeoff = 0.1)
+#'FLAME_SQLite(db = db, data = data, holdout = holdout)
 #'
 #'dbDisconnect(db)
 #'}
@@ -233,26 +308,33 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'@importFrom stats rbinom rnorm runif setNames
 #'@export
 
-FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = NULL,
+FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1, PE_function = NULL,
                          model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
 
+  num_covs = ncol(data) - 2
+
+  # If covariate(s) are not factor(s), then stop
   if (Reduce("|", sapply(1:num_covs, function(x) !is.factor(data[,x] ))) |
       Reduce("|", sapply(1:num_covs, function(x) !is.factor(holdout[,x] )))) {
     stop("Covariates are not factor data type")
   }
 
+  # If treatment is not factor, then stop
   if (!is.factor(data[,num_covs + 2]) | !is.factor(holdout[,num_covs + 2])) {
     stop("Treatment variable is not factor data type")
   }
 
+  # If outcome variable is not numeric, then stop
   if (!is.numeric(data[,num_covs + 1]) | !is.numeric(holdout[,num_covs + 1])) {
     stop("Outcome variable is not numeric data type")
   }
 
-  data$matched <- as.integer(0) #add column matched to input data
+  #add column matched to input data
+  data$matched <- as.integer(0)
   column <- colnames(data)
 
-  factor_level <- lapply(data[,1:num_covs], levels) # Get levels of each factor
+  # Get levels of each factor
+  factor_level <- lapply(data[,1:num_covs], levels)
 
   # Convert each covariate and treated into type integer
   data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)],as.integer)
@@ -285,9 +367,9 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = 
 
   #Get matched units without dropping anything
 
-  update_matched_SQLite(db, cur_covs,length(cur_covs))
+  update_matched_SQLite(db, cur_covs, length(cur_covs), compute_var)
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level)
+  CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level, compute_var)
 
 
   #while there are still covariates for matching
@@ -302,7 +384,7 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = 
     #Drop the covariate that returns highest Match Quality Score
 
     list_score <- unlist(lapply(cur_covs,match_quality_SQLite, db, holdout, num_covs, cur_covs, tradeoff,
-                                PE_function, model, ridge_reg, lasso_reg, tree_depth))
+                                PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var))
     quality <- max(list_score)
     covs_to_drop <- cur_covs[which(list_score == quality)]
 
@@ -311,8 +393,8 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = 
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
-    update_matched_SQLite(db, cur_covs,length(cur_covs))
-    CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level)
+    update_matched_SQLite(db, cur_covs,length(cur_covs), compute_var)
+    CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level, compute_var)
 
   }
 
@@ -323,13 +405,13 @@ FLAME_SQLite <- function(db,data,holdout,num_covs,tradeoff = 0.1, PE_function = 
   return(list(covs_list, CATE, unlist(SCORE), return_df))
 }
 
+#data <- FLAME::Data_Generation(1000,1000,15,5,5)
+#holdout <- data
+
+#result_bit <- FLAME_bit(data, holdout, compute_var = TRUE)
 
 #db <- dbConnect(SQLite(),"tempdb")
-
-
-#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout,
-#                                           num_covs = 15, tradeoff = 0.1, model = "Ridge", ridge_reg = 0.1)
-
+#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = TRUE)
 #dbDisconnect(db)
 
 
