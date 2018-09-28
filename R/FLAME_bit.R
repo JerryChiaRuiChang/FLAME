@@ -1,7 +1,7 @@
 # Aggregate Function for getting number of times each value occurs
 aggregate_table <- function(tab, list_val) {
   tab = unclass(tab)
-  name = as.integer(names(tab))
+  name = as.numeric(names(tab))
   return(as.vector(tab[sapply(list_val, function(x) which(name ==  x))]))
 }
 
@@ -34,7 +34,7 @@ update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
     match_index = mapply(function(x,y) (x != y) && (x >= 4) && (y >= 2) && (x - y >= 2), c_u, c_u_plus)
   }
   else {
-    match_index = mapply(function(x,y) x != y, c_u, c_u_plus)
+    match_index = mapply(function(x,y) (x != y) && (x >= 2) && (y >= 1), c_u, c_u_plus)
   }
   index = b_u[match_index]
   return(list(match_index, index))
@@ -44,10 +44,10 @@ update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
 
 num_2_vector <- function(num, covs_max_list) {
   res = list()
-  num = as.integer(num)
+  num = as.numeric(num)
   for (i in rev(seq(0,length(covs_max_list) - 1))) {
-    res = c(res, (num %/% as.integer(covs_max_list[i+1]^(i))))
-    num = num %% as.integer(covs_max_list[i+1]^(i))
+    res = c(res, (num %/% as.numeric(covs_max_list[i+1]^(i))))
+    num = num %% as.numeric(covs_max_list[i+1]^(i))
   }
   return(rev(unlist(res)))
 }
@@ -79,10 +79,10 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
                            summarize(size = sum(.data$size), treated_lst = list(.data$treated), mean_lst = list(.data$mean), var_list = list(.data$variance)))
 
     if (length(covs_max_list) > 1) {
-      CATE = data.frame(t(sapply(summary$b_u, num_2_vector, covs_max_list)))
+      CATE = as.data.frame(t(sapply(summary$b_u, num_2_vector, covs_max_list)))
     }
     else {
-      CATE = data.frame(sapply(summary$b_u, num_2_vector, covs_max_list))
+      CATE = as.data.frame(sapply(summary$b_u, num_2_vector, covs_max_list))
     }
 
     CATE$effect = mapply(function(x,y) x[which(y == 1)] - x[which(y == 0)], summary$mean_lst, summary$treated_lst)
@@ -95,6 +95,7 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
     else {
       colnames(CATE) = c(column[(cur_covs + 1)],"effect","size")
     }
+
 
     CATE <- CATE[order(CATE$effect),]
     CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]+1], cur_covs + 1, 1:length(cur_covs))
@@ -260,22 +261,28 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     stop("Outcome variable is not numeric data type")
   }
 
-  # add column "matched" to input data
-  data$matched <- as.integer(0)
-  column <- colnames(data)
-
   factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
   covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
-
-  # If covs_max_list is not sorted in decreasing order, then stop
-  if (is.unsorted(rev(covs_max_list))) {
-    stop("Covariates are not sorted in the correct form: please sort the covariates in decreasing order.")
-  }
 
   # If any covariate contains more than 31 levels, then stop
   if (max(covs_max_list) >= 31) {
     stop("WARNING: Integer Overflow. Please consider using FLAME_SQLite or FLAME_PostgreSQL.")
   }
+
+  # Sort in increasing order
+  covs_max_list <- covs_max_list[order(covs_max_list)]
+  factor_level <- factor_level[names(covs_max_list)]
+
+  data[,c(1:num_covs)] = data[,names(covs_max_list)]
+  colnames(data) <- c(names(covs_max_list), "outcome", "treated")
+
+
+  holdout[,c(1:num_covs)] = holdout[,names(covs_max_list)]
+  colnames(holdout) <- c(names(covs_max_list), "outcome", "treated")
+
+  # add column "matched" to input data
+  data$matched <- as.integer(0)
+  column <- colnames(data)
 
   # Convert each covariate and treated into type integer
   data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x) - 1)
@@ -370,3 +377,5 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #db <- dbConnect(SQLite(),"tempdb")
 #result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout)
 #dbDisconnect(db)
+
+

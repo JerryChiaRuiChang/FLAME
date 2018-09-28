@@ -12,7 +12,7 @@
 FLAME_summary <- function(FLAME_object) {
 
   #number of matched units
-  print(paste("Number of units matched = ", sum(result_bit[[4]]['matched'] >= 1)))
+  print(paste("Number of units matched = ", sum(FLAME_object[[4]]['matched'] >= 1)))
 
   # ATE
   df <- do.call(rbind,lapply(FLAME_object[[2]],simp))
