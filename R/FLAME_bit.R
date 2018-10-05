@@ -238,6 +238,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_function = NULL,
                       model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
 
+  options(scipen=999)
   num_covs = ncol(data) - 2
 
   # If there are more than 31 covariates, then stop
@@ -378,14 +379,4 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout)
 #dbDisconnect(db)
 
-#data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
-#data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
-#holdout <- data
-#tradeoff = 0.1
-#compute_var = FALSE
-#PE_function = NULL
-#model = NULL
-#ridge_reg = NULL
-#lasso_reg = NULL
-#tree_depth = NULL
 
