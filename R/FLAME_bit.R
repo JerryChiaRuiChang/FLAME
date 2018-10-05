@@ -378,4 +378,14 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout)
 #dbDisconnect(db)
 
+#data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
+#data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
+#holdout <- data
+#tradeoff = 0.1
+#compute_var = FALSE
+#PE_function = NULL
+#model = NULL
+#ridge_reg = NULL
+#lasso_reg = NULL
+#tree_depth = NULL
 

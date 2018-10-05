@@ -33,6 +33,7 @@ $$
 $$
 $T \in \{0,1\}$ indicates whether a unit is in the treated group or in the control group. $\alpha_{i} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, $\beta_{i} \sim N(1.5,0.15)$, and $U$ represents the coefficient of non-linear term. We applied `Data_Generation` function to generate 1000 treated units and 1000 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data.  
 ```{r}
+
 data <- FLAME::Data_Generation(num_control = 1000, num_treated = 1000,
                                num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
 holdout <- data 
