@@ -28,7 +28,8 @@ Depends:
     latticeExtra,
     dplyr,
     RPostgreSQL,
-    RSQLite
+    RSQLite,
+    gmp
 Imports:
     graphics,
     stats,
