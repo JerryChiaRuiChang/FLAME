@@ -388,7 +388,7 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     quality <- max(list_score)
     covs_to_drop <- cur_covs[which(list_score == quality)]
 
-    cur_covs = cur_covs[cur_covs != covs_to_drop] #Dropping one covariate
+    cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping covariate(s)
 
     #Update Match
     SCORE[[level-1]] <- quality
@@ -407,8 +407,8 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
 
 #data <- FLAME::Data_Generation(1000,1000,15,5,5)
 #holdout <- data
-
 #result_bit <- FLAME_bit(data, holdout, compute_var = TRUE)
+
 
 #db <- dbConnect(SQLite(),"tempdb")
 #result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = TRUE)

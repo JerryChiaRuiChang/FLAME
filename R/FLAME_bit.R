@@ -1,7 +1,8 @@
-# Aggregate Function for getting number of times each value occurs
-aggregate_table <- function(tab, list_val) {
+aggregate_table <- function(list) {
+  tab = table(as.character(list))
   tab = unclass(tab)
-  name = as.numeric(names(tab))
+  name = names(tab)
+  list_val = as.character(list)
   return(as.vector(tab[sapply(list_val, function(x) which(name ==  x))]))
 }
 
@@ -15,20 +16,29 @@ update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
 
   data_wo_t = as.matrix(data[,cur_covs+1]) # the covariates values as a matrix
 
+  options("scipen"=100, "digits"=4)
+
   # Compute b_u
-  multiplier <- mapply(function(x,y) x^y, covs_max_list, seq(0,length(cur_covs)-1))
-  b_u = sapply(1:nrow(data_wo_t), function(x) data_wo_t[x,] %*% multiplier)
+  multiplier = as.bigz(rep(0,length(cur_covs)))
+  for (i in 1:length(cur_covs)) {
+    multiplier[i] = pow.bigz(covs_max_list[i],i-1)
+  }
+  b_u = as.vector(data_wo_t %*% multiplier)
 
   # Compute b_u+
-  multiplier <- mapply(function(x,y) x^y, covs_max_list, seq(1,length(cur_covs)))
-  b_u_plus = sapply(1:nrow(data_wo_t), function(x) data_wo_t[x,] %*% multiplier)
-  b_u_plus = b_u_plus + data[,'treated']
+  multiplier = as.bigz(rep(0,length(cur_covs)))
+  for (i in 1:length(cur_covs)) {
+    multiplier[i] = pow.bigz(covs_max_list[i],i)
+  }
+
+  b_u_plus = as.vector(data_wo_t %*% multiplier)
+  b_u_plus = add.bigz(b_u_plus, data[,'treated'])
 
   # Compute c_u
-  c_u = aggregate_table(table(b_u), b_u)
+  c_u = aggregate_table(b_u)
 
   # Compute c_u+
-  c_u_plus = aggregate_table(table(b_u_plus), b_u_plus)
+  c_u_plus = aggregate_table(b_u_plus)
 
   if (compute_var) {
     match_index = mapply(function(x,y) (x != y) && (x >= 4) && (y >= 2) && (x - y >= 2), c_u, c_u_plus)
@@ -38,18 +48,6 @@ update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
   }
   index = b_u[match_index]
   return(list(match_index, index))
-}
-
-# Convert b_u to its original form
-
-num_2_vector <- function(num, covs_max_list) {
-  res = list()
-  num = as.numeric(num)
-  for (i in rev(seq(0,length(covs_max_list) - 1))) {
-    res = c(res, (num %/% as.numeric(covs_max_list[i+1]^(i))))
-    num = num %% as.numeric(covs_max_list[i+1]^(i))
-  }
-  return(rev(unlist(res)))
 }
 
 #get_CATE function takes match_index and index (b_u values)
@@ -73,17 +71,16 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
   else {
     d = data[match_index,]
     d[,'b_u'] = index
+    d[,'b_u'] = unlist(lapply(d[,'b_u'], as.character))
     summary = data.frame(d %>% group_by(.data$b_u,.data$treated) %>%
                            summarise(size = length(.data$outcome), mean = mean(.data$outcome), variance= var(.data$outcome)))
     summary = data.frame(summary %>% group_by(.data$b_u) %>%
                            summarize(size = sum(.data$size), treated_lst = list(.data$treated), mean_lst = list(.data$mean), var_list = list(.data$variance)))
 
-    if (length(covs_max_list) > 1) {
-      CATE = as.data.frame(t(sapply(summary$b_u, num_2_vector, covs_max_list)))
-    }
-    else {
-      CATE = as.data.frame(sapply(summary$b_u, num_2_vector, covs_max_list))
-    }
+
+    pos <- unlist(lapply(summary$b_u, function(x) which(d$b_u %in% x)[1]))
+    CATE <- as.data.frame(d[pos, 1:length(cur_covs)])
+
 
     CATE$effect = mapply(function(x,y) x[which(y == 1)] - x[which(y == 0)], summary$mean_lst, summary$treated_lst)
     CATE$size = summary$size
@@ -95,7 +92,6 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
     else {
       colnames(CATE) = c(column[(cur_covs + 1)],"effect","size")
     }
-
 
     CATE <- CATE[order(CATE$effect),]
     CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]+1], cur_covs + 1, 1:length(cur_covs))
@@ -238,13 +234,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_function = NULL,
                       model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
 
-  options(scipen=999)
   num_covs = ncol(data) - 2
-
-  # If there are more than 31 covariates, then stop
-  if (num_covs >= 31) {
-    stop("WARNING: Integer Overflow. Please consider using FLAME_SQLite or FLAME_PostgreSQL. ")
-  }
 
   # If covariate(s) are not factor(s), then stop
   if (Reduce("|", sapply(1:num_covs, function(x) !is.factor(data[,x] ))) |
@@ -265,10 +255,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
   covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
 
-  # If any covariate contains more than 31 levels, then stop
-  if (max(covs_max_list) >= 31) {
-    stop("WARNING: Integer Overflow. Please consider using FLAME_SQLite or FLAME_PostgreSQL.")
-  }
 
   # Sort in increasing order
   covs_max_list <- covs_max_list[order(covs_max_list)]
@@ -375,8 +361,10 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #holdout <- data
 #result_bit <- FLAME_bit(data, holdout)
 
-#db <- dbConnect(SQLite(),"tempdb")
-#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout)
-#dbDisconnect(db)
+#data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
+#data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
+#holdout <- data
+#FLAME_bit(data, holdout)
+
 
 

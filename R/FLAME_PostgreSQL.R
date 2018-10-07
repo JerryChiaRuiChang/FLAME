@@ -400,7 +400,8 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
     quality <- max(list_score)
     covs_to_drop <- cur_covs[which(list_score == quality)]
 
-    cur_covs = cur_covs[cur_covs != covs_to_drop] #Dropping one covariate
+    cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping covariate(s)
+
 
     #Update Match
     SCORE[[level-1]] <- quality
@@ -418,12 +419,25 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
 }
 
 
+#data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
+#data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
+#holdout <- data
+
 #drv <- dbDriver('PostgreSQL')
 #db <- dbConnect(drv, dbname="FLAME", host='localhost',
 #             port=5432, user="postgres", password = 'new_password')
 
-#result_Postgres <- FLAME_PostgreSQL(db = db, data = data, holdout = holdout, compute_var = TRUE)
+#result_Postgres <- FLAME_PostgreSQL(db = db, data = data, holdout = holdout, compute_var = FALSE)
 #dbDisconnect(db)
+
+#compute_var = FALSE
+#tradeoff = 0.1
+#PE_function = NULL
+#model = NULL
+#ridge_reg = NULL
+#lasso_reg = NULL
+#tree_depth = NULL
+
 
 
 
