@@ -23,7 +23,7 @@ update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
   for (i in 1:length(cur_covs)) {
     multiplier[i] = pow.bigz(covs_max_list[i],i-1)
   }
-  b_u = as.vector(data_wo_t %*% multiplier)
+  b_u = as.vector(data_wo_t %*% as.matrix(multiplier))
 
   # Compute b_u+
   multiplier = as.bigz(rep(0,length(cur_covs)))
@@ -31,7 +31,7 @@ update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
     multiplier[i] = pow.bigz(covs_max_list[i],i)
   }
 
-  b_u_plus = as.vector(data_wo_t %*% multiplier)
+  b_u_plus = as.vector(data_wo_t %*% as.matrix(multiplier))
   b_u_plus = add.bigz(b_u_plus, data[,'treated'])
 
   # Compute c_u
@@ -225,6 +225,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' FLAME_bit(data = data, holdout = holdout)
 #' }
 #' @import dplyr
+#' @import gmp
 #' @import reticulate
 #' @importFrom rlang .data
 #' @importFrom graphics boxplot
