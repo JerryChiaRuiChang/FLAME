@@ -13,4 +13,5 @@ dplyr
 DBI
 RPostgreSQL
 RSQLite
+gmp
 FLAME

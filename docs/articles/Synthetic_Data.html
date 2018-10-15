@@ -85,7 +85,7 @@
       <h1>Apply the FLAME Algorithm to Synthetic Data</h1>
                         <h4 class="author">Jerry Chia-Rui Chang</h4>
             
-            <h4 class="date">2018-09-13</h4>
+            <h4 class="date">2018-10-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chiarui424/FLAME/blob/master/vignettes/Synthetic_Data.Rmd"><code>vignettes/Synthetic_Data.Rmd</code></a></small>
       <div class="hidden name"><code>Synthetic_Data.Rmd</code></div>
@@ -105,7 +105,8 @@
 &amp; y = \sum_{i}\alpha_{i}x_{i} + T\sum_{i}\beta_{i}x_{i} + T \cdot U \sum_{i=1..5, \gamma = 1...5, \gamma &gt; i} x_{i}x_{\gamma}
 \end{aligned}
 \]</span> <span class="math inline">\(T \in \{0,1\}\)</span> indicates whether a unit is in the treated group or in the control group. <span class="math inline">\(\alpha_{i} \sim N(10s, 1)\)</span> with <span class="math inline">\(s \sim Uniform\{-1,1\}\)</span>, <span class="math inline">\(\beta_{i} \sim N(1.5,0.15)\)</span>, and <span class="math inline">\(U\)</span> represents the coefficient of non-linear term. We applied <code>Data_Generation</code> function to generate 1000 treated units and 1000 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/Data_Generation">Data_Generation</a></span>(<span class="dt">num_control =</span> <span class="dv">1000</span>, <span class="dt">num_treated =</span> <span class="dv">1000</span>,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+data &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/Data_Generation">Data_Generation</a></span>(<span class="dt">num_control =</span> <span class="dv">1000</span>, <span class="dt">num_treated =</span> <span class="dv">1000</span>,
                                <span class="dt">num_cov_dense =</span> <span class="dv">10</span>, <span class="dt">num_cov_unimportant =</span> <span class="dv">5</span>, <span class="dt">U =</span> <span class="dv">5</span>)
 holdout &lt;-<span class="st"> </span>data 
 
@@ -122,22 +123,22 @@ holdout &lt;-<span class="st"> </span>data
 <h2 class="hasAnchor">
 <a href="#bit-vectors-implementation" class="anchor"></a>Bit vectors implementation</h2>
 <p>We run <code>FLAME_bit</code> function with the following command. The required inputs include (1) input data and (2) holdout training set. Note that if we would like to compute the variance of each matched group, please specify optioanl argument <code>compute_var = TRUE</code>. Since the variance of each matched group is the sum of the variance of the treated units and the variance of the control units, each matched group should contain at least 2 treated units and 2 control units. Therefore, it is expected that less matched units will be found in earlier iteration.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result_bit &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">compute_var =</span> <span class="ot">TRUE</span>)
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1975"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1925"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1718"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1155"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  553"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  286"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  178"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  106"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  69"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  37"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  22"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  8"</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result_bit &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">compute_var =</span> <span class="ot">FALSE</span>)
+<span class="co">#&gt; [1] "number of unmatched units =  1938"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1873"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1784"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1568"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1321"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1012"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  688"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  453"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  280"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  231"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  150"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  108"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  68"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  68"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  26"</span></code></pre></div>
 <p>The outputs contain four elements, including (1) list of covariates FLAME performs matching at each iteration, (2) list of dataframe showing matched groups’ sizes, conditional average treatment effects (CATEs), and variance (if <code>compute_var = TRUE</code>) at each iteration, (3) matching quality at each iteration, and (4) the original data with additional column <em>matched</em>, indicating the number of covariates each unit is matched. If a unit is never matched, then <em>matched</em> will be 0.</p>
 </div>
 <div id="database-systems-implementation" class="section level2">
@@ -158,22 +159,22 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(drv, <span cl
              <span class="dt">port=</span><span class="dv">5432</span>, <span class="dt">password =</span> <span class="st">'new_password'</span>)
 
 <span class="co"># Run FLAME_PostgreSQL </span>
-result_PostgreSQL &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_PostgreSQL">FLAME_PostgreSQL</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">compute_var =</span> <span class="ot">TRUE</span>)
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1975"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1925"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1718"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1155"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  553"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  286"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  178"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  106"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  69"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  37"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  22"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  8"</span>
+result_PostgreSQL &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_PostgreSQL">FLAME_PostgreSQL</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">compute_var =</span> <span class="ot">FALSE</span>)
+<span class="co">#&gt; [1] "number of unmatched units =  1938"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1873"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1784"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1568"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1321"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1012"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  688"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  453"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  280"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  231"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  150"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  108"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  68"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  68"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  26"</span>
 
 <span class="co"># Disconnect from db</span>
 <span class="kw">dbDisconnect</span>(db)
@@ -187,22 +188,22 @@ result_PostgreSQL &lt;-<span class="st"> </span>FLAME<span class="op">::</span><
 db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="kw">SQLite</span>(),<span class="st">"tempdb"</span>) 
 
 <span class="co">#Run FLAME_SQLite</span>
-result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_SQLite">FLAME_SQLite</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">compute_var =</span> <span class="ot">TRUE</span>)
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  2000"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1975"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1925"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1718"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  1155"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  553"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  286"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  178"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  106"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  69"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  37"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  22"</span>
-<span class="co">#&gt; [1] "number of unmatched units =  8"</span>
+result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/FLAME/topics/FLAME_SQLite">FLAME_SQLite</a></span>(<span class="dt">db =</span> db, <span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">compute_var =</span> <span class="ot">FALSE</span>)
+<span class="co">#&gt; [1] "number of unmatched units =  1938"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1873"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1784"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1568"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1321"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  1012"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  688"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  453"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  280"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  231"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  150"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  108"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  68"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  68"</span>
+<span class="co">#&gt; [1] "number of unmatched units =  26"</span>
 
 <span class="co">#Disconnect from db</span>
 <span class="kw">dbDisconnect</span>(db)</code></pre></div>
@@ -216,17 +217,16 @@ result_SQLite &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span
 <li>Apply summary function to examine the number of matched units, average treatment effect, and the conditional average treatment effect (CATE) of each matched group in boxplot.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/FLAME_summary.html">FLAME_summary</a></span>(result_bit)
-<span class="co">#&gt; [1] "Number of units matched =  1992"</span>
-<span class="co">#&gt; [1] "Average treatment effect =  19.4468166387077"</span></code></pre></div>
+<span class="co">#&gt; [1] "Number of units matched =  1974"</span>
+<span class="co">#&gt; [1] "Average treatment effect =  19.6297775008364"</span>
+<span class="kw"><a href="../reference/FLAME_summary.html">FLAME_summary</a></span>(result_SQLite)
+<span class="co">#&gt; [1] "Number of units matched =  1974"</span>
+<span class="co">#&gt; [1] "Average treatment effect =  19.6297775008364"</span></code></pre></div>
 <p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/FLAME_summary.html">FLAME_summary</a></span>(result_SQLite)
-<span class="co">#&gt; [1] "Number of units matched =  1992"</span>
-<span class="co">#&gt; [1] "Average treatment effect =  19.4468166387077"</span></code></pre></div>
-<p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/FLAME_summary.html">FLAME_summary</a></span>(result_PostgreSQL)
-<span class="co">#&gt; [1] "Number of units matched =  1992"</span>
-<span class="co">#&gt; [1] "Average treatment effect =  19.4468166387077"</span></code></pre></div>
-<p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
+<span class="co">#&gt; [1] "Number of units matched =  1974"</span>
+<span class="co">#&gt; [1] "Average treatment effect =  19.6297775008364"</span></code></pre></div>
+<p><img src="Synthetic_Data_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
 <ol start="2" style="list-style-type: decimal">
 <li>The covariates FLAME performs matching at the <span class="math inline">\(10^{th}\)</span> iteration.</li>
 </ol>
@@ -240,44 +240,41 @@ result_SQLite[[<span class="dv">1</span>]][[<span class="dv">10</span>]] <span c
 <li>Each matched group’s size, conditional average treatment effect (CATE), and variance at the <span class="math inline">\(10^{th}\)</span> iteration. Note that if we specify <code>compute_var = FLASE</code> when running FLAME, the variance column will not be in the output.</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(result_bit[[<span class="dv">2</span>]][[<span class="dv">10</span>]]) <span class="co"># bit vectors</span>
-<span class="co">#&gt;   x2 x3 x4 x5 x6 x9    effect size variance</span>
-<span class="co">#&gt; 1  1  0  0  0  0  0  2.868871    8 69.17528</span>
-<span class="co">#&gt; 2  1  0  0  0  1  0  3.468964   10 44.96403</span>
-<span class="co">#&gt; 3  0  0  0  1  1  1  3.976116    7 41.91578</span>
-<span class="co">#&gt; 4  0  0  0  0  0  1  6.967516    4 20.66160</span>
-<span class="co">#&gt; 5  0  1  0  0  1  0  7.042798    9 46.99055</span>
-<span class="co">#&gt; 6  0  1  1  0  0  0 12.638478    9 45.40109</span>
+<span class="co">#&gt;   x2 x3 x4 x5 x6 x9  effect size</span>
+<span class="co">#&gt; 1  0  1  0  0  0  0 -0.8076    4</span>
+<span class="co">#&gt; 2  1  0  0  1  0  1  0.2418    6</span>
+<span class="co">#&gt; 3  0  0  1  0  0  0  4.5022    8</span>
+<span class="co">#&gt; 4  0  0  1  1  0  0  8.8697    7</span>
+<span class="co">#&gt; 5  1  0  0  0  0  0 11.0326    2</span>
+<span class="co">#&gt; 6  0  1  0  1  0  0 15.6090    9</span>
 <span class="kw">head</span>(result_PostgreSQL[[<span class="dv">2</span>]][[<span class="dv">10</span>]]) <span class="co">#PostgreSQL</span>
-<span class="co">#&gt;   x2 x3 x4 x5 x6 x9    effect size variance</span>
-<span class="co">#&gt; 1  1  0  0  0  0  0  2.868871    8 69.17528</span>
-<span class="co">#&gt; 2  1  0  0  0  1  0  3.468964   10 44.96403</span>
-<span class="co">#&gt; 3  0  0  0  1  1  1  3.976116    7 41.91578</span>
-<span class="co">#&gt; 4  0  0  0  0  0  1  6.967516    4 20.66160</span>
-<span class="co">#&gt; 5  0  1  0  0  1  0  7.042798    9 46.99055</span>
-<span class="co">#&gt; 6  0  1  1  0  0  0 12.638478    9 45.40109</span>
+<span class="co">#&gt;   x2 x3 x4 x5 x6 x9  effect size</span>
+<span class="co">#&gt; 1  1  0  0  0  0  0 -0.8076    4</span>
+<span class="co">#&gt; 2  0  0  1  0  1  0  0.2418    6</span>
+<span class="co">#&gt; 3  0  1  0  0  0  0  4.5022    8</span>
+<span class="co">#&gt; 4  0  1  1  0  0  0  8.8697    7</span>
+<span class="co">#&gt; 5  0  0  0  0  0  1 11.0326    2</span>
+<span class="co">#&gt; 6  1  0  1  0  0  0 15.6090    9</span>
 <span class="kw">head</span>(result_SQLite[[<span class="dv">2</span>]][[<span class="dv">10</span>]]) <span class="co">#SQLite</span>
-<span class="co">#&gt;   x2 x3 x4 x5 x6 x9    effect size variance</span>
-<span class="co">#&gt; 1  1  0  0  0  0  0  2.868871    8 69.17528</span>
-<span class="co">#&gt; 2  1  0  0  0  1  0  3.468964   10 44.96403</span>
-<span class="co">#&gt; 3  0  0  0  1  1  1  3.976116    7 41.91578</span>
-<span class="co">#&gt; 4  0  0  0  0  0  1  6.967516    4 20.66160</span>
-<span class="co">#&gt; 5  0  1  0  0  1  0  7.042798    9 46.99055</span>
-<span class="co">#&gt; 6  0  1  1  0  0  0 12.638478    9 45.40109</span></code></pre></div>
+<span class="co">#&gt;   x2 x3 x4 x5 x6 x9  effect size</span>
+<span class="co">#&gt; 1  1  0  0  0  0  0 -0.8076    4</span>
+<span class="co">#&gt; 2  0  0  1  0  1  0  0.2418    6</span>
+<span class="co">#&gt; 3  0  1  0  0  0  0  4.5022    8</span>
+<span class="co">#&gt; 4  0  1  1  0  0  0  8.8697    7</span>
+<span class="co">#&gt; 5  0  0  0  0  0  1 11.0326    2</span>
+<span class="co">#&gt; 6  1  0  1  0  0  0 15.6090    9</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Matching Quality at each iteration</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result_bit[[<span class="dv">3</span>]] <span class="co"># bit vectors</span>
-<span class="co">#&gt;  [1]  -15.15741  -15.15022  -15.14692  -15.14275  -15.14497  -16.26473</span>
-<span class="co">#&gt;  [7]  -25.05900  -42.74084  -60.78923 -102.17315 -145.20427 -200.49402</span>
-<span class="co">#&gt; [13] -264.88630 -345.28909</span>
+<span class="co">#&gt;  [1]  -15.15  -15.14  -15.13  -15.12  -15.12  -16.27  -25.09  -42.76</span>
+<span class="co">#&gt;  [9]  -60.83 -102.19 -145.21 -200.51 -264.97 -345.27</span>
 result_PostgreSQL[[<span class="dv">3</span>]] <span class="co">#PostgreSQL</span>
-<span class="co">#&gt;  [1]  -15.15741  -15.15022  -15.14692  -15.14275  -15.14497  -16.26473</span>
-<span class="co">#&gt;  [7]  -25.05900  -42.74084  -60.78923 -102.17315 -145.20427 -200.49402</span>
-<span class="co">#&gt; [13] -264.88630 -345.28909</span>
+<span class="co">#&gt;  [1]  -15.15  -15.14  -15.13  -15.12  -15.12  -16.27  -25.09  -42.76</span>
+<span class="co">#&gt;  [9]  -60.83 -102.19 -145.21 -200.51 -264.97 -345.27</span>
 result_SQLite[[<span class="dv">3</span>]] <span class="co">#SQLite</span>
-<span class="co">#&gt;  [1]  -15.15741  -15.15022  -15.14692  -15.14275  -15.14497  -16.26473</span>
-<span class="co">#&gt;  [7]  -25.05900  -42.74084  -60.78923 -102.17315 -145.20427 -200.49402</span>
-<span class="co">#&gt; [13] -264.88630 -345.28909</span></code></pre></div>
+<span class="co">#&gt;  [1]  -15.15  -15.14  -15.13  -15.12  -15.12  -16.27  -25.09  -42.76</span>
+<span class="co">#&gt;  [9]  -60.83 -102.19 -145.21 -200.51 -264.97 -345.27</span></code></pre></div>
 </div>
   </div>
 
