@@ -109,6 +109,27 @@ correct_variance <- function(x,y) {
   }
 }
 
+Regression_PE_bit <- function(holdout_trt, holdout_ctl) {
+
+  # Convert each covariate into factor type and drop covariate with less than 1 level
+  holdout_trt[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_trt[,1:(ncol(holdout_trt)-1)], as.factor)
+  holdout_trt <- holdout_trt[, c(sapply(holdout_trt[,1:(ncol(holdout_trt)-1)], nlevels) > 1,TRUE)]
+
+  holdout_ctl[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_ctl[,1:(ncol(holdout_trt)-1)], as.factor)
+  holdout_ctl <- holdout_ctl[, c(sapply(holdout_ctl[,1:(ncol(holdout_ctl)-1)], nlevels) > 1,TRUE)]
+
+  # MSE for treated
+
+  model_lm <- lm(outcome ~ ., data = holdout_trt) # fit the data to lm model
+  MSE_treated <- sum((holdout_trt$outcome - model_lm$fitted.values)^2)/length(holdout_trt$outcome) # compute mean squared error
+
+  # MSE for control
+  model_lm <- lm(outcome ~ ., data = holdout_ctl) # fit the data to lm model
+  MSE_control <- sum((holdout_ctl$outcome - model_lm$fitted.values)^2)/length(holdout_ctl$outcome) # compute mean squared error
+
+  return(MSE_treated + MSE_control)
+}
+
 
 #match_quality function takes holdout dataset, number of total covariates,
 #list of current covariates, covariate c to temporily remove from, and trafeoff
@@ -116,7 +137,7 @@ correct_variance <- function(x,y) {
 #returning Match Quality.
 
 match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_list, tradeoff,
-                              PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var) {
+                              PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run) {
 
   # temporarly remove covariate c
   covs_to_match = cur_covs[cur_covs != c]
@@ -133,6 +154,14 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 
   num_control_matched = nrow(data[match_index & data[,'treated'] == 0,])
   num_treated_matched = nrow(data[match_index & data[,'treated'] == 1,])
+
+  if (!py_run) {
+    holdout_trt <- holdout[holdout[,'treated'] == 1,]
+    holdout_trt <- holdout_trt[,!(names(holdout_trt) %in% 'treated')]
+    holdout_ctl <- holdout[holdout[,'treated'] == 0,]
+    holdout_ctl <- holdout_trt[,!(names(holdout_ctl) %in% 'treated')]
+    PE <- Regression_PE_bit(holdout_trt, holdout_ctl)
+  }
 
   #Compute Predictive Error
 
@@ -253,9 +282,25 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     stop("Outcome variable is not numeric data type")
   }
 
+  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
+
+  if (!py_module_available("pandas")) {
+    warning("The package will use R’s default linear regression because there pandas module is not attached to Python. This will be VERY SLOW!
+            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  }
+
+  if (!py_module_available("numpy")) {
+    warning("The package will use R’s default linear regression because numpy module is not attached to Python. This will be VERY SLOW!
+            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  }
+
+  if (!py_module_available("sklearn")) {
+    warning("The package will use R’s default linear regression because sklearn module is not attached to Python. This will be VERY SLOW!
+            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  }
+
   factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
   covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
-
 
   # Sort in increasing order
   covs_max_list <- covs_max_list[order(covs_max_list)]
@@ -323,9 +368,8 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     #Temporarily drop one covariate at a time to calculate Match Quality
     #Drop the covariate that returns highest Match Quality Score
 
-
     list_score <- unlist(lapply(cur_covs, match_quality_bit, data, holdout, num_covs, cur_covs, covs_max_list,
-                                tradeoff, PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var))
+                                tradeoff, PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
     quality <- max(list_score)
 
     cur_covs = cur_covs[-which(list_score == quality)] #Dropping one covariate
@@ -358,14 +402,12 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   return(list(covs_list, CATE, unlist(SCORE), return_df))
 }
 
-#data <- FLAME::Data_Generation(1000,1000,15,5,5)
-#holdout <- data
-#result_bit <- FLAME_bit(data, holdout)
 
 #data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
 #data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
 #holdout <- data
 #FLAME_bit(data, holdout)
 
+#data <- read.csv("/Users/Jerry/Desktop/Natality_db_abnormality.csv")
 
 

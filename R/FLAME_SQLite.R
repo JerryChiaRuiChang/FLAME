@@ -130,13 +130,34 @@ get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level, compute_va
   return(CATE)
 }
 
+Regression_PE_SQLite <- function(holdout_trt, holdout_ctl) {
+
+  # Convert each covariate into factor type and drop covariate with less than 1 level
+  holdout_trt[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_trt[,1:(ncol(holdout_trt)-1)], as.factor)
+  holdout_trt <- holdout_trt[, c(sapply(holdout_trt[,1:(ncol(holdout_trt)-1)], nlevels) > 1,TRUE)]
+
+  holdout_ctl[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_ctl[,1:(ncol(holdout_trt)-1)], as.factor)
+  holdout_ctl <- holdout_ctl[, c(sapply(holdout_ctl[,1:(ncol(holdout_ctl)-1)], nlevels) > 1,TRUE)]
+
+  # MSE for treated
+
+  model_lm <- lm(outcome ~ ., data = holdout_trt) # fit the data to lm model
+  MSE_treated <- sum((holdout_trt$outcome - model_lm$fitted.values)^2)/length(holdout_trt$outcome) # compute mean squared error
+
+  # MSE for control
+  model_lm <- lm(outcome ~ ., data = holdout_ctl) # fit the data to lm model
+  MSE_control <- sum((holdout_ctl$outcome - model_lm$fitted.values)^2)/length(holdout_ctl$outcome) # compute mean squared error
+
+  return(MSE_treated + MSE_control)
+}
+
 #match_quality function takes holdout dataset, number of total covariates,
 #list of current covariates, covariate c to temporily remove from, and trafeoff
 #parameter as input. The function then computes Balancing Factor and Predictive Error,
 #returning Match Quality.
 
 match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
-                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var) {
+                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run) {
 
   #temporarly remove covariate c
 
@@ -203,6 +224,14 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
   }
 
   #Compute Predictive Error
+
+  if (!py_run) {
+    holdout_trt <- holdout[holdout[,'treated'] == 1,]
+    holdout_trt <- holdout_trt[,!(names(holdout_trt) %in% 'treated')]
+    holdout_ctl <- holdout[holdout[,'treated'] == 0,]
+    holdout_ctl <- holdout_trt[,!(names(holdout_ctl) %in% 'treated')]
+    PE <- Regression_PE_SQLite(holdout_trt, holdout_ctl)
+  }
 
   if (!is.null(PE_function)) {
     # Compute -PE based on user defined PE_function
@@ -329,6 +358,23 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     stop("Outcome variable is not numeric data type")
   }
 
+  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
+
+  if (!py_module_available("pandas")) {
+    warning("The package will use R’s default linear regression because there pandas module is not attached to Python. This will be VERY SLOW!
+            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  }
+
+  if (!py_module_available("numpy")) {
+    warning("The package will use R’s default linear regression because numpy module is not attached to Python. This will be VERY SLOW!
+            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  }
+
+  if (!py_module_available("sklearn")) {
+    warning("The package will use R’s default linear regression because sklearn module is not attached to Python. This will be VERY SLOW!
+            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  }
+
   #add column matched to input data
   data$matched <- as.integer(0)
   column <- colnames(data)
@@ -384,7 +430,7 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     #Drop the covariate that returns highest Match Quality Score
 
     list_score <- unlist(lapply(cur_covs,match_quality_SQLite, db, holdout, num_covs, cur_covs, tradeoff,
-                                PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var))
+                                PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
     quality <- max(list_score)
     covs_to_drop <- cur_covs[which(list_score == quality)]
 
@@ -411,7 +457,7 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
 
 
 #db <- dbConnect(SQLite(),"tempdb")
-#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = TRUE)
+#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = FALSE)
 #dbDisconnect(db)
 
 

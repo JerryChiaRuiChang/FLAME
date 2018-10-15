@@ -46,7 +46,7 @@ head(data)
 We run `FLAME_bit` function with the following command. The required inputs include (1) input data and (2) holdout training set. Note that if we would like to compute the variance of each matched group, please specify optioanl argument `compute_var = TRUE`. Since the variance of each matched group is the sum of the variance of the treated units and the variance of the control units, each matched group should contain at least 2 treated units and 2 control units. Therefore, it is expected that less matched units will be found in earlier iteration.
 
 ```{r, warning=FALSE}
-result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, compute_var = TRUE)
+result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, compute_var = FALSE)
 ```
 
 The outputs contain four elements, including (1) list of covariates FLAME performs matching at each iteration, (2) list of dataframe showing matched groups' sizes, conditional average treatment effects (CATEs), and variance (if `compute_var = TRUE`) at each iteration, (3) matching quality at each iteration, and (4) the original data with additional column *matched*, indicating the number of covariates each unit is matched. If a unit is never matched, then *matched* will be 0.
@@ -72,7 +72,7 @@ db <- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
              port=5432, password = 'new_password')
 
 # Run FLAME_PostgreSQL 
-result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = holdout, compute_var = TRUE)
+result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = holdout, compute_var = FALSE)
 
 # Disconnect from db
 dbDisconnect(db)
@@ -86,7 +86,7 @@ Connect to a temporary database in R and run `FLAME_SQLite` function with the fo
 db <- dbConnect(SQLite(),"tempdb") 
 
 #Run FLAME_SQLite
-result_SQLite <- FLAME::FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = TRUE)
+result_SQLite <- FLAME::FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = FALSE)
 
 #Disconnect from db
 dbDisconnect(db)
