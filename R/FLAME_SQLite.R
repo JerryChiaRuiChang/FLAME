@@ -446,7 +446,7 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   colnames(return_df) <- column
 
   return_list = list(covs_list, CATE, unlist(SCORE), return_df)
-  names(return_list) = c("covariate_lst", "CATE", "match_quality", "matched_data")
+  names(return_list) = c("covariate_list", "matched_group", "match_quality", "matched_data")
 
   return(return_list)
 }
