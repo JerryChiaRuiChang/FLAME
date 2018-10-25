@@ -6,7 +6,6 @@ aggregate_table <- function(list) {
   return(as.vector(tab[sapply(list_val, function(x) which(name ==  x))]))
 }
 
-
 # update_matched_bit takes a dataframe, a set of covariates to match on,
 # the treatment indicator column and the matched indicator column.
 # it returns the array indicating whether each unit is matched (the first return value),
@@ -111,15 +110,7 @@ correct_variance <- function(x,y) {
 
 Regression_PE_bit <- function(holdout_trt, holdout_ctl) {
 
-  # Convert each covariate into factor type and drop covariate with less than 1 level
-  holdout_trt[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_trt[,1:(ncol(holdout_trt)-1)], as.factor)
-  holdout_trt <- holdout_trt[, c(sapply(holdout_trt[,1:(ncol(holdout_trt)-1)], nlevels) > 1,TRUE)]
-
-  holdout_ctl[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_ctl[,1:(ncol(holdout_trt)-1)], as.factor)
-  holdout_ctl <- holdout_ctl[, c(sapply(holdout_ctl[,1:(ncol(holdout_ctl)-1)], nlevels) > 1,TRUE)]
-
-  # MSE for treated
-
+ # MSE for treated
   model_lm <- lm(outcome ~ ., data = holdout_trt) # fit the data to lm model
   MSE_treated <- sum((holdout_trt$outcome - model_lm$fitted.values)^2)/length(holdout_trt$outcome) # compute mean squared error
 
@@ -155,7 +146,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
   num_control_matched = nrow(data[match_index & data[,'treated'] == 0,])
   num_treated_matched = nrow(data[match_index & data[,'treated'] == 1,])
 
-  if (!py_run) {
+  if (!py_run && is.null(PE_function)) {
     holdout_trt <- holdout[holdout[,'treated'] == 1,]
     holdout_trt <- holdout_trt[,!(names(holdout_trt) %in% 'treated')]
     holdout_ctl <- holdout[holdout[,'treated'] == 0,]
@@ -324,10 +315,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],function(x) as.integer(x) - 1)
   holdout[,num_covs + 2] <- as.integer(levels(holdout[,num_covs+2])[holdout[,num_covs+2]])
 
-  # Convert outcome variable to numeric
-  data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
-  holdout[,num_covs + 1] <- as.numeric(holdout[,num_covs + 1])
-
   #change input data and holdout training data column name
   colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
   colnames(holdout) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated")
@@ -354,8 +341,9 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var)
 
   # Remove matched_units
+  print(paste("number of matched units =", sum(match_index)))
   data = data[!match_index,]
-  print(paste("number of unmatched units = ", nrow(data)))
+
 
   #while there are still covariates for matching
 
@@ -390,7 +378,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 
     # Remove matched_units
     data = data[!match_index,]
-    print(paste("number of unmatched units = ", nrow(data)))
+    print(paste("number of matched units =", sum(match_index)))
   }
 
   if (nrow(data) != 0) {
@@ -399,7 +387,9 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   colnames(return_df) <- column
   rownames(return_df) <- NULL
   return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]+1], 1:num_covs, 1:num_covs)
-  return(list(covs_list, CATE, unlist(SCORE), return_df))
+  return_list = list(covs_list, CATE, unlist(SCORE), return_df)
+  names(return_list) = c("covariate_lst", "CATE", "match_quality", "matched_data")
+  return(return_list)
 }
 
 
@@ -407,7 +397,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
 #holdout <- data
 #FLAME_bit(data, holdout)
-
 #data <- read.csv("/Users/Jerry/Desktop/Natality_db_abnormality.csv")
 
 

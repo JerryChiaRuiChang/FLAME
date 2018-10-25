@@ -18,7 +18,7 @@ set.seed(500)
 library(FLAME)
 ```
 
-This vignette demonstrates how to implement the `FLAME` package. We applied bit vectors and database systems implementation to synthetic data.  
+This vignette demonstrates how to implement the `FLAME` package. We applied implementations of both bit vectors and database systems to synthetic data.  
 
 ## Generate synthetic data
 
@@ -28,17 +28,19 @@ This vignette demonstrates how to implement the `FLAME` package. We applied bit 
 
 $$
 \begin{aligned}
-& y = \sum_{i}\alpha_{i}x_{i} + T\sum_{i}\beta_{i}x_{i} + T \cdot U \sum_{i=1..5, \gamma = 1...5, \gamma > i} x_{i}x_{\gamma}
+& y_{i} = \sum_{j = 1}^{n}\alpha_{j}x_{j} + T_{i}\sum_{j = 1}^{n}\beta_{j}x_{j} + T_{i} \cdot U \sum_{j=1..5, \gamma = 1...5, \gamma > j} x_{j}x_{\gamma}
 \end{aligned}
 $$
-$T \in \{0,1\}$ indicates whether a unit is in the treated group or in the control group. $\alpha_{i} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, $\beta_{i} \sim N(1.5,0.15)$, and $U$ represents the coefficient of non-linear term. We applied `Data_Generation` function to generate 1000 treated units and 1000 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data.  
+$T_{i} \in \{0,1\}$ indicates whether a unit $i$ is treated or control, and $U$ represents the coefficient of non-linear term. Here, $x_{j} \sim$ Bernoulli(0.5), $\alpha_{j} \sim N(10s, 1)$ with $s \sim Uniform\{-1,1\}$, and $\beta_{j} \sim N(1.5,0.15)$. For package demonstration, the simulated data contains 5,000 treated units and 5,000 control units with $U = 5$. In addition, there are 10 important covariates and 5 unimportant covariates. Important covariates are those used to generate the true outcome $y_{i}$, whereas unimportant covariates are random samples from Bernoulli(0.5). For the simulated data below, $x_{1}, x_{2}, ..., x_{10}$ are important covariates and $x_{11}, x_{12}, ..., x_{15}$ are unimportant covariates. We assume holdout training set to be the same as simulated data. The following code is used to generate simulated data.
+
 ```{r}
-
-data <- FLAME::Data_Generation(num_control = 1000, num_treated = 1000,
+set.seed(1234) # set seed for reproducibility
+sim_data = FLAME::Data_Generation(num_control = 5000, num_treated = 5000, 
                                num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
-holdout <- data 
 
-head(data)
+sim_holdout = sim_data
+
+head(sim_data)
 ```
 
 ## Bit vectors implementation
