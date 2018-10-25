@@ -1,13 +1,12 @@
 #update_matched function takes list of covariates (cur_covs) to match
 #and update column matched = 0 to matched = l (level) for matched units
 
-update_matched_PostgreSQL <- function(db, cur_covs, level, compute_var) {
+update_matched_PostgreSQL <- function(db, cur_covs, compute_var) {
 
   #Convert column names to dynamic strings
 
   covariates <- toString(sprintf("x%s", cur_covs, cur_covs))
   equalcovariates <- paste(sprintf("S.x%s = data.x%s", cur_covs, cur_covs), collapse = " AND ")
-  level <- toString(level)
 
   #Update Data
 
@@ -25,7 +24,7 @@ update_matched_PostgreSQL <- function(db, cur_covs, level, compute_var) {
                                (SELECT %s
                                FROM tempgroups S
                                WHERE %s)
-                               AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+                               AND matched = 0",covariates,covariates,length(cur_covs), covariates,equalcovariates)))
   }
   else {
     dbExecute(db, gsub("[[:space:]]{2,}"," ",
@@ -41,11 +40,11 @@ update_matched_PostgreSQL <- function(db, cur_covs, level, compute_var) {
                                (SELECT %s
                                FROM tempgroups S
                                WHERE %s)
-                               AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+                               AND matched = 0",covariates,covariates,length(cur_covs), covariates,equalcovariates)))
   }
 
-  num_unmatched <- as.integer(dbGetQuery(db, "SELECT count(*) FROM data WHERE matched = 0")[1,1])
-  print(paste("number of unmatched units = ", num_unmatched))
+  num_matched <- as.integer(dbGetQuery(db, sprintf("SELECT count(*) FROM data WHERE matched = %s", length(cur_covs)))[1,1])
+  message(paste("number of matched units = ", num_matched))
 }
 
 #get_CATE function takes list of covariates that are used to
@@ -54,7 +53,7 @@ update_matched_PostgreSQL <- function(db, cur_covs, level, compute_var) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_PostgreSQL <- function(db, cur_covs, level, column, factor_level, compute_var) {
+get_CATE_PostgreSQL <- function(db, cur_covs, column, factor_level, compute_var) {
 
   #Convert column names to dynamic strings
 
@@ -81,7 +80,7 @@ get_CATE_PostgreSQL <- function(db, cur_covs, level, column, factor_level, compu
       FROM
       (control INNER JOIN treated
       ON %s)",
-      covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
+      covariates,length(cur_covs),covariates,covariates,length(cur_covs),covariates,datacovariates,equalcovariates)))
   }
 
   else {
@@ -100,7 +99,7 @@ get_CATE_PostgreSQL <- function(db, cur_covs, level, column, factor_level, compu
       FROM
       (control INNER JOIN treated
       ON %s)",
-      covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
+      covariates,length(cur_covs),covariates,covariates,length(cur_covs),covariates,datacovariates,equalcovariates)))
   }
 
   if (compute_var) {
@@ -135,13 +134,6 @@ get_CATE_PostgreSQL <- function(db, cur_covs, level, column, factor_level, compu
 }
 
 Regression_PE_PostgreSQL <- function(holdout_trt, holdout_ctl) {
-
-  # Convert each covariate into factor type and drop covariate with less than 1 level
-  holdout_trt[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_trt[,1:(ncol(holdout_trt)-1)], as.factor)
-  holdout_trt <- holdout_trt[, c(sapply(holdout_trt[,1:(ncol(holdout_trt)-1)], nlevels) > 1,TRUE)]
-
-  holdout_ctl[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_ctl[,1:(ncol(holdout_trt)-1)], as.factor)
-  holdout_ctl <- holdout_ctl[, c(sapply(holdout_ctl[,1:(ncol(holdout_ctl)-1)], nlevels) > 1,TRUE)]
 
   # MSE for treated
 
@@ -370,22 +362,31 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
     stop("Outcome variable is not numeric data type")
   }
 
-  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
-
   if (!py_module_available("pandas")) {
-    warning("The package will use R’s default linear regression because there pandas module is not attached to Python. This will be VERY SLOW!
+    py_install("pandas")
+    if (!py_module_available("pandas")) {
+      warning("The package will use R’s default linear regression pandas module is not available. This will be VERY SLOW!
             For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
   }
 
   if (!py_module_available("numpy")) {
-    warning("The package will use R’s default linear regression because numpy module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    py_install("numpy")
+    if (!py_module_available("numpy")) {
+      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
   }
 
   if (!py_module_available("sklearn")) {
-    warning("The package will use R’s default linear regression because sklearn module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    py_install("sklearn")
+    if (!py_module_available("sklearn")) {
+      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
   }
+
+  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
 
   #add column matched to input data
   data$matched <- as.integer(0)
@@ -394,15 +395,11 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
   factor_level <- lapply(data[,1:num_covs],levels) # Get levels of each factor
 
   # Convert each covariate and treated into type integer
-  data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)],as.integer)
+  data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x))
   data[,num_covs + 2] <- as.integer(levels(data[,num_covs+2])[data[,num_covs+2]])
 
-  holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],as.integer)
+  holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],function(x) as.integer(x))
   holdout[,num_covs + 2] <- as.integer(levels(holdout[,num_covs+2])[holdout[,num_covs+2]])
-
-  # Convert outcome variable to numeric
-  data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
-  holdout[,num_covs + 1] <- as.numeric(holdout[,num_covs + 1])
 
   #change input data and holdout training data column name
   colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
@@ -423,10 +420,9 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
   level = 1
   #Get matched units without dropping anything
 
-  update_matched_PostgreSQL(db, cur_covs,length(cur_covs), compute_var)
+  update_matched_PostgreSQL(db, cur_covs, compute_var)
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_PostgreSQL(db, cur_covs,length(cur_covs),column, factor_level, compute_var)
-
+  CATE[[level]] <- get_CATE_PostgreSQL(db, cur_covs, column, factor_level, compute_var)
 
   #while there are still covariates for matching
 
@@ -439,7 +435,6 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
     #Temporarily drop one covariate at a time to calculate Match Quality
     #Drop the covariate that returns highest Match Quality Score
 
-
     list_score <- unlist(lapply(cur_covs, match_quality_PostgreSQL, db, holdout, num_covs, cur_covs, tradeoff,
                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
     quality <- max(list_score)
@@ -447,12 +442,11 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
 
     cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping covariate(s)
 
-
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
-    update_matched_PostgreSQL(db, cur_covs,length(cur_covs), compute_var)
-    CATE[[level]] <- get_CATE_PostgreSQL(db, cur_covs,length(cur_covs),column, factor_level, compute_var)
+    update_matched_PostgreSQL(db, cur_covs, compute_var)
+    CATE[[level]] <- get_CATE_PostgreSQL(db, cur_covs, column, factor_level, compute_var)
   }
 
 
@@ -460,7 +454,10 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
   return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]], 1:num_covs, 1:num_covs)
   colnames(return_df) <- column
 
-  return(list(covs_list, CATE, unlist(SCORE), return_df))
+  return_list = list(covs_list, CATE, unlist(SCORE), return_df)
+  names(return_list) = c("covariate_lst", "CATE", "match_quality", "matched_data")
+
+  return(return_list)
 }
 
 

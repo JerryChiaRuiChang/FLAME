@@ -1,13 +1,12 @@
 #update_matched function takes list of covariates (cur_covs) to match
 #and update column matched = 0 to matched = l (level) for matched units
 
-update_matched_SQLite <- function(db, cur_covs, level, compute_var) {
+update_matched_SQLite <- function(db, cur_covs, compute_var) {
 
   #Convert column names to dynamic strings
 
   covariates <- toString(sprintf("x%s", cur_covs, cur_covs))
   equalcovariates <- paste(sprintf("S.x%s = data.x%s", cur_covs, cur_covs), collapse = " AND ")
-  level <- toString(level)
 
   #Update Data
 
@@ -25,7 +24,7 @@ update_matched_SQLite <- function(db, cur_covs, level, compute_var) {
                                (SELECT %s
                                FROM tempgroups S
                                WHERE %s)
-                               AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+                               AND matched = 0",covariates,covariates,length(cur_covs), covariates,equalcovariates)))
   }
 
   else {
@@ -42,11 +41,11 @@ update_matched_SQLite <- function(db, cur_covs, level, compute_var) {
                                (SELECT %s
                                FROM tempgroups S
                                WHERE %s)
-                               AND matched = 0",covariates,covariates,level, covariates,equalcovariates)))
+                               AND matched = 0",covariates,covariates,length(cur_covs), covariates,equalcovariates)))
   }
 
-  num_unmatched <- as.integer(dbGetQuery(db, "SELECT count(*) FROM data WHERE matched = 0")[1,1])
-  print(paste("number of unmatched units = ", num_unmatched))
+  num_matched <- as.integer(dbGetQuery(db, sprintf("SELECT count(*) FROM data WHERE matched = %s", length(cur_covs)))[1,1])
+  message(paste("number of matched units = ", num_matched))
 }
 
 #get_CATE function takes list of covariates that are used to
@@ -55,7 +54,7 @@ update_matched_SQLite <- function(db, cur_covs, level, compute_var) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level, compute_var) {
+get_CATE_SQLite <- function(db, cur_covs, column, factor_level, compute_var) {
 
   #Convert column names to dynamic strings
 
@@ -81,7 +80,7 @@ get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level, compute_va
       FROM
       (control INNER JOIN treated
       ON %s)",
-      covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
+      covariates,length(cur_covs),covariates,covariates,length(cur_covs),covariates,datacovariates,equalcovariates)))
   }
   else {
     CATE <- dbGetQuery(db, gsub("[[:space:]]{2,}"," ", sprintf(
@@ -99,7 +98,7 @@ get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level, compute_va
       FROM
       (control INNER JOIN treated
       ON %s)",
-      covariates,level,covariates,covariates,level,covariates,datacovariates,equalcovariates)))
+      covariates,length(cur_covs),covariates,covariates,length(cur_covs),covariates,datacovariates,equalcovariates)))
   }
 
   if (compute_var) {
@@ -132,15 +131,8 @@ get_CATE_SQLite <- function(db, cur_covs, level,column, factor_level, compute_va
 
 Regression_PE_SQLite <- function(holdout_trt, holdout_ctl) {
 
-  # Convert each covariate into factor type and drop covariate with less than 1 level
-  holdout_trt[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_trt[,1:(ncol(holdout_trt)-1)], as.factor)
-  holdout_trt <- holdout_trt[, c(sapply(holdout_trt[,1:(ncol(holdout_trt)-1)], nlevels) > 1,TRUE)]
-
-  holdout_ctl[,1:(ncol(holdout_trt)-1)] <- lapply(holdout_ctl[,1:(ncol(holdout_trt)-1)], as.factor)
-  holdout_ctl <- holdout_ctl[, c(sapply(holdout_ctl[,1:(ncol(holdout_ctl)-1)], nlevels) > 1,TRUE)]
 
   # MSE for treated
-
   model_lm <- lm(outcome ~ ., data = holdout_trt) # fit the data to lm model
   MSE_treated <- sum((holdout_trt$outcome - model_lm$fitted.values)^2)/length(holdout_trt$outcome) # compute mean squared error
 
@@ -358,22 +350,31 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     stop("Outcome variable is not numeric data type")
   }
 
-  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
-
   if (!py_module_available("pandas")) {
-    warning("The package will use R’s default linear regression because there pandas module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  }
+    py_install("pandas")
+    if (!py_module_available("pandas")) {
+      warning("The package will use R’s default linear regression pandas module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
+    }
 
   if (!py_module_available("numpy")) {
-    warning("The package will use R’s default linear regression because numpy module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  }
+    py_install("numpy")
+    if (!py_module_available("numpy")) {
+      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
+    }
 
   if (!py_module_available("sklearn")) {
-    warning("The package will use R’s default linear regression because sklearn module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  }
+    py_install("sklearn")
+    if (!py_module_available("sklearn")) {
+      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
+    }
+
+  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
 
   #add column matched to input data
   data$matched <- as.integer(0)
@@ -388,10 +389,6 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
 
   holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],as.integer)
   holdout[,num_covs + 2] <- as.integer(levels(holdout[,num_covs+2])[holdout[,num_covs+2]])
-
-  # Convert outcome variable to numeric
-  data[,num_covs + 1] <- as.numeric(data[,num_covs + 1])
-  holdout[,num_covs + 1] <- as.numeric(holdout[,num_covs + 1])
 
   #change input data and holdout training data column name
   colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
@@ -413,9 +410,9 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
 
   #Get matched units without dropping anything
 
-  update_matched_SQLite(db, cur_covs, length(cur_covs), compute_var)
+  update_matched_SQLite(db, cur_covs, compute_var)
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level, compute_var)
+  CATE[[level]] <- get_CATE_SQLite(db, cur_covs, column, factor_level, compute_var)
 
 
   #while there are still covariates for matching
@@ -439,8 +436,8 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     #Update Match
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
-    update_matched_SQLite(db, cur_covs,length(cur_covs), compute_var)
-    CATE[[level]] <- get_CATE_SQLite(db, cur_covs,length(cur_covs),column, factor_level, compute_var)
+    update_matched_SQLite(db, cur_covs, compute_var)
+    CATE[[level]] <- get_CATE_SQLite(db, cur_covs, column, factor_level, compute_var)
 
   }
 
@@ -448,14 +445,15 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]], 1:num_covs, 1:num_covs)
   colnames(return_df) <- column
 
-  return(list(covs_list, CATE, unlist(SCORE), return_df))
+  return_list = list(covs_list, CATE, unlist(SCORE), return_df)
+  names(return_list) = c("covariate_lst", "CATE", "match_quality", "matched_data")
+
+  return(return_list)
 }
 
-#data <- FLAME::Data_Generation(1000,1000,15,5,5)
+#data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
+#data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
 #holdout <- data
-#result_bit <- FLAME_bit(data, holdout, compute_var = TRUE)
-
-
 #db <- dbConnect(SQLite(),"tempdb")
 #result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = FALSE)
 #dbDisconnect(db)

@@ -273,22 +273,31 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     stop("Outcome variable is not numeric data type")
   }
 
-  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
-
   if (!py_module_available("pandas")) {
-    warning("The package will use R’s default linear regression because there pandas module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    py_install("pandas")
+    if (!py_module_available("pandas")) {
+      warning("The package will use R’s default linear regression pandas module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
   }
 
   if (!py_module_available("numpy")) {
-    warning("The package will use R’s default linear regression because numpy module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    py_install("numpy")
+    if (!py_module_available("numpy")) {
+      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
   }
 
   if (!py_module_available("sklearn")) {
-    warning("The package will use R’s default linear regression because sklearn module is not attached to Python. This will be VERY SLOW!
-            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    py_install("sklearn")
+    if (!py_module_available("sklearn")) {
+      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+    }
   }
+
+  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
 
   factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
   covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
@@ -341,7 +350,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var)
 
   # Remove matched_units
-  print(paste("number of matched units =", sum(match_index)))
+  message(paste("number of matched units =", sum(match_index)))
   data = data[!match_index,]
 
 
@@ -378,7 +387,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 
     # Remove matched_units
     data = data[!match_index,]
-    print(paste("number of matched units =", sum(match_index)))
+    message(paste("number of matched units =", sum(match_index)))
   }
 
   if (nrow(data) != 0) {
