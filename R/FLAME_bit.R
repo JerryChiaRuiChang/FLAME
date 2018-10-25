@@ -318,10 +318,10 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   column <- colnames(data)
 
   # Convert each covariate and treated into type integer
-  data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x) - 1)
+  data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x))
   data[,num_covs + 2] <- as.integer(levels(data[,num_covs+2])[data[,num_covs+2]])
 
-  holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],function(x) as.integer(x) - 1)
+  holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],function(x) as.integer(x))
   holdout[,num_covs + 2] <- as.integer(levels(holdout[,num_covs+2])[holdout[,num_covs+2]])
 
   #change input data and holdout training data column name
