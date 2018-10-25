@@ -9,7 +9,7 @@
 #' (3) Summary of conditional average treatment effect (CATE) in boxplot
 #' @export
 
-FLAME_summary <- function(FLAME_object) {
+summary <- function(FLAME_object) {
 
   #number of matched units
   print(paste("Number of units matched = ", sum(FLAME_object[[4]]['matched'] >= 1)))
@@ -21,10 +21,6 @@ FLAME_summary <- function(FLAME_object) {
   size <- df[,which(colnames(df) == "size")]
 
   print(paste("Average treatment effect = ", sum(effect * size)/sum(size)))
-
-  # CATE summary plot
-  boxplot(effect, main = paste("CATE summary with", toString(sum(size)), "matched units",sep = " "),
-                               ylab = "CATE" )
 
 }
 
