@@ -18,7 +18,7 @@ set.seed(500)
 library(FLAME)
 ```
 
-This vignette demonstrates how to implement the `FLAME` package. We applied implementations of both bit vectors and database systems to synthetic data.  
+This vignette demonstrates how to implement the `FLAME` package. We applied `FLAME_bit`, `FLAME_PostgreSQL`, and `FLAME_SQLite` to synthetic data.  
 
 ## Generate synthetic data
 
@@ -45,13 +45,17 @@ head(sim_data)
 
 ## Bit vectors implementation
 
-We run `FLAME_bit` function with the following command. The required inputs include (1) input data and (2) holdout training set. Note that if we would like to compute the variance of each matched group, please specify optioanl argument `compute_var = TRUE`. Since the variance of each matched group is the sum of the variance of the treated units and the variance of the control units, each matched group should contain at least 2 treated units and 2 control units. Therefore, it is expected that less matched units will be found in earlier iteration.
+We run `FLAME_bit` function with the following command. The required inputs include (1) input data and (2) holdout training set. Note that if we would like to compute the variance of each matched group, please specify optioanl argument `compute_var = TRUE`. Since the variance of each matched group is the sum of the variance of the treated units and the variance of the control units, each matched group should contain at least 2 treated units and 2 control units. Therefore, it is expected that less matched units will be found in earlier iteration if `compute_var` is specified to be TRUE.
 
-```{r, warning=FALSE}
-result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, compute_var = FALSE)
+```{r}
+result_bit <- FLAME_bit(data = sim_data, holdout = sim_holdout)
 ```
 
-The outputs contain four elements, including (1) list of covariates FLAME performs matching at each iteration, (2) list of dataframe showing matched groups' sizes, conditional average treatment effects (CATEs), and variance (if `compute_var = TRUE`) at each iteration, (3) matching quality at each iteration, and (4) the original data with additional column *matched*, indicating the number of covariates each unit is matched. If a unit is never matched, then *matched* will be 0.
+The outputs contain four elements, including 
+1. covaraite_list: list of covariates FLAME performs matching at each iteration
+2. matched_group: list of dataframe showing matched groups' sizes, conditional average treatment effects (CATEs), and variance (if `compute_var = TRUE`) at each iteration
+3. match_quality: matching quality at each iteration
+4. matched_data: the original data with additional column *matched*, indicating the number of covariates each unit is matched. If a unit is never matched, then *matched* will be 0.
 
 ## Database systems implementation 
 
@@ -63,7 +67,7 @@ If your computer does not have PostgreSQL installed, install from [here](https:/
 
 \newline
 
-Connect to PostgreSQL in R and run `FLAME_PostgreSQL` function with the following command. Note that it is required to name the connection as **db** and disconnect it once done. The required inputs include (1) database connection (**db**), (2) input data, and (3) holdout training set. In this case, we also specify `compute_var = TRUE`. The outputs of `FLAME_PostgreSQL` are the same as the outputs of `FLAME_bit`.
+Connect to PostgreSQL in R and run `FLAME_PostgreSQL` function with the following command. Note that it is required to name the connection as **db** and disconnect it once done. The required inputs include (1) database connection (**db**), (2) input data, and (3) holdout training set. The outputs of `FLAME_PostgreSQL` are the same as the outputs of `FLAME_bit`.
 
 ```{r}
 # Connect to PostgreSQL
@@ -74,7 +78,7 @@ db <- dbConnect(drv, user="postgres", dbname="FLAME", host='localhost',
              port=5432, password = 'new_password')
 
 # Run FLAME_PostgreSQL 
-result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = data, holdout = holdout, compute_var = FALSE)
+result_PostgreSQL <- FLAME::FLAME_PostgreSQL(db = db, data = sim_data, holdout = sim_holdout)
 
 # Disconnect from db
 dbDisconnect(db)
@@ -84,11 +88,11 @@ dbDisconnect(db)
 
 Connect to a temporary database in R and run `FLAME_SQLite` function with the following command. Note that it is required to name the connection as **db**. The required inputs include (1) database connection (**db**), (2) input data, and (3) holdout training set. In this case, we also specify `compute_var = TRUE`. The outputs of `FLAME_SQLite` are the same as the outputs of `FLAME_bit` and `FLAME_PostgreSQL`.
 ```{r}
-#Name the connection as conn
+#Name the connection as db
 db <- dbConnect(SQLite(),"tempdb") 
 
 #Run FLAME_SQLite
-result_SQLite <- FLAME::FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = FALSE)
+result_SQLite <- FLAME::FLAME_SQLite(db = db, data = sim_data, holdout = sim_holdout)
 
 #Disconnect from db
 dbDisconnect(db)
@@ -98,31 +102,31 @@ dbDisconnect(db)
 
 We compare the results of bit vectors, PostgreSQL, and SQLite implementations, where all three should yield the same outputs. 
 
-(1) Apply summary function to examine the number of matched units, average treatment effect, and the conditional average treatment effect (CATE) of each matched group in boxplot.
+(1) Apply summary function to examine the number of matched units and average treatment effect.
 
 ```{r}
-FLAME_summary(result_bit)
-FLAME_summary(result_SQLite)
-FLAME_summary(result_PostgreSQL)
+summary(result_bit)
+summary(result_SQLite)
+summary(result_PostgreSQL)
 ```
 
-(2) The covariates FLAME performs matching at the $10^{th}$ iteration.
+(2) The covariates FLAME performs matching at the $8^{th}$ iteration.
 ```{r}
-result_bit[[1]][[10]] # bit vectors
-result_PostgreSQL[[1]][[10]] #PostgreSQL
-result_SQLite[[1]][[10]] #SQLite
+result_bit$covariate_list[[8]] # bit vectors
+result_PostgreSQL$covariate_list[[8]] #PostgreSQL
+result_SQLite$covariate_list[[8]] #SQLite
 ```
 
 (3) Each matched group's size, conditional average treatment effect (CATE), and variance at the $10^{th}$ iteration. Note that if we specify `compute_var = FLASE` when running FLAME, the variance column will not be in the output.
 ```{r}
-head(result_bit[[2]][[10]]) # bit vectors
-head(result_PostgreSQL[[2]][[10]]) #PostgreSQL
-head(result_SQLite[[2]][[10]]) #SQLite
+head(result_bit$matched_group[[10]]) # bit vectors
+head(result_PostgreSQL$matched_group[[10]]) #PostgreSQL
+head(result_SQLite$matched_group[[10]]) #SQLite
 ```
 
 (4) Matching Quality at each iteration
 ```{r}
-result_bit[[3]] # bit vectors
-result_PostgreSQL[[3]] #PostgreSQL
-result_SQLite[[3]] #SQLite
+result_bit$match_quality # bit vectors
+result_PostgreSQL$match_quality #PostgreSQL
+result_SQLite$match_quality #SQLite
 ```
