@@ -55,7 +55,7 @@ update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
 #(1) conditional average treatment effect (effect)
 #(2) size of each matched group (size)
 
-get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var) {
+get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var, num_covs) {
   if (length(index) == 0) {
     if (compute_var) {
       CATE <- setNames(data.frame(matrix(ncol = length(cur_covs)+3, nrow = 0)),
@@ -71,6 +71,8 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
     d = data[match_index,]
     d[,'b_u'] = index
     d[,'b_u'] = unlist(lapply(d[,'b_u'], as.character))
+    d[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][d[,y]], 1:num_covs, 1:num_covs)
+
     summary = data.frame(d %>% group_by(.data$b_u,.data$treated) %>%
                            summarise(size = length(.data$outcome), mean = mean(.data$outcome), variance= var(.data$outcome)))
     summary = data.frame(summary %>% group_by(.data$b_u) %>%
@@ -78,7 +80,7 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
 
 
     pos <- unlist(lapply(summary$b_u, function(x) which(d$b_u %in% x)[1]))
-    CATE <- as.data.frame(d[pos, 1:length(cur_covs)])
+    CATE <- as.data.frame(d[pos, cur_covs + 1])
 
 
     CATE$effect = mapply(function(x,y) x[which(y == 1)] - x[which(y == 0)], summary$mean_lst, summary$treated_lst)
@@ -93,7 +95,6 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
     }
 
     CATE <- CATE[order(CATE$effect),]
-    CATE[,1:length(cur_covs)] <- mapply(function(x,y) factor_level[[x]][CATE[,y]+1], cur_covs + 1, 1:length(cur_covs))
     rownames(CATE) = NULL
   }
   return(CATE)
@@ -110,7 +111,7 @@ correct_variance <- function(x,y) {
 
 Regression_PE_bit <- function(holdout_trt, holdout_ctl) {
 
- # MSE for treated
+  # MSE for treated
   model_lm <- lm(outcome ~ ., data = holdout_trt) # fit the data to lm model
   MSE_treated <- sum((holdout_trt$outcome - model_lm$fitted.values)^2)/length(holdout_trt$outcome) # compute mean squared error
 
@@ -279,7 +280,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
       warning("The package will use R’s default linear regression pandas module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
-  }
+    }
 
   if (!py_module_available("numpy")) {
     py_install("numpy")
@@ -287,7 +288,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
       warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
-  }
+    }
 
   if (!py_module_available("sklearn")) {
     py_install("sklearn")
@@ -347,7 +348,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   return_df = data[match_index,]
 
   covs_list[[level]] <- column[(cur_covs + 1)]
-  CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var)
+  CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var, num_covs)
 
   # Remove matched_units
   message(paste("number of matched units =", sum(match_index)))
@@ -383,7 +384,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     # Set matched = num_covs and get those matched units
     data[match_index,'matched'] = length(cur_covs)
     return_df = rbind(return_df,data[match_index,])
-    CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var)
+    CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var, num_covs)
 
     # Remove matched_units
     data = data[!match_index,]
@@ -405,7 +406,11 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
 #data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
 #holdout <- data
-#FLAME_bit(data, holdout)
+#set.seed(1234)
+#data <- FLAME::Data_Generation(num_control = 5000, num_treated = 5000,
+#                               num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
+#holdout <- data
+#result_bit <- FLAME_bit(data, holdout)
 #data <- read.csv("/Users/Jerry/Desktop/Natality_db_abnormality.csv")
 
 
