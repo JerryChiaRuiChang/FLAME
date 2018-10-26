@@ -396,7 +396,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   }
   colnames(return_df) <- column
   rownames(return_df) <- NULL
-  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]+1], 1:num_covs, 1:num_covs)
+  return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]], 1:num_covs, 1:num_covs)
   return_list = list(covs_list, CATE, unlist(SCORE), return_df)
   names(return_list) = c("covariate_list", "matched_group", "match_quality", "matched_data")
   return(return_list)
