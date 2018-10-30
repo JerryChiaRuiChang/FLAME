@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
+import warnings
 from sklearn.metrics import mean_squared_error as MSE
 from sklearn import linear_model
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_score
+warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
 def predictive_error(holdout, num_covs, covs_subset, param):
 

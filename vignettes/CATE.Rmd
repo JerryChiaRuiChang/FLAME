@@ -25,10 +25,11 @@ This vignette demonstrates how to get detailed information such as conditional a
 First, we applied `Data_Generation` function to generate 1000 treated units and 1000 control units, where U = 5 with 10 important covariates and 5 unimportant covariates. Assume holdout training data is the same as input data. Second, we ran `FLAME_bit` function for matching, where `compute_var` is specified to be true.
 
 ```{r}
-data <- FLAME::Data_Generation(num_control = 1000, num_treated = 1000,
+set.seed(1234)
+data <- FLAME::Data_Generation(num_control = 5000, num_treated = 5000,
                                num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
 holdout <- data #Assume holdout training data is the same as input data
-result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, compute_var = TRUE)
+result_bit <- FLAME::FLAME_bit(data = data, holdout = holdout, compute_var = FALSE)
 ```
 
 ## Conditional Average Treatment Effect (CATE)
@@ -82,7 +83,7 @@ FLAME::MATCH(FLAME_object = result_bit, cov_name = cov_name, cov_val = cov_val)
 Assume we want to see all matched groups containing the covariate combination **x1 = 1, x3 = 0, x5 = 1, x7 = 0, x9 = 1**. Specifically, even when the FLAME algorithm performs matching with more than 5 covariates, we can still apply `CATE` function to output all possible matches as long as it contains the specified covariate combination. The input requirements are the same as (b), but `num_covs` argument does not need to be specified.
 
 ```{r}
-CATE_object <- CATE(FLAME_object = result_bit, 
+CATE_object <- FLAME::CATE(FLAME_object = result_bit, 
                     cov_name = c("x1", "x3", "x5", "x7", "x9"), 
                     cov_val = c("1", "0", "1", "0", "1"))
 CATE_object
@@ -94,9 +95,9 @@ CATE_object
 We can compute estimated treatment effects of all matched groups in (d) with `AVG_EFFECT` function. Note that estimated treatment effect is the weighted average of CATEs, with weight being the number of units in each matched group. In addition, we can visualize the distribution of all CATEs in boxplot by applying `CATE_plot` function.
 ```{r}
 # Estimated treatment effects 
-AVG_EFFECT(CATE_object) 
+FLAME::AVG_EFFECT(CATE_object) 
 
-CATE_plot(CATE_object)
+FLAME::CATE_plot(CATE_object)
 ```
 
 ## Average Treatment Effect (ATE) and Summary Visualization  

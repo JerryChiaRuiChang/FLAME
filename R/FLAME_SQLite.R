@@ -327,6 +327,7 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'@import reticulate
 #'@importFrom graphics boxplot
 #'@importFrom stats rbinom rnorm runif setNames
+#'@importFrom stats lm var
 #'@export
 
 FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1, PE_function = NULL,
@@ -353,26 +354,26 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   if (!py_module_available("pandas")) {
     py_install("pandas")
     if (!py_module_available("pandas")) {
-      warning("The package will use R’s default linear regression pandas module is not available. This will be VERY SLOW!
+      warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
-    }
+  }
 
   if (!py_module_available("numpy")) {
     py_install("numpy")
     if (!py_module_available("numpy")) {
-      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+      warning("The package will use default linear regression in R since numpy module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
-    }
+  }
 
   if (!py_module_available("sklearn")) {
     py_install("sklearn")
     if (!py_module_available("sklearn")) {
-      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+      warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
-    }
+  }
 
   py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
 
@@ -432,6 +433,9 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     covs_to_drop <- cur_covs[which(list_score == quality)]
 
     cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping covariate(s)
+    if (length(cur_covs) == 0) {
+      break
+    }
 
     #Update Match
     SCORE[[level-1]] <- quality
@@ -451,8 +455,8 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   return(return_list)
 }
 
-#data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
-#data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
+#data <- read.csv("/Users/Jerry/Desktop/this_breaks_FLAME_bit.csv")
+#data[,c(1:20,22)] <- lapply(data[,c(1:20,22)], factor)
 #holdout <- data
 #db <- dbConnect(SQLite(),"tempdb")
 #result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = FALSE)

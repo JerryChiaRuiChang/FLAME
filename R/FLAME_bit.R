@@ -251,6 +251,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' @importFrom rlang .data
 #' @importFrom graphics boxplot
 #' @importFrom stats rbinom rnorm runif setNames
+#' @importFrom stats lm var
 #' @export
 
 FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_function = NULL,
@@ -277,23 +278,23 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   if (!py_module_available("pandas")) {
     py_install("pandas")
     if (!py_module_available("pandas")) {
-      warning("The package will use R’s default linear regression pandas module is not available. This will be VERY SLOW!
+      warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
-    }
+  }
 
   if (!py_module_available("numpy")) {
     py_install("numpy")
     if (!py_module_available("numpy")) {
-      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+      warning("The package will use default linear regression in R since numpy module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
-    }
+  }
 
   if (!py_module_available("sklearn")) {
     py_install("sklearn")
     if (!py_module_available("sklearn")) {
-      warning("The package will use R’s default linear regression numpy module is not available. This will be VERY SLOW!
+      warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
     }
   }
@@ -370,8 +371,11 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
                                 tradeoff, PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
     quality <- max(list_score)
 
-    cur_covs = cur_covs[-which(list_score == quality)] #Dropping one covariate
-    covs_max_list = covs_max_list[-which(list_score == quality)]
+    cur_covs = cur_covs[-(which(list_score == quality))] #Dropping one covariate
+    if (length(cur_covs) == 0) {
+      break
+    }
+    covs_max_list = covs_max_list[-(which(list_score == quality))]
 
     SCORE[[level-1]] <- quality
     covs_list[[level]] <- column[(cur_covs + 1)]
@@ -403,9 +407,10 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 }
 
 
-#data <- read.csv("/Users/Jerry/Desktop/flame_bit_breaks_on_this.csv")
-#data[,c(1:22,24)] <- lapply(data[,c(1:22,24)], factor)
+#data <- read.csv("/Users/Jerry/Desktop/this_breaks_bit_and_sqlite.csv")
+#data[,c(1:14,16)] <- lapply(data[,c(1:14,16)], factor)
 #holdout <- data
+#result_bit <- FLAME_bit(data, holdout)
 #set.seed(1234)
 #data <- FLAME::Data_Generation(num_control = 5000, num_treated = 5000,
 #                               num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
@@ -413,4 +418,12 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #result_bit <- FLAME_bit(data, holdout)
 #data <- read.csv("/Users/Jerry/Desktop/Natality_db_abnormality.csv")
 
+
+#tradeoff <- 0.1
+#PE_function <- NULL
+#model <- NULL
+#ridge_reg <- NULL
+#lasso_reg <- NULL
+#tree_depth <- NULL
+#compute_var <- FALSE
 
