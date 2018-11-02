@@ -10,3 +10,4 @@
 #'   \item{outcome}{Outcome Variable}
 #'   \item{treated}{Treated = 1, Control = 0}
 #' }
+"toy_data"
