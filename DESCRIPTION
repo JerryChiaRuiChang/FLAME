@@ -20,19 +20,19 @@ Description: The `FLAME` algorithm provides fast and large-scale matching approa
     in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database 
     systems should be applied.
 Maintainer: Chia-Rui (Jerry) Chang <chiarui424@gmail.com>
-URL: https://github.com/chiarui424/FLAME
+URL: https://chiarui424.github.io/FLAME/
 BugReports: https://github.com/chiarui424/FLAME/issues
 Depends:
     R (>= 3.3),
+    graphics,
+    stats
+Imports:
     reticulate (>= 1.9),
     latticeExtra,
     dplyr,
     RPostgreSQL,
     RSQLite,
-    gmp
-Imports:
-    graphics,
-    stats,
+    gmp,
     lattice,
     rlang
 Suggests: 
@@ -45,4 +45,3 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-VignetteBuilder: knitr

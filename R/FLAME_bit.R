@@ -276,27 +276,18 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   }
 
   if (!py_module_available("pandas")) {
-    py_install("pandas")
-    if (!py_module_available("pandas")) {
       warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-    }
   }
 
   if (!py_module_available("numpy")) {
-    py_install("numpy")
-    if (!py_module_available("numpy")) {
       warning("The package will use default linear regression in R since numpy module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-    }
   }
 
   if (!py_module_available("sklearn")) {
-    py_install("sklearn")
-    if (!py_module_available("sklearn")) {
       warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-    }
   }
 
   py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
@@ -407,10 +398,11 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 }
 
 
-#data <- read.csv("/Users/Jerry/Desktop/this_breaks_bit_and_sqlite.csv")
-#data[,c(1:14,16)] <- lapply(data[,c(1:14,16)], factor)
+#data <- read.csv("/Users/Jerry/Desktop/FLAME Other Document/data_broke_code/this_breaks_FLAME_bit.csv")
+#data[,c(1:20,22)] <- lapply(data[,c(1:20,22)], factor)
+
 #holdout <- data
-#result_bit <- FLAME_bit(data, holdout)
+#result_bit <- FLAME::FLAME_bit(data, holdout)
 #set.seed(1234)
 #data <- FLAME::Data_Generation(num_control = 5000, num_treated = 5000,
 #                               num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
