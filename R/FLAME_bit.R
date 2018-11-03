@@ -242,8 +242,9 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' indicating the number of covariates each unit is matched. If a unit is never
 #' matched, then *matched* will be 0.
 #' @examples
-#' \dontrun{
-#' FLAME_bit(data = data, holdout = holdout)
+#' {
+#' data <- data(toy_data)
+#' FLAME_bit(data = data, holdout = data)
 #' }
 #' @import dplyr
 #' @import gmp

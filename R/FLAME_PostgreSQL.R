@@ -326,12 +326,14 @@ match_quality_PostgreSQL <- function(c, db, holdout, num_covs, cur_covs, tradeof
 #'  matched, then *matched* will be 0.
 #'@examples
 #'\dontrun{
+#'data <- data(toy_data)
+#'
 #'drv <- dbDriver('PostgreSQL')
 #'
 #'db <- dbConnect(drv, dbname="FLAME", host='localhost',
 #'port=5432, user="postgres", password = 'new_password')
 #'
-#'FLAME_PostgreSQL(db = db, data = data, holdout = holdout)
+#'FLAME_PostgreSQL(db = db, data = data, holdout = data)
 #'
 #'dbDisconnect(db)
 #'}

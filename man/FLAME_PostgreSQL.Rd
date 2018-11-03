@@ -54,12 +54,14 @@ host='your_localhost', port='your_port', user='your_username', password =
 }
 \examples{
 \dontrun{
+data <- data(toy_data)
+
 drv <- dbDriver('PostgreSQL')
 
 db <- dbConnect(drv, dbname="FLAME", host='localhost',
 port=5432, user="postgres", password = 'new_password')
 
-FLAME_PostgreSQL(db = db, data = data, holdout = holdout)
+FLAME_PostgreSQL(db = db, data = data, holdout = data)
 
 dbDisconnect(db)
 }

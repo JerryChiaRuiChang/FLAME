@@ -316,10 +316,12 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'  indicating the number of covariates each unit is matched. If a unit is never
 #'  matched, then *matched* will be 0.
 #'@examples
-#'\dontrun{
+#'{
+#'data <- data(toy_data)
+#'
 #'db <- dbConnect(SQLite(),"tempdb")
 #'
-#'FLAME_SQLite(db = db, data = data, holdout = holdout)
+#'FLAME_SQLite(db = db, data = data, holdout = data)
 #'
 #'dbDisconnect(db)
 #'}

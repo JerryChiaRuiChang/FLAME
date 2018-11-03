@@ -50,10 +50,12 @@ user should connect to a temporary database with command
 The rest of the arguments are optional.
 }
 \examples{
-\dontrun{
+{
+data <- data(toy_data)
+
 db <- dbConnect(SQLite(),"tempdb")
 
-FLAME_SQLite(db = db, data = data, holdout = holdout)
+FLAME_SQLite(db = db, data = data, holdout = data)
 
 dbDisconnect(db)
 }
