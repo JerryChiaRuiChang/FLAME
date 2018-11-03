@@ -232,7 +232,7 @@ match_quality_PostgreSQL <- function(c, db, holdout, num_covs, cur_covs, tradeof
     PE <- Regression_PE_PostgreSQL(holdout_trt, holdout_ctl)
   }
 
-  if (!is.null(PE_function)) {
+  else if (!is.null(PE_function)) {
     # Compute -PE based on user defined PE_function
     outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
     outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']

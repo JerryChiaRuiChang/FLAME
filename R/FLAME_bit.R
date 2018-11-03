@@ -147,26 +147,22 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
   num_control_matched = nrow(data[match_index & data[,'treated'] == 0,])
   num_treated_matched = nrow(data[match_index & data[,'treated'] == 1,])
 
+  #Compute Predictive Error
+
   if (!py_run && is.null(PE_function)) {
     holdout_trt <- holdout[holdout[,'treated'] == 1,]
     holdout_trt <- holdout_trt[,!(names(holdout_trt) %in% 'treated')]
     holdout_ctl <- holdout[holdout[,'treated'] == 0,]
     holdout_ctl <- holdout_trt[,!(names(holdout_ctl) %in% 'treated')]
     PE <- Regression_PE_bit(holdout_trt, holdout_ctl)
-  }
-
-  #Compute Predictive Error
-
-  if (!is.null(PE_function)) {
+  } else if (!is.null(PE_function)) {
     # Compute -PE based on user defined PE_function
     outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
     outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']
     covs_treated <- as.matrix(holdout[holdout[,'treated'] == 1,][,covs_to_match + 1])
     covs_control <- as.matrix(holdout[holdout[,'treated'] == 0,][,covs_to_match + 1])
     PE <- -PE_function(outcome_treated, outcome_control, covs_treated, covs_control)
-  }
-
-  else {
+  } else {
     predictive_error  <- NULL
     if (!is.null(model)) {
 
@@ -242,10 +238,8 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' indicating the number of covariates each unit is matched. If a unit is never
 #' matched, then *matched* will be 0.
 #' @examples
-#' {
-#' data <- data(toy_data)
-#' FLAME_bit(data = data, holdout = data)
-#' }
+#' data(toy_data)
+#' FLAME_bit(data = toy_data, holdout = toy_data)
 #' @import dplyr
 #' @import gmp
 #' @import reticulate
@@ -276,6 +270,8 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     stop("Outcome variable is not numeric data type")
   }
 
+  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
+
   if (!py_module_available("pandas")) {
       warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
@@ -290,8 +286,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
       warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
               For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
   }
-
-  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
 
   factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
   covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate

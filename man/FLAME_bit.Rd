@@ -45,8 +45,6 @@ implementation. The required arguments include (1) data and (2) holdout.
 The rest of the arguments are optional.
 }
 \examples{
-{
-data <- data(toy_data)
-FLAME_bit(data = data, holdout = data)
-}
+data(toy_data)
+FLAME_bit(data = toy_data, holdout = toy_data)
 }

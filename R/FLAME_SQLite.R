@@ -225,7 +225,7 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
     PE <- Regression_PE_SQLite(holdout_trt, holdout_ctl)
   }
 
-  if (!is.null(PE_function)) {
+  else if (!is.null(PE_function)) {
     # Compute -PE based on user defined PE_function
     outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
     outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']
@@ -316,7 +316,7 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'  indicating the number of covariates each unit is matched. If a unit is never
 #'  matched, then *matched* will be 0.
 #'@examples
-#'{
+#'\dontrun{
 #'data <- data(toy_data)
 #'
 #'db <- dbConnect(SQLite(),"tempdb")
