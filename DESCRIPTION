@@ -23,7 +23,7 @@ Maintainer: Chia-Rui (Jerry) Chang <chiarui424@gmail.com>
 URL: https://chiarui424.github.io/FLAME/
 BugReports: https://github.com/chiarui424/FLAME/issues
 Depends:
-    R (>= 3.3),
+    R (>= 3.3)
 Imports:
     reticulate (>= 1.9),
     graphics,

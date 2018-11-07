@@ -45,7 +45,11 @@ MATCH <- function(FLAME_object, cov_name, cov_val) {
   df <- FLAME_object[[4]]
   df <- df[df$matched == length(cov_name),]
 
-  L <- sapply(1:nrow(df), function(x) identical(unlist(df[x,cov_matched]),unlist(cov_val_sort)))
+  if (length(cov_matched) == 1) {
+    L <- sapply(1:nrow(df), function(x) identical(unlist(df[x,cov_matched]),as.character(unlist(cov_val_sort))))
+  } else{
+    L <- sapply(1:nrow(df), function(x) identical(unlist(df[x,cov_matched]),unlist(cov_val_sort)))
+  }
 
   if (nrow(df[L,]) == 0) {
     return("no CATE for such combination is available using this procedure")
