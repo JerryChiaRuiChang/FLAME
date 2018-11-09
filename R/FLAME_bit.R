@@ -85,6 +85,7 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
 
     CATE$effect = mapply(function(x,y) x[which(y == 1)] - x[which(y == 0)], summary$mean_lst, summary$treated_lst)
     CATE$size = summary$size
+    CATE$index = match_index
 
     if (compute_var) {
       CATE$variance = mapply(correct_variance, summary$var_list, summary$treated_lst)
