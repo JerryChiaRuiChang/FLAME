@@ -309,7 +309,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   data[,c(1:num_covs, num_covs + 2)] <- sapply(data[,c(1:num_covs, num_covs + 2)], function(x) as.integer(x))
   data$treated <- data$treated - 1
 
-  holdout[,c(1:num_covs, num_covs + 2)] <- holdout(data[,c(1:num_covs, num_covs + 2)], function(x) as.integer(x))
+  holdout[,c(1:num_covs, num_covs + 2)] <- sapply(holdout[,c(1:num_covs, num_covs + 2)], function(x) as.integer(x))
   holdout$treated <- holdout$treated - 1
 
   #change input data and holdout training data column name
