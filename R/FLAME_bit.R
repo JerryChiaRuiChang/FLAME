@@ -89,10 +89,10 @@ get_CATE_bit <- function(data, match_index, index, cur_covs, covs_max_list, colu
 
     if (compute_var) {
       CATE$variance = mapply(correct_variance, summary$var_list, summary$treated_lst)
-      colnames(CATE) = c(column[(cur_covs + 1)],"effect","size", "variance")
+      colnames(CATE) = c(column[(cur_covs + 1)],"effect","size", "variance", "index")
     }
     else {
-      colnames(CATE) = c(column[(cur_covs + 1)],"effect","size")
+      colnames(CATE) = c(column[(cur_covs + 1)],"effect","size","index")
     }
 
     CATE <- CATE[order(CATE$effect),]
