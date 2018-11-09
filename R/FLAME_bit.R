@@ -337,8 +337,9 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 
   covs_list[[level]] <- column[(cur_covs + 1)]
   CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var, num_covs)
-  if (length(match_index) > 0) {
-    Index[[level]] <- match_index
+  row_index = row.names(data[match_index,])
+  if (length(row_index) > 0) {
+    Index[[level]] <- as.integer(row_index)
   } else {
     Index[[level]] <- NULL
   }
@@ -382,8 +383,9 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     data[match_index,'matched'] = length(cur_covs)
     return_df = rbind(return_df,data[match_index,])
     CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var, num_covs)
-    if (length(match_index) > 0) {
-      Index[[level]] <- match_index
+    row_index = row.names(data[match_index,])
+    if (length(row_index) > 0) {
+      Index[[level]] <- as.integer(row_index)
     } else {
       Index[[level]] <- NULL
     }
