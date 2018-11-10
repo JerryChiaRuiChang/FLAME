@@ -55,7 +55,7 @@ MATCH <- function(FLAME_object, cov_name, cov_val) {
     return("no CATE for such combination is available using this procedure")
   }
   else {
-    return_df <- df[L,-ncol(df)]
+    return_df <- df[L,-(ncol(df)-1)]
     row.names(return_df) <- NULL
     return(return_df)
   }

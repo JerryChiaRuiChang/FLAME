@@ -320,7 +320,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   covs_list = list() #list of covariates for matching at each level
   CATE = list() #list of dataframe that calculates conditional average treatment effect at each level
   SCORE = list()
-  Index = list()
 
   #Initialize the current covariates to be all covariates and set level to 1
   cur_covs = seq(0,num_covs - 1)
@@ -337,12 +336,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 
   covs_list[[level]] <- column[(cur_covs + 1)]
   CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var, num_covs)
-  row_index = row.names(data[match_index,])
-  if (length(row_index) > 0) {
-    Index[[level]] <- as.integer(row_index)
-  } else {
-    Index[[level]] <- NULL
-  }
 
   # Remove matched_units
   message(paste("number of matched units =", sum(match_index)))
@@ -383,12 +376,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     data[match_index,'matched'] = length(cur_covs)
     return_df = rbind(return_df,data[match_index,])
     CATE[[level]] <- get_CATE_bit(data, match_index, index, cur_covs, covs_max_list, column, factor_level, compute_var, num_covs)
-    row_index = row.names(data[match_index,])
-    if (length(row_index) > 0) {
-      Index[[level]] <- as.integer(row_index)
-    } else {
-      Index[[level]] <- NULL
-    }
 
     # Remove matched_units
     data = data[!match_index,]
@@ -401,8 +388,9 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   colnames(return_df) <- column
   rownames(return_df) <- NULL
   return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]], 1:num_covs, 1:num_covs)
-  return_list = list(covs_list, CATE, unlist(SCORE), return_df, Index)
-  names(return_list) = c("covariate_list", "matched_group", "match_quality", "matched_data", "Index")
+  return_df$index <- 1:nrow(return_df)
+  return_list = list(covs_list, CATE, unlist(SCORE), return_df)
+  names(return_list) = c("covariate_list", "matched_group", "match_quality", "matched_data")
   return(return_list)
 }
 
