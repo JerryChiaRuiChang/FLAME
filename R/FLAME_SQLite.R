@@ -444,13 +444,12 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     covs_list[[level]] <- column[(cur_covs + 1)]
     update_matched_SQLite(db, cur_covs, compute_var)
     CATE[[level]] <- get_CATE_SQLite(db, cur_covs, column, factor_level, compute_var)
-
   }
 
   return_df <- dbGetQuery(db, "SELECT * FROM data")
   return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]], 1:num_covs, 1:num_covs)
   colnames(return_df) <- column
-
+  return_df$index <- 1:nrow(return_df)
   return_list = list(covs_list, CATE, unlist(SCORE), return_df)
   names(return_list) = c("covariate_list", "matched_group", "match_quality", "matched_data")
 

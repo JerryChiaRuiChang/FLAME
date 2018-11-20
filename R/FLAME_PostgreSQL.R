@@ -459,7 +459,7 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
   return_df <- dbGetQuery(db, "SELECT * FROM data")[,-1]
   return_df[,1:num_covs] <- mapply(function(x,y) factor_level[[x]][return_df[,y]], 1:num_covs, 1:num_covs)
   colnames(return_df) <- column
-
+  return_df$index <- 1:nrow(return_df)
   return_list = list(covs_list, CATE, unlist(SCORE), return_df)
   names(return_list) = c("covariate_list", "matched_group", "match_quality", "matched_data")
 
