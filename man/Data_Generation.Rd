@@ -4,7 +4,8 @@
 \alias{Data_Generation}
 \title{Generate Synthetic Data}
 \usage{
-Data_Generation(num_control, num_treated, num_cov_dense, num_cov_unimportant, U)
+Data_Generation(num_control, num_treated, num_cov_dense,
+  num_cov_unimportant, U)
 }
 \arguments{
 \item{num_control}{number of samples in the control group}

@@ -5,8 +5,8 @@
 \title{SQLite Database Implementation}
 \usage{
 FLAME_SQLite(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
-  PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
-  tree_depth = NULL)
+  PE_function = NULL, model = NULL, ridge_reg = NULL,
+  lasso_reg = NULL, tree_depth = NULL)
 }
 \arguments{
 \item{db}{name of the connection to temporary database  (\strong{must name the

@@ -9,9 +9,16 @@ The **FLAME** algorithm provides fast and large-scale matching approach to causa
 
 For more details about the FLAME algorithm, please refer to the paper: [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference](https://arxiv.org/pdf/1707.06315.pdf)
 
+### Installation
+
+``` r
+# Current version on GitHub
+devtools::install_github("chiarui424/FLAME") 
+```
+
 ### Required data format
 
-`FLAME` package requires input data to have specific format. First, input data should be a **R Data Frame**. Second, all covariates in the input data should be categorical covariates, represented by *factor* R data type. If there are continuous covariates, please consider regrouping. Third, input data columns should contain (1) covariates, (2) outcome variable in *numeric* R data type, and (3) variable specifying a unit is treated or control (treated = 1, control = 0) in *factor* R data type. Lastly, though there are no requirements for input data column names, the column order should follow *\[covariates, outcome, treated\]*. Below is an example of input data with *n* units and *m* covariates.
+`FLAME` package requires input data to have specific format. First, input data should be a **R Data Frame**. Second, all covariates in the input data should be categorical covariates, represented by *factor* R data type. If there are continuous covariates, please consider regrouping. Third, input data columns should contain (1) covariates in *factor* data type, (2) outcome variable in *numeric* data type, and (3) variable specifying a unit is treated or control (treated = 1, control = 0) in *factor* data type. Lastly, though there are no requirements for input data column names, the column order should follow *\[covariates, outcome, treated\]*. Below is an example of input data with *n* units and *m* covariates.
 
 |                 | ***x*<sub>1</sub>** | ***x*<sub>2</sub>** |  **...** | ***x*<sub>*m* − 1</sub>** | ***x*<sub>*m*</sub>** | **outcome** | **treated** |
 |:---------------:|:-------------------:|:-------------------:|:--------:|:-------------------------:|:---------------------:|:-----------:|:-----------:|
@@ -22,20 +29,15 @@ For more details about the FLAME algorithm, please refer to the paper: [FLAME: A
 |       ...       |         ...         |         ...         |    ...   |            ...            |          ...          |     ...     |     ...     |
 |   **unit *n***  |          0          |          1          |    ...   |             1             |           0           |      20     |      1      |
 
-Holdout training data should also follow the same format.
+Holdout training set should also follow the same format.
 
 ### Other requirements
 
-1.  `FLAME` requires installation of python, specifically with at least python3 version. If your computer system does not have python3, install from [here](https://www.python.org/downloads/).
+1.  `FLAME` requires installation of python, specifically with at least python 2.7 version. If your computer system does not have python 2.7, install from [here](https://www.python.org/downloads/).
 
-2.  For database systems implementation, please name the database connection as **db**.
+2.  For database systems implementation, FLAME package provides two versions - SQLite and PostgreSQL. PostgreSQL requires installation of external database system but it is faster. SQLite does not require external database system but is slower. If your computer does not have PostgreSQL installed, install from [here](https://www.postgresql.org/download/). For connecting and setup of PostgreSQL server, please refer to the [tutorial](at%20\url%7B)<http://www.postgresqltutorial.com/connect-to-postgresql-database/>)
 
-### Installation
-
-``` r
-# Current version on GitHub
-devtools::install_github("chiarui424/FLAME") 
-```
+3.  For database systems implementation, please name the database connection as **db**.
 
 ### Some examples
 
@@ -43,4 +45,4 @@ devtools::install_github("chiarui424/FLAME")
 
 [Get Detailed Information After Matching](articles/CATE.html)
 
-[Matching Quality](articles/Matching_Quality.html)
+[Match Quality](articles/Matching_Quality.html)

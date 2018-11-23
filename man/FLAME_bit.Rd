@@ -5,8 +5,8 @@
 \title{Bit Vectors Implementation}
 \usage{
 FLAME_bit(data, holdout, tradeoff = 0.1, compute_var = FALSE,
-  PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
-  tree_depth = NULL)
+  PE_function = NULL, model = NULL, ridge_reg = NULL,
+  lasso_reg = NULL, tree_depth = NULL)
 }
 \arguments{
 \item{data}{input data}

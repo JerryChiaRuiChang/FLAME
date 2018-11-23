@@ -1,0 +1,10 @@
+---
+title: "NEWS"
+author: "Jerry Chia-Rui Chang"
+date: "11/22/2018"
+output: md_document
+---
+
+# FLAME 1.0.0
+
+This is a new submission to CRAN.

@@ -4,9 +4,9 @@
 \alias{FLAME_PostgreSQL}
 \title{PostgreSQL Database Implementation}
 \usage{
-FLAME_PostgreSQL(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
-  PE_function = NULL, model = NULL, ridge_reg = NULL, lasso_reg = NULL,
-  tree_depth = NULL)
+FLAME_PostgreSQL(db, data, holdout, compute_var = FALSE,
+  tradeoff = 0.1, PE_function = NULL, model = NULL,
+  ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL)
 }
 \arguments{
 \item{db}{name of the database connection (\strong{must name the connection as
