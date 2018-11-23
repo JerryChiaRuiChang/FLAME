@@ -16,7 +16,7 @@ There was 1 NOTE:
 
 -   Possibly mis-spelled words in DESCRIPTION: 'A (3:8) Inference' (4:9)
 
-This words were the name of the package and were not mis-spelled.
+These words were not mis-spelled.
 
 Downstream dependencies
 -----------------------
