@@ -7,7 +7,7 @@ FLAME (Fast, Large-scale, Almost Matching Exactly)
 
 The **FLAME** algorithm provides fast and large-scale matching approach to causal inference. **FLAME** creates matches that include as many covariates as possible, and iteratively drops covariates that are successively less useful for predicting outcomes based on matching quality. Currently the `FLAME` package applies to categorical data, and provides two approaches for implementation - bit vectors and database management systems (e.g., PostgreSQL, SQLite). For data that has been preprocessed and fits in memory, bit vectors should be applied. For extremely large data that does not fit in memory, database systems should be applied.
 
-For more details about the FLAME algorithm, please refer to the paper: [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference](https://arxiv.org/pdf/1707.06315.pdf) and [FLAME: An R Package for a Fast Large-scale Almost Matching Exactly Approach to Causal Inference](articles/article.pdf)
+For more details about the FLAME algorithm, please refer to the paper: [FLAME: A Fast Large-scale Almost Matching Exactly Approach to Causal Inference](https://arxiv.org/pdf/1707.06315.pdf) and [FLAME: An R Package for a Fast Large-scale Almost Matching Exactly Approach to Causal Inference](articles/jss.html)
 
 ### Installation
 
