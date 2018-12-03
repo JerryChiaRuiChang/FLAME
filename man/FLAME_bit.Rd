@@ -13,12 +13,12 @@ FLAME_bit(data, holdout, tradeoff = 0.1, compute_var = FALSE,
 
 \item{holdout}{holdout training data}
 
-\item{tradeoff}{tradeoff parameter to compute Matching Quality (optional, default =
+\item{tradeoff}{tradeoff parameter to compute Match Quality (optional, default =
 0.1)}
 
 \item{compute_var}{indicator variable of computing variance (optional, default = FALSE)}
 
-\item{PE_function}{user defined function to compute predivtive error
+\item{PE_function}{user defined function to compute predictive error
 (optional)}
 
 \item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree
@@ -33,15 +33,14 @@ FLAME_bit(data, holdout, tradeoff = 0.1, compute_var = FALSE,
 }
 \value{
 (1) list of covariates FLAME performs matching at each iteration, (2)
-list of dataframe showing matched groups' sizes, conditional average treatment
-effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
-quality at each iteration, and (4) the original data with additional column *matched*,
-indicating the number of covariates each unit is matched. If a unit is never
-matched, then *matched* will be 0.
+Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
+of matches at each iteration, (3) match quality at each iteration, and (4) the original
+data with additional column *matched*, indicating the number of covariates each unit is
+matched on. If a unit is never matched, then *matched* will be 0.
 }
 \description{
-\code{FLAME_bit} applies FLAME matching algorithm based on bit vectors
-implementation. The required arguments include (1) data and (2) holdout.
+\code{FLAME_bit} applies FLAME matching algorithm based on bit vectors.
+The required arguments include (1) data and (2) holdout.
 The rest of the arguments are optional.
 }
 \examples{

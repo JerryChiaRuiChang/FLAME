@@ -12,10 +12,15 @@ ATE(FLAME_object)
 \code{\link{FLAME_SQLite}})}
 }
 \value{
-average treatment effect (ATE)
+average treatment effect (ATE) of the matched subsamples
 }
 \description{
-\code{ATE} computes average treatment effect for each given sub-population by
+\code{ATE} computes average treatment effect of the matched subsamples by
 a weighted average of the estimated treatment effects in each matched group.
-The weight is the number of units matched.
+The weight is the number of matched units.
+}
+\examples{
+data(toy_data)
+result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
+FLAME::ATE(result)
 }

@@ -3,7 +3,11 @@
 #' \code{AVG_EFFECT} computes estimated treatment effects. Estimated treatment
 #' effect is the weighted average of CATEs, with weight being the number of units
 #' in each matched group.
-#'
+#' @examples
+#' data(toy_data)
+#' result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
+#' CATE_object <- FLAME::CATE(FLAME_object = result, cov_name = c("X1", "X2"), cov_val = c("2", "2"))
+#' FLAME::AVG_EFFECT(CATE_object)
 #' @param CATE_object object returned by applying \code{\link{CATE}} function
 #' @return estimated treatment effects
 #' @export

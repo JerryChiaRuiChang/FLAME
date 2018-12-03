@@ -300,8 +300,8 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'@param data input data
 #'@param holdout holdout training data
 #'@param compute_var indicator variable of computing variance (optional, default = FALSE)
-#'@param tradeoff tradeoff parameter to compute Matching Quality (optional, default = 0.1)
-#'@param PE_function user defined function to compute predivtive error
+#'@param tradeoff tradeoff parameter to compute Match Quality (optional, default = 0.1)
+#'@param PE_function user defined function to compute predictive error
 #'  (optional)
 #'@param model user defined model - Linear, Ridge, Lasso, or DecisionTree
 #'  (optional)
@@ -310,11 +310,10 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'@param tree_depth maximum depth of decision tree if model = DecisionTree
 #'  (optional)
 #'@return (1) list of covariates FLAME performs matching at each iteration, (2)
-#' list of dataframe showing matched groups' sizes, conditional average treatment
-#' effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
-#' quality at each iteration, and (4) the original data with additional column *matched*,
-#'  indicating the number of covariates each unit is matched. If a unit is never
-#'  matched, then *matched* will be 0.
+#' Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
+#' of matches at each iteration, (3) match quality at each iteration, and (4) the original
+#' data with additional column *matched*, indicating the number of covariates each unit is
+#' matched on. If a unit is never matched, then *matched* will be 0.
 #'@examples
 #'\dontrun{
 #'data <- data(toy_data)

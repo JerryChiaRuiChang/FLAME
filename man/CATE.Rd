@@ -24,15 +24,23 @@ data frame with covariate values, CATE, and size of each matched
   group
 }
 \description{
-\code{CATE} provides detailed information of each matched group's CATE and
-size. First, given number of covariates used for matching,
+\code{CATE} provides detailed information of the conditional average treatment effect (CATE)
+and size of each matched group. First, given number of covariates used for matching,
 \code{CATE(FLAME_object, num_covs = x)} returns the covariate values, size
-and CATE of each matched group. Second, to see a specific matched group given
-a specific covariate combination, \code{CATE(FLAME_object, num_covs = x,
-cov_name = c("x1", "x2", ...), cov_val = c(0,1,...))} returns the CATE and
-size of this specific matched group. Third, if user would like to see all
+and CATE of each matched group. Second, given a covariate combination,
+\code{CATE(FLAME_object, num_covs = x, cov_name = c("x1", "x2", ...), cov_val = c(0,1,...))}
+returns the CATE and size of the matched group. Third, if user would like to see all
 matched groups given a specific covariate combination even when the FLAME
 algorithm performs matching with more than the number of covariates
 specified, \code{CATE(FLAME_object, cov_name = c("x1", "x2", ...), cov_val =
 c(0,1,...))} returns all matched groups containing the covariate combination.
+}
+\examples{
+\dontrun{
+data(toy_data)
+result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
+FLAME::CATE(FLAME_object = result, num_covs  = 2)
+FLAME::CATE(FLAME_object = result, num_covs  = 2, cov_name = c("X1", "X2"), cov_val = c("2", "2"))
+FLAME::CATE(FLAME_object = result, cov_name = c("X1", "X2"), cov_val = c("2", "2"))
+}
 }

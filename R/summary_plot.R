@@ -29,6 +29,10 @@ summary_data <- function(num_covs,FLAME_object) {
 #' @param FLAME_object object returned by applying the FLAME algorithm
 #'   (\code{\link{FLAME_bit}}, \code{\link{FLAME_PostgreSQL}}, or
 #'   \code{\link{FLAME_SQLite}})
+#' @examples
+#' data(toy_data)
+#' result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
+#' FLAME::summary_plot(result)
 #' @return summary plot of the FLAME algorithm
 #' @import latticeExtra
 #' @importFrom lattice xyplot barchart
@@ -44,7 +48,11 @@ summary_plot <- function(FLAME_object) {
 
   # get the covariate dropped at each level
   for(i in 1:(length(FLAME_object[[1]])-1)) {
-    covs_drop <- c(covs_drop,setdiff(FLAME_object[[1]][[i]],FLAME_object[[1]][[i+1]]))
+    cov = setdiff(FLAME_object[[1]][[i]],FLAME_object[[1]][[i+1]])
+    if (length(cov) > 1) {
+      cov <- paste(cov[1], "+", sep = "")
+    }
+    covs_drop <- c(covs_drop,cov)
   }
 
   # get average CATE at each level and combine it with covs_drop into a dataframe
@@ -55,7 +63,7 @@ summary_plot <- function(FLAME_object) {
   summary$covs_dropped <- factor(summary$covs_dropped, levels=unique( as.character(summary$covs_dropped)))
 
   # construct separate plots for each series
-  obj1 <- barchart(size ~ covs_dropped, data = summary, xlab="covariate dropped", ylab = "number of units matched", main = "Summary Plot")
+  obj1 <- barchart(size ~ covs_dropped, data = summary, xlab="covariate(s) dropped", ylab = "number of units matched", main = "Summary Plot")
   obj2 <- xyplot(CATE ~ covs_dropped, summary, type = "p", pch = 20, lwd=5, xlab="covariate dropped", ylab = "estimated treatment effects", main = "Summary Plot")
 
   # make the plot with second y axis

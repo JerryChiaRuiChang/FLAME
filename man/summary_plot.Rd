@@ -19,3 +19,8 @@ summary plot of the FLAME algorithm
 each covariate dropped, number of matched units, and average
 CATE at each iteration.
 }
+\examples{
+data(toy_data)
+result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
+FLAME::summary_plot(result)
+}

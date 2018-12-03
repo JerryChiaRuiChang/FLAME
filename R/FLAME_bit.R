@@ -214,16 +214,16 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 
 #' Bit Vectors Implementation
 #'
-#' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors
-#' implementation. The required arguments include (1) data and (2) holdout.
+#' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors.
+#' The required arguments include (1) data and (2) holdout.
 #' The rest of the arguments are optional.
 #'
 #' @param data input data
 #' @param holdout holdout training data
 #' @param compute_var indicator variable of computing variance (optional, default = FALSE)
-#' @param tradeoff tradeoff parameter to compute Matching Quality (optional, default =
+#' @param tradeoff tradeoff parameter to compute Match Quality (optional, default =
 #'   0.1)
-#' @param PE_function user defined function to compute predivtive error
+#' @param PE_function user defined function to compute predictive error
 #'   (optional)
 #' @param model user defined model - Linear, Ridge, Lasso, or DecisionTree
 #'   (optional)
@@ -232,11 +232,10 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' @param tree_depth maximum depth of decision tree if model = DecisionTree
 #'   (optional)
 #' @return (1) list of covariates FLAME performs matching at each iteration, (2)
-#' list of dataframe showing matched groups' sizes, conditional average treatment
-#' effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
-#' quality at each iteration, and (4) the original data with additional column *matched*,
-#' indicating the number of covariates each unit is matched. If a unit is never
-#' matched, then *matched* will be 0.
+#' Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
+#' of matches at each iteration, (3) match quality at each iteration, and (4) the original
+#' data with additional column *matched*, indicating the number of covariates each unit is
+#' matched on. If a unit is never matched, then *matched* will be 0.
 #' @examples
 #' data(toy_data)
 #' FLAME_bit(data = toy_data, holdout = toy_data)

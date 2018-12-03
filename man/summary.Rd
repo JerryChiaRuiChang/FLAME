@@ -12,9 +12,13 @@ summary(FLAME_object)
 \code{\link{FLAME_SQLite}})}
 }
 \value{
-(1) Number of units matched (2) Average treatment effect
-(3) Summary of conditional average treatment effect (CATE) in boxplot
+(1) Number of units matched (2) Average treatment effect (ATE)
 }
 \description{
 \code{FLAME_summary} provides brief summary of FLAME implementation.
+}
+\examples{
+data(toy_data)
+result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
+FLAME::summary(result)
 }

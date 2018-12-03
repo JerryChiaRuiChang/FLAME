@@ -5,6 +5,10 @@
 #'   \code{\link{FLAME_SQLite}})
 #' @param cov_name a vector of covariate names
 #' @param cov_val  a vector of covariate values, where the value position should match cov_name position
+#' @examples
+#' data(toy_data)
+#' result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
+#' FLAME::MATCH(FLAME_object = result, cov_name = c("X1", "X2"), cov_val = c("2", "2"))
 #' @return data frame with all matched units
 #' @export
 
