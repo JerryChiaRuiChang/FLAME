@@ -45,4 +45,4 @@ Holdout training set should also follow the same format.
 
 [Get Detailed Information After Matching](articles/CATE.html)
 
-[Match Quality](articles/Matching_Quality.html)
+[Match Quality](articles/Match_Quality.html)

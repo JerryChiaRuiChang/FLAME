@@ -94,7 +94,7 @@ The rest of the arguments are optional." />
       <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
     </li>
     <li>
-      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+      <a href="../articles/Match_Quality.html">Match Quality</a>
     </li>
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
@@ -162,11 +162,11 @@ connection as db</strong>)</p></td>
     </tr>
     <tr>
       <th>tradeoff</th>
-      <td><p>tradeoff parameter to compute Matching Quality (optional, default = 0.1)</p></td>
+      <td><p>tradeoff parameter to compute Match Quality (optional, default = 0.1)</p></td>
     </tr>
     <tr>
       <th>PE_function</th>
-      <td><p>user defined function to compute predivtive error
+      <td><p>user defined function to compute predictive error
 (optional)</p></td>
     </tr>
     <tr>
@@ -192,11 +192,10 @@ connection as db</strong>)</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>(1) list of covariates FLAME performs matching at each iteration, (2)
-list of dataframe showing matched groups' sizes, conditional average treatment
-effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
-quality at each iteration, and (4) the original data with additional column *matched*,
- indicating the number of covariates each unit is matched. If a unit is never
- matched, then *matched* will be 0.</p>
+Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
+of matches at each iteration, (3) match quality at each iteration, and (4) the original
+data with additional column *matched*, indicating the number of covariates each unit is
+matched on. If a unit is never matched, then *matched* will be 0.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>

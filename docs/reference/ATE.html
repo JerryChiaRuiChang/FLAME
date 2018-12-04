@@ -32,9 +32,9 @@
 
 <meta property="og:title" content="Compute Average Treatment Effect — ATE" />
 
-<meta property="og:description" content="ATE computes average treatment effect for each given sub-population by
+<meta property="og:description" content="ATE computes average treatment effect of the matched subsamples by
 a weighted average of the estimated treatment effects in each matched group.
-The weight is the number of units matched." />
+The weight is the number of matched units." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -91,7 +91,7 @@ The weight is the number of units matched." />
       <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
     </li>
     <li>
-      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+      <a href="../articles/Match_Quality.html">Match Quality</a>
     </li>
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
@@ -124,9 +124,9 @@ The weight is the number of units matched." />
 
     <div class="ref-description">
     
-    <p><code>ATE</code> computes average treatment effect for each given sub-population by
+    <p><code>ATE</code> computes average treatment effect of the matched subsamples by
 a weighted average of the estimated treatment effects in each matched group.
-The weight is the number of units matched.</p>
+The weight is the number of matched units.</p>
     
     </div>
 
@@ -145,9 +145,12 @@ The weight is the number of units matched.</p>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>average treatment effect (ATE)</p>
+    <p>average treatment effect (ATE) of the matched subsamples</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>toy_data</span>)
+<span class='no'>result</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit'>FLAME_bit</a></span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>toy_data</span>, <span class='kw'>holdout</span> <span class='kw'>=</span> <span class='no'>toy_data</span>)</div><div class='output co'>#&gt; <span class='message'>number of matched units = 29</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 4</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 5</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 14</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 7</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 16</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 10</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 3</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='input'><span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/ATE'>ATE</a></span>(<span class='no'>result</span>)</div><div class='output co'>#&gt; [1] 4.954</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -155,7 +158,9 @@ The weight is the number of units matched.</p>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

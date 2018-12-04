@@ -89,7 +89,7 @@
       <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
     </li>
     <li>
-      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+      <a href="../articles/Match_Quality.html">Match Quality</a>
     </li>
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
@@ -141,10 +141,13 @@
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>(1) Number of units matched (2) Average treatment effect
-(3) Summary of conditional average treatment effect (CATE) in boxplot</p>
+    <p>(1) Number of units matched (2) Average treatment effect (ATE)</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>toy_data</span>)
+<span class='no'>result</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit'>FLAME_bit</a></span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>toy_data</span>, <span class='kw'>holdout</span> <span class='kw'>=</span> <span class='no'>toy_data</span>)</div><div class='output co'>#&gt; <span class='message'>number of matched units = 29</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 4</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 5</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 14</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 7</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 16</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 10</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 3</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='input'><span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/summary'>summary</a></span>(<span class='no'>result</span>)</div><div class='output co'>#&gt; [1] "Number of units matched =  92"
+#&gt; [1] "Average treatment effect =  4.9538889264587"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -152,7 +155,9 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

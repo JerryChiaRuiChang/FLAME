@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matching Quality • FLAME</title>
+<title>Match Quality • FLAME</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Matching Quality">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Match Quality">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -56,7 +56,7 @@
       <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
     </li>
     <li>
-      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+      <a href="../articles/Match_Quality.html">Match Quality</a>
     </li>
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
@@ -79,13 +79,13 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Matching Quality</h1>
+      <h1>Match Quality</h1>
                         <h4 class="author">Jerry Chia-Rui Chang</h4>
             
-            <h4 class="date">2018-11-27</h4>
+            <h4 class="date">2018-12-03</h4>
       
       
-      <div class="hidden name"><code>Matching_Quality.Rmd</code></div>
+      <div class="hidden name"><code>Match_Quality.Rmd</code></div>
 
     </div>
 
@@ -106,13 +106,17 @@ PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}
 \]</span></p>
 
 <p>We demonstrate how to select various predictive models based on bit vectors implementation. Note that model specification for database systems implementation is the same as bit vectors implementation. We applied <code>Data_Generation</code> function to create a synthetic data. There are 1000 treated units and 1000 control units with 10 important covariates and 5 unimportant covariates. Assume holdout training set is the same as the input data.</p>
-<pre><code>#&gt;   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated
-#&gt; 1  1  0  0  0  0  1  1  1  0   0   1   1   0   0   0 -25.326354       0
-#&gt; 2  1  1  1  1  0  0  0  1  0   1   0   1   1   1   0   5.172278       0
-#&gt; 3  1  0  0  0  0  1  1  0  1   0   1   0   1   1   0 -11.501727       0
-#&gt; 4  0  0  0  1  1  0  1  1  1   1   0   0   1   1   0   8.840892       0
-#&gt; 5  1  1  1  0  1  1  0  0  0   0   1   0   0   0   1   3.435872       0
-#&gt; 6  0  1  0  0  1  0  0  0  1   1   1   0   1   1   1  20.460055       0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/Data_Generation">Data_Generation</a></span>(<span class="dt">num_control =</span> <span class="dv">1000</span>, <span class="dt">num_treated =</span> <span class="dv">1000</span>,
+                               <span class="dt">num_cov_dense =</span> <span class="dv">10</span>, <span class="dt">num_cov_unimportant =</span> <span class="dv">5</span>, <span class="dt">U =</span> <span class="dv">5</span>)
+holdout &lt;-<span class="st"> </span>data 
+<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(data)</code></pre></div>
+<pre><code>##   x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15    outcome treated
+## 1  1  0  0  0  0  1  1  1  0   0   1   1   0   0   0 -25.326354       0
+## 2  1  1  1  1  0  0  0  1  0   1   0   1   1   1   0   5.172278       0
+## 3  1  0  0  0  0  1  1  0  1   0   1   0   1   1   0 -11.501727       0
+## 4  0  0  0  1  1  0  1  1  1   1   0   0   1   1   0   8.840892       0
+## 5  1  1  1  0  1  1  0  0  0   0   1   0   0   0   1   3.435872       0
+## 6  0  1  0  0  1  0  0  0  1   1   1   0   1   1   1  20.460055       0</code></pre>
 <div id="package-provided-models" class="section level3">
 <h3 class="hasAnchor">
 <a href="#package-provided-models" class="anchor"></a>package provided models</h3>
@@ -120,85 +124,85 @@ PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}
 <li>Linear Regression - R argument requires <code>model = "Linear"</code>
 </li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">linear &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"Linear"</span>)
-<span class="co">#&gt; number of matched units = 62</span>
-<span class="co">#&gt; number of matched units = 65</span>
-<span class="co">#&gt; number of matched units = 89</span>
-<span class="co">#&gt; number of matched units = 216</span>
-<span class="co">#&gt; number of matched units = 247</span>
-<span class="co">#&gt; number of matched units = 309</span>
-<span class="co">#&gt; number of matched units = 324</span>
-<span class="co">#&gt; number of matched units = 235</span>
-<span class="co">#&gt; number of matched units = 173</span>
-<span class="co">#&gt; number of matched units = 49</span>
-<span class="co">#&gt; number of matched units = 81</span>
-<span class="co">#&gt; number of matched units = 42</span>
-<span class="co">#&gt; number of matched units = 40</span>
-<span class="co">#&gt; number of matched units = 0</span>
-<span class="co">#&gt; number of matched units = 42</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">linear &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"Linear"</span>)</code></pre></div>
+<pre><code>## number of matched units = 62</code></pre>
+<pre><code>## number of matched units = 65</code></pre>
+<pre><code>## number of matched units = 89</code></pre>
+<pre><code>## number of matched units = 216</code></pre>
+<pre><code>## number of matched units = 247</code></pre>
+<pre><code>## number of matched units = 309</code></pre>
+<pre><code>## number of matched units = 324</code></pre>
+<pre><code>## number of matched units = 235</code></pre>
+<pre><code>## number of matched units = 173</code></pre>
+<pre><code>## number of matched units = 49</code></pre>
+<pre><code>## number of matched units = 81</code></pre>
+<pre><code>## number of matched units = 42</code></pre>
+<pre><code>## number of matched units = 40</code></pre>
+<pre><code>## number of matched units = 0</code></pre>
+<pre><code>## number of matched units = 42</code></pre>
 
 <ol start="2" style="list-style-type: decimal">
 <li>Ridge Regression with L2 regularization parameter of 0.1 - R argument requires <code>model = "Ridge", ridge_reg = 0.1</code>
 </li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ridge &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"Ridge"</span>, <span class="dt">ridge_reg =</span> <span class="fl">0.1</span>)
-<span class="co">#&gt; number of matched units = 62</span>
-<span class="co">#&gt; number of matched units = 65</span>
-<span class="co">#&gt; number of matched units = 89</span>
-<span class="co">#&gt; number of matched units = 216</span>
-<span class="co">#&gt; number of matched units = 247</span>
-<span class="co">#&gt; number of matched units = 309</span>
-<span class="co">#&gt; number of matched units = 324</span>
-<span class="co">#&gt; number of matched units = 235</span>
-<span class="co">#&gt; number of matched units = 173</span>
-<span class="co">#&gt; number of matched units = 49</span>
-<span class="co">#&gt; number of matched units = 81</span>
-<span class="co">#&gt; number of matched units = 42</span>
-<span class="co">#&gt; number of matched units = 40</span>
-<span class="co">#&gt; number of matched units = 0</span>
-<span class="co">#&gt; number of matched units = 42</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ridge &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"Ridge"</span>, <span class="dt">ridge_reg =</span> <span class="fl">0.1</span>)</code></pre></div>
+<pre><code>## number of matched units = 62</code></pre>
+<pre><code>## number of matched units = 65</code></pre>
+<pre><code>## number of matched units = 89</code></pre>
+<pre><code>## number of matched units = 216</code></pre>
+<pre><code>## number of matched units = 247</code></pre>
+<pre><code>## number of matched units = 309</code></pre>
+<pre><code>## number of matched units = 324</code></pre>
+<pre><code>## number of matched units = 235</code></pre>
+<pre><code>## number of matched units = 173</code></pre>
+<pre><code>## number of matched units = 49</code></pre>
+<pre><code>## number of matched units = 81</code></pre>
+<pre><code>## number of matched units = 42</code></pre>
+<pre><code>## number of matched units = 40</code></pre>
+<pre><code>## number of matched units = 0</code></pre>
+<pre><code>## number of matched units = 42</code></pre>
 
 <ol start="3" style="list-style-type: decimal">
 <li>Lasso with L1 regularization regularization parameter of 0.1 - R argument requires <code>model = "Lasso", lasso_reg = 0.1</code>
 </li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lasso &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"Lasso"</span>, <span class="dt">lasso_reg =</span> <span class="fl">0.1</span>)
-<span class="co">#&gt; number of matched units = 62</span>
-<span class="co">#&gt; number of matched units = 65</span>
-<span class="co">#&gt; number of matched units = 117</span>
-<span class="co">#&gt; number of matched units = 191</span>
-<span class="co">#&gt; number of matched units = 247</span>
-<span class="co">#&gt; number of matched units = 309</span>
-<span class="co">#&gt; number of matched units = 324</span>
-<span class="co">#&gt; number of matched units = 236</span>
-<span class="co">#&gt; number of matched units = 173</span>
-<span class="co">#&gt; number of matched units = 47</span>
-<span class="co">#&gt; number of matched units = 80</span>
-<span class="co">#&gt; number of matched units = 41</span>
-<span class="co">#&gt; number of matched units = 40</span>
-<span class="co">#&gt; number of matched units = 0</span>
-<span class="co">#&gt; number of matched units = 42</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lasso &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"Lasso"</span>, <span class="dt">lasso_reg =</span> <span class="fl">0.1</span>)</code></pre></div>
+<pre><code>## number of matched units = 62</code></pre>
+<pre><code>## number of matched units = 65</code></pre>
+<pre><code>## number of matched units = 117</code></pre>
+<pre><code>## number of matched units = 191</code></pre>
+<pre><code>## number of matched units = 247</code></pre>
+<pre><code>## number of matched units = 309</code></pre>
+<pre><code>## number of matched units = 324</code></pre>
+<pre><code>## number of matched units = 236</code></pre>
+<pre><code>## number of matched units = 173</code></pre>
+<pre><code>## number of matched units = 47</code></pre>
+<pre><code>## number of matched units = 80</code></pre>
+<pre><code>## number of matched units = 41</code></pre>
+<pre><code>## number of matched units = 40</code></pre>
+<pre><code>## number of matched units = 0</code></pre>
+<pre><code>## number of matched units = 42</code></pre>
 
 <ol start="4" style="list-style-type: decimal">
 <li>Decision Tree with maximum depth of 8 - R argument requires <code>model = "DecisionTree", tree_depth = 8</code>
 </li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tree &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"DecisionTree"</span>, <span class="dt">tree_depth =</span> <span class="dv">8</span>)
-<span class="co">#&gt; number of matched units = 62</span>
-<span class="co">#&gt; number of matched units = 51</span>
-<span class="co">#&gt; number of matched units = 107</span>
-<span class="co">#&gt; number of matched units = 168</span>
-<span class="co">#&gt; number of matched units = 274</span>
-<span class="co">#&gt; number of matched units = 346</span>
-<span class="co">#&gt; number of matched units = 305</span>
-<span class="co">#&gt; number of matched units = 246</span>
-<span class="co">#&gt; number of matched units = 128</span>
-<span class="co">#&gt; number of matched units = 119</span>
-<span class="co">#&gt; number of matched units = 44</span>
-<span class="co">#&gt; number of matched units = 38</span>
-<span class="co">#&gt; number of matched units = 17</span>
-<span class="co">#&gt; number of matched units = 23</span>
-<span class="co">#&gt; number of matched units = 62</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tree &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">model =</span> <span class="st">"DecisionTree"</span>, <span class="dt">tree_depth =</span> <span class="dv">8</span>)</code></pre></div>
+<pre><code>## number of matched units = 62</code></pre>
+<pre><code>## number of matched units = 51</code></pre>
+<pre><code>## number of matched units = 107</code></pre>
+<pre><code>## number of matched units = 168</code></pre>
+<pre><code>## number of matched units = 274</code></pre>
+<pre><code>## number of matched units = 346</code></pre>
+<pre><code>## number of matched units = 305</code></pre>
+<pre><code>## number of matched units = 246</code></pre>
+<pre><code>## number of matched units = 128</code></pre>
+<pre><code>## number of matched units = 119</code></pre>
+<pre><code>## number of matched units = 44</code></pre>
+<pre><code>## number of matched units = 38</code></pre>
+<pre><code>## number of matched units = 17</code></pre>
+<pre><code>## number of matched units = 23</code></pre>
+<pre><code>## number of matched units = 62</code></pre>
 </div>
 <div id="user-defined-model" class="section level3">
 <h3 class="hasAnchor">
@@ -223,21 +227,21 @@ PE = \frac{1}{\sum(1-T^{H}_{u})} \sum_{u:T^{H}_{u} = 0} (Y^{H}_{u} - \hat{Y}^{H}
 }</code></pre></div>
 
 <p>Apply the model as <code>PE_function = SVM_PE</code> to the package.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SVM &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">PE_function =</span> SVM_PE)
-<span class="co">#&gt; number of matched units = 62</span>
-<span class="co">#&gt; number of matched units = 41</span>
-<span class="co">#&gt; number of matched units = 102</span>
-<span class="co">#&gt; number of matched units = 163</span>
-<span class="co">#&gt; number of matched units = 333</span>
-<span class="co">#&gt; number of matched units = 295</span>
-<span class="co">#&gt; number of matched units = 318</span>
-<span class="co">#&gt; number of matched units = 263</span>
-<span class="co">#&gt; number of matched units = 116</span>
-<span class="co">#&gt; number of matched units = 89</span>
-<span class="co">#&gt; number of matched units = 90</span>
-<span class="co">#&gt; number of matched units = 12</span>
-<span class="co">#&gt; number of matched units = 78</span>
-<span class="co">#&gt; number of matched units = 22</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SVM &lt;-<span class="st"> </span>FLAME<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit">FLAME_bit</a></span>(<span class="dt">data =</span> data, <span class="dt">holdout =</span> holdout, <span class="dt">PE_function =</span> SVM_PE)</code></pre></div>
+<pre><code>## number of matched units = 62</code></pre>
+<pre><code>## number of matched units = 41</code></pre>
+<pre><code>## number of matched units = 102</code></pre>
+<pre><code>## number of matched units = 163</code></pre>
+<pre><code>## number of matched units = 333</code></pre>
+<pre><code>## number of matched units = 295</code></pre>
+<pre><code>## number of matched units = 318</code></pre>
+<pre><code>## number of matched units = 263</code></pre>
+<pre><code>## number of matched units = 116</code></pre>
+<pre><code>## number of matched units = 89</code></pre>
+<pre><code>## number of matched units = 90</code></pre>
+<pre><code>## number of matched units = 12</code></pre>
+<pre><code>## number of matched units = 78</code></pre>
+<pre><code>## number of matched units = 22</code></pre>
 </div>
 </div>
   </div>

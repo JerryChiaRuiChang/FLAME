@@ -89,7 +89,7 @@
       <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
     </li>
     <li>
-      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+      <a href="../articles/Match_Quality.html">Match Quality</a>
     </li>
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
@@ -152,6 +152,16 @@
     <p>data frame with all matched units</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>toy_data</span>)
+<span class='no'>result</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit'>FLAME_bit</a></span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>toy_data</span>, <span class='kw'>holdout</span> <span class='kw'>=</span> <span class='no'>toy_data</span>)</div><div class='output co'>#&gt; <span class='message'>number of matched units = 29</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 4</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 5</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 14</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 7</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 16</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 10</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 3</span></div><div class='input'><span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/MATCH'>MATCH</a></span>(<span class='kw'>FLAME_object</span> <span class='kw'>=</span> <span class='no'>result</span>, <span class='kw'>cov_name</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"X1"</span>, <span class='st'>"X2"</span>), <span class='kw'>cov_val</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"2"</span>, <span class='st'>"2"</span>))</div><div class='output co'>#&gt;   X15 X16 X17 X18 X19 X20 X13 X14 X11 X12 X9 X10 X7 X5 X6 X8 X1 X2 X3 X4
+#&gt; 1   0   0   0   0   0   0   0   0   0   0  0   0  1  1  1  1  2  2  1  1
+#&gt; 2   1   1   1   1   1   1   1   1   1   1  2   2  2  2  2  2  2  2  2  2
+#&gt; 3   1   1   1   1   1   1   1   1   1   1  1   1  1  2  1  1  2  2  2  2
+#&gt;   outcome treated index
+#&gt; 1   7.976       0    90
+#&gt; 2  15.348       1    91
+#&gt; 3  14.660       1    92</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -159,7 +169,9 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

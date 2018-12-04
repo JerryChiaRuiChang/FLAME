@@ -32,13 +32,12 @@
 
 <meta property="og:title" content="Get the Size and CATE of Matched Group(s) — CATE" />
 
-<meta property="og:description" content="CATE provides detailed information of each matched group's CATE and
-size. First, given number of covariates used for matching,
+<meta property="og:description" content="CATE provides detailed information of the conditional average treatment effect (CATE)
+and size of each matched group. First, given number of covariates used for matching,
 CATE(FLAME_object, num_covs = x) returns the covariate values, size
-and CATE of each matched group. Second, to see a specific matched group given
-a specific covariate combination, CATE(FLAME_object, num_covs = x,
-cov_name = c(&quot;x1&quot;, &quot;x2&quot;, ...), cov_val = c(0,1,...)) returns the CATE and
-size of this specific matched group. Third, if user would like to see all
+and CATE of each matched group. Second, given a covariate combination,
+CATE(FLAME_object, num_covs = x, cov_name = c(&quot;x1&quot;, &quot;x2&quot;, ...), cov_val = c(0,1,...))
+returns the CATE and size of the matched group. Third, if user would like to see all
 matched groups given a specific covariate combination even when the FLAME
 algorithm performs matching with more than the number of covariates
 specified, CATE(FLAME_object, cov_name = c(&quot;x1&quot;, &quot;x2&quot;, ...), cov_val =
@@ -99,7 +98,7 @@ c(0,1,...)) returns all matched groups containing the covariate combination." />
       <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
     </li>
     <li>
-      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+      <a href="../articles/Match_Quality.html">Match Quality</a>
     </li>
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
@@ -132,13 +131,12 @@ c(0,1,...)) returns all matched groups containing the covariate combination." />
 
     <div class="ref-description">
     
-    <p><code>CATE</code> provides detailed information of each matched group's CATE and
-size. First, given number of covariates used for matching,
+    <p><code>CATE</code> provides detailed information of the conditional average treatment effect (CATE)
+and size of each matched group. First, given number of covariates used for matching,
 <code>CATE(FLAME_object, num_covs = x)</code> returns the covariate values, size
-and CATE of each matched group. Second, to see a specific matched group given
-a specific covariate combination, <code>CATE(FLAME_object, num_covs = x,
-cov_name = c("x1", "x2", ...), cov_val = c(0,1,...))</code> returns the CATE and
-size of this specific matched group. Third, if user would like to see all
+and CATE of each matched group. Second, given a covariate combination,
+<code>CATE(FLAME_object, num_covs = x, cov_name = c("x1", "x2", ...), cov_val = c(0,1,...))</code>
+returns the CATE and size of the matched group. Third, if user would like to see all
 matched groups given a specific covariate combination even when the FLAME
 algorithm performs matching with more than the number of covariates
 specified, <code>CATE(FLAME_object, cov_name = c("x1", "x2", ...), cov_val =
@@ -179,6 +177,14 @@ type.</p></td>
   group</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>toy_data</span>)
+<span class='no'>result</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/FLAME_bit'>FLAME_bit</a></span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>toy_data</span>, <span class='kw'>holdout</span> <span class='kw'>=</span> <span class='no'>toy_data</span>)
+<span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/CATE'>CATE</a></span>(<span class='kw'>FLAME_object</span> <span class='kw'>=</span> <span class='no'>result</span>, <span class='kw'>num_covs</span>  <span class='kw'>=</span> <span class='fl'>2</span>)
+<span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/CATE'>CATE</a></span>(<span class='kw'>FLAME_object</span> <span class='kw'>=</span> <span class='no'>result</span>, <span class='kw'>num_covs</span>  <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>cov_name</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"X1"</span>, <span class='st'>"X2"</span>), <span class='kw'>cov_val</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"2"</span>, <span class='st'>"2"</span>))
+<span class='kw pkg'>FLAME</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/FLAME/topics/CATE'>CATE</a></span>(<span class='kw'>FLAME_object</span> <span class='kw'>=</span> <span class='no'>result</span>, <span class='kw'>cov_name</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"X1"</span>, <span class='st'>"X2"</span>), <span class='kw'>cov_val</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"2"</span>, <span class='st'>"2"</span>))
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -186,7 +192,9 @@ type.</p></td>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

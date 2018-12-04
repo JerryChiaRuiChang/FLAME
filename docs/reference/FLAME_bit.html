@@ -32,8 +32,8 @@
 
 <meta property="og:title" content="Bit Vectors Implementation — FLAME_bit" />
 
-<meta property="og:description" content="FLAME_bit applies FLAME matching algorithm based on bit vectors
-implementation. The required arguments include (1) data and (2) holdout.
+<meta property="og:description" content="FLAME_bit applies FLAME matching algorithm based on bit vectors.
+The required arguments include (1) data and (2) holdout.
 The rest of the arguments are optional." />
 <meta name="twitter:card" content="summary" />
 
@@ -91,7 +91,7 @@ The rest of the arguments are optional." />
       <a href="../articles/CATE.html">Get Detailed Information After Matching</a>
     </li>
     <li>
-      <a href="../articles/Matching_Quality.html">Matching Quality</a>
+      <a href="../articles/Match_Quality.html">Match Quality</a>
     </li>
     <li>
       <a href="../articles/Synthetic_Data.html">Apply the FLAME Algorithm to Synthetic Data</a>
@@ -124,8 +124,8 @@ The rest of the arguments are optional." />
 
     <div class="ref-description">
     
-    <p><code>FLAME_bit</code> applies FLAME matching algorithm based on bit vectors
-implementation. The required arguments include (1) data and (2) holdout.
+    <p><code>FLAME_bit</code> applies FLAME matching algorithm based on bit vectors.
+The required arguments include (1) data and (2) holdout.
 The rest of the arguments are optional.</p>
     
     </div>
@@ -147,7 +147,7 @@ The rest of the arguments are optional.</p>
     </tr>
     <tr>
       <th>tradeoff</th>
-      <td><p>tradeoff parameter to compute Matching Quality (optional, default =
+      <td><p>tradeoff parameter to compute Match Quality (optional, default =
 0.1)</p></td>
     </tr>
     <tr>
@@ -156,7 +156,7 @@ The rest of the arguments are optional.</p>
     </tr>
     <tr>
       <th>PE_function</th>
-      <td><p>user defined function to compute predivtive error
+      <td><p>user defined function to compute predictive error
 (optional)</p></td>
     </tr>
     <tr>
@@ -182,16 +182,15 @@ The rest of the arguments are optional.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>(1) list of covariates FLAME performs matching at each iteration, (2)
-list of dataframe showing matched groups' sizes, conditional average treatment
-effects (CATEs), and variance (if compute_var = TRUE) at each iteration, (3) matching
-quality at each iteration, and (4) the original data with additional column *matched*,
-indicating the number of covariates each unit is matched. If a unit is never
-matched, then *matched* will be 0.</p>
+Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
+of matches at each iteration, (3) match quality at each iteration, and (4) the original
+data with additional column *matched*, indicating the number of covariates each unit is
+matched on. If a unit is never matched, then *matched* will be 0.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>toy_data</span>)
-<span class='fu'>FLAME_bit</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>toy_data</span>, <span class='kw'>holdout</span> <span class='kw'>=</span> <span class='no'>toy_data</span>)</div><div class='output co'>#&gt; <span class='message'>number of matched units = 29</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 4</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 5</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 14</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 7</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 16</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 10</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 3</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; $covariate_list
+<span class='fu'>FLAME_bit</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>toy_data</span>, <span class='kw'>holdout</span> <span class='kw'>=</span> <span class='no'>toy_data</span>)</div><div class='output co'>#&gt; <span class='message'>number of matched units = 29</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 4</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 5</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 14</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 7</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 16</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 10</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 2</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 3</span></div><div class='output co'>#&gt; <span class='message'>number of matched units = 0</span></div><div class='output co'>#&gt; $covariate_list
 #&gt; $covariate_list[[1]]
 #&gt;  [1] "X15" "X16" "X17" "X18" "X19" "X20" "X13" "X14" "X11" "X12" "X9"  "X10"
 #&gt; [13] "X7"  "X5"  "X6"  "X8"  "X1"  "X2"  "X3"  "X4" 
@@ -231,15 +230,18 @@ matched, then *matched* will be 0.</p>
 #&gt;  [1] "X15" "X16" "X17" "X18" "X19" "X20" "X13" "X14" "X1"  "X2"  "X3" 
 #&gt; 
 #&gt; $covariate_list[[11]]
-#&gt; [1] "X15" "X16" "X17" "X18" "X19" "X20" "X1"  "X2"  "X3" 
+#&gt;  [1] "X15" "X16" "X17" "X18" "X19" "X20" "X14" "X1"  "X2"  "X3" 
 #&gt; 
 #&gt; $covariate_list[[12]]
-#&gt; [1] "X15" "X16" "X17" "X18" "X19" "X20" "X1"  "X2" 
+#&gt; [1] "X15" "X16" "X17" "X18" "X19" "X20" "X1"  "X2"  "X3" 
 #&gt; 
 #&gt; $covariate_list[[13]]
-#&gt; [1] "X1" "X2"
+#&gt; [1] "X15" "X16" "X17" "X18" "X19" "X20" "X1"  "X2" 
 #&gt; 
 #&gt; $covariate_list[[14]]
+#&gt; [1] "X1" "X2"
+#&gt; 
+#&gt; $covariate_list[[15]]
 #&gt; [1] "X1"
 #&gt; 
 #&gt; 
@@ -319,27 +321,32 @@ matched, then *matched* will be 0.</p>
 #&gt; 5   1   1   1   1   1   1   2   2  6  6  6  6.156    2
 #&gt; 
 #&gt; $matched_group[[11]]
+#&gt;  [1] X15    X16    X17    X18    X19    X20    X14    X1     X2     X3    
+#&gt; [11] effect size  
+#&gt; &lt;0 rows&gt; (or 0-length row.names)
+#&gt; 
+#&gt; $matched_group[[12]]
 #&gt;   X15 X16 X17 X18 X19 X20 X1 X2 X3 effect size
 #&gt; 1   0   0   0   0   0   0  5  5  5  2.483    2
 #&gt; 2   0   0   0   0   0   0  1  1  1  3.978    3
 #&gt; 3   0   0   0   0   0   0  2  2  2  4.370    5
 #&gt; 
-#&gt; $matched_group[[12]]
+#&gt; $matched_group[[13]]
 #&gt;   X15 X16 X17 X18 X19 X20 X1 X2 effect size
 #&gt; 1   0   0   0   0   0   0  3  3  4.702    2
 #&gt; 
-#&gt; $matched_group[[13]]
+#&gt; $matched_group[[14]]
 #&gt;   X1 X2 effect size
 #&gt; 1  2  2  7.028    3
 #&gt; 
-#&gt; $matched_group[[14]]
+#&gt; $matched_group[[15]]
 #&gt; [1] X1     effect size  
 #&gt; &lt;0 rows&gt; (or 0-length row.names)
 #&gt; 
 #&gt; 
 #&gt; $match_quality
 #&gt;  [1] -6.861 -6.294 -6.087 -5.790 -5.570 -5.362 -5.263 -5.193 -5.032 -5.115
-#&gt; [11] -5.000 -5.043 -5.158
+#&gt; [11] -4.949 -5.000 -5.043 -5.158
 #&gt; 
 #&gt; $matched_data
 #&gt;     X15 X16 X17 X18 X19 X20 X13 X14 X11 X12 X9 X10 X7 X5 X6 X8 X1 X2 X3 X4

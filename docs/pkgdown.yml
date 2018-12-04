@@ -3,6 +3,6 @@ pkgdown: 1.2.0
 pkgdown_sha: ~
 articles:
   CATE: CATE.html
-  Matching_Quality: Matching_Quality.html
+  Match_Quality: Match_Quality.html
   Synthetic_Data: Synthetic_Data.html
 
