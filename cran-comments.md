@@ -3,9 +3,11 @@ Resubmission
 
 This is a resubmission. In this version I have:
 
--   Add method reference with arXiv citation to package DESCRIPTION
+-   Take out package title quotation marks
 
--   Add examples to Rd files
+-   Change Description text to undirected quotation marks ('FLAME').
+
+-   Replace dontrun{} to donttest{} for some Rd examples.
 
 Test environments
 -----------------
