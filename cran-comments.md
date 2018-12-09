@@ -26,7 +26,7 @@ There were no ERRORs or WARNINGs.
 There was 1 NOTE:
 
 -   Possibly mis-spelled words in DESCRIPTION: Rudin (17:32) Volfovsky
-    (17:39)
+    (17:39) arXiv (17:67)
 
 These words are last names and are not mis-spelled.
 
