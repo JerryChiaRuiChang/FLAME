@@ -9,6 +9,10 @@ This is a resubmission. In this version I have:
 
 -   Replace dontrun{} to donttest{} for some Rd examples.
 
+-   Change Title from 'A Fast Large-scale Almost Matching Exactly
+    Approach to Causal Inference' to title case 'A Fast Large-Scale
+    Almost Matching Exactly Approach to Causal Inference'
+
 Test environments
 -----------------
 
