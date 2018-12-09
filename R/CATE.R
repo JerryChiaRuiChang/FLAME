@@ -137,7 +137,7 @@ find_match <- function(df, cov_name, cov_val) {
 #'   match cov_name position. In addition, it has to be in character R data
 #'   type.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(toy_data)
 #' result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
 #' FLAME::CATE(FLAME_object = result, num_covs  = 2)

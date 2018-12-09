@@ -52,7 +52,7 @@ host='your_localhost', port='your_port', user='your_username', password =
 'your_password')} and name the connection as \strong{db}
 }
 \examples{
-\dontrun{
+\donttest{
 data <- data(toy_data)
 
 drv <- dbDriver('PostgreSQL')

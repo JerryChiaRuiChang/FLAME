@@ -324,7 +324,7 @@ match_quality_PostgreSQL <- function(c, db, holdout, num_covs, cur_covs, tradeof
 #' data with additional column *matched*, indicating the number of covariates each unit is
 #' matched on. If a unit is never matched, then *matched* will be 0.
 #'@examples
-#'\dontrun{
+#'\donttest{
 #'data <- data(toy_data)
 #'
 #'drv <- dbDriver('PostgreSQL')

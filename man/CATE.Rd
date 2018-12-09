@@ -36,7 +36,7 @@ specified, \code{CATE(FLAME_object, cov_name = c("x1", "x2", ...), cov_val =
 c(0,1,...))} returns all matched groups containing the covariate combination.
 }
 \examples{
-\dontrun{
+\donttest{
 data(toy_data)
 result <- FLAME::FLAME_bit(data = toy_data, holdout = toy_data)
 FLAME::CATE(FLAME_object = result, num_covs  = 2)

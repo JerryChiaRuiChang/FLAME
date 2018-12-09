@@ -49,7 +49,7 @@ user should connect to a temporary database with command
 The rest of the arguments are optional.
 }
 \examples{
-\dontrun{
+\donttest{
 data <- data(toy_data)
 
 db <- dbConnect(SQLite(),"tempdb")
