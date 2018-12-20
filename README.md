@@ -12,7 +12,10 @@ For more details about the FLAME algorithm, please refer to the paper: [FLAME: A
 ### Installation
 
 ``` r
-# Current version on GitHub
+# Download from CRAN
+install.packages("FLAME")
+
+# Download from GitHub
 devtools::install_github("chiarui424/FLAME") 
 ```
 
