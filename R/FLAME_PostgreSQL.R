@@ -136,13 +136,31 @@ get_CATE_PostgreSQL <- function(db, cur_covs, column, factor_level, compute_var)
 Regression_PE_PostgreSQL <- function(holdout_trt, holdout_ctl) {
 
   # MSE for treated
-
   model_lm <- lm(outcome ~ ., data = holdout_trt) # fit the data to lm model
-  MSE_treated <- sum((holdout_trt$outcome - model_lm$fitted.values)^2)/length(holdout_trt$outcome) # compute mean squared error
+  MSE_treated <- mean((holdout_trt$outcome - model_lm$fitted.values)^2) # compute mean squared error
 
   # MSE for control
   model_lm <- lm(outcome ~ ., data = holdout_ctl) # fit the data to lm model
-  MSE_control <- sum((holdout_ctl$outcome - model_lm$fitted.values)^2)/length(holdout_ctl$outcome) # compute mean squared error
+  MSE_control <- mean((holdout_ctl$outcome - model_lm$fitted.values)^2)# compute mean squared error
+
+  return(MSE_treated + MSE_control)
+}
+
+GLMNET_PE_PostgreSQL <- function(holdout_trt, holdout_ctl, lambda, alpha) {
+
+  # MSE for treated
+  y <- holdout_trt$outcome
+  x <- model.matrix(~ .-1, holdout_trt[,-which(colnames(holdout_trt) == "outcome")])
+  fit <- glmnet(x, y, alpha = alpha, lambda = lambda)
+  predicted_value <- predict(fit, x, s = lambda)
+  MSE_treated <- mean((y - predicted_value)^2) # compute mean squared error
+
+  # MSE for control
+  y <- holdout_ctl$outcome
+  x <- model.matrix(~ .-1, holdout_ctl[,-which(colnames(holdout_ctl) == "outcome")])
+  fit <- glmnet(x, y, alpha = alpha, lambda = lambda)
+  predicted_value <- predict(fit, x, s = lambda)
+  MSE_control <- mean((y - predicted_value)^2) # compute mean squared error
 
   return(MSE_treated + MSE_control)
 }
@@ -222,73 +240,56 @@ match_quality_PostgreSQL <- function(c, db, holdout, num_covs, cur_covs, tradeof
     num_treated_matched <- as.integer(dbGetQuery(db, "SELECT count(*) FROM match WHERE treated = 1")[1,1])
   }
 
-  #Compute Predictive Error
+  # Compute Predictive Error
 
-  if (!py_run) {
-    holdout_trt <- holdout[holdout[,'treated'] == 1,]
-    holdout_trt <- holdout_trt[,!(names(holdout_trt) %in% 'treated')]
-    holdout_ctl <- holdout[holdout[,'treated'] == 0,]
-    holdout_ctl <- holdout_trt[,!(names(holdout_ctl) %in% 'treated')]
-    PE <- Regression_PE_PostgreSQL(holdout_trt, holdout_ctl)
+  holdout_trt <- holdout[holdout[,'treated'] == '1',-(c+1)]
+  holdout_trt <- holdout_trt[,!(names(holdout_trt) %in% 'treated')]
+  holdout_ctl <- holdout[holdout[,'treated'] == '0',-(c+1)]
+  holdout_ctl <- holdout_ctl[,!(names(holdout_ctl) %in% 'treated')]
+
+  if (is.null(PE_function)) {
+
+    # default PE - ridge regression with 0.1 regularization parameter
+    if (is.null(model)) {
+      PE <- GLMNET_PE_PostgreSQL(holdout_trt, holdout_ctl, lambda = 0.1, alpha = 0)
+    }
+    else {
+      if (model == "Linear") {
+        PE <- Regression_PE_PostgreSQL(holdout_trt, holdout_ctl)
+      }
+
+      if (model == "Lasso") {
+        if (is.null(lasso_reg)) {
+          stop("Please specify lasso_reg regularization parameter.")
+        }
+        PE <- GLMNET_PE_PostgreSQL(holdout_trt, holdout_ctl, lambda = lasso_reg, alpha = 1)
+      }
+
+      if (model == "Ridge") {
+        if (is.null(ridge_reg)) {
+          stop("Please specify ridge_reg regularization parameter")
+        }
+        PE <- GLMNET_PE_PostgreSQL(holdout_trt, holdout_ctl, lambda = ridge_reg, alpha = 0)
+      }
+    }
   }
 
-  else if (!is.null(PE_function)) {
-    # Compute -PE based on user defined PE_function
+  else {
+    # Compute PE based on user defined PE_function
     outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
     outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']
     covs_treated <- as.matrix(holdout[holdout[,'treated'] == 1,][,covs_to_match + 1])
     covs_control <- as.matrix(holdout[holdout[,'treated'] == 0,][,covs_to_match + 1])
-    PE <- -PE_function(outcome_treated, outcome_control, covs_treated, covs_control)
-  }
-
-  else {
-    predictive_error  <- NULL
-    if (!is.null(model)) {
-
-      # Linear Regression
-      if (model == "Linear") {
-        source_python(system.file("Linear.py",package = "FLAME"))
-        parameter = 0
-      }
-
-      # Ridge Regression
-      if (model == "Ridge" && !is.null(ridge_reg)) {
-        source_python(system.file("Ridge.py",package = "FLAME"))
-        parameter = ridge_reg
-      }
-
-      # Lasso
-      if (model == "Lasso" && !is.null(lasso_reg)) {
-        source_python(system.file("Lasso.py",package = "FLAME"))
-        parameter = lasso_reg
-      }
-
-      # Decision Tree
-      if (model == "DecisionTree" && !is.null(tree_depth)) {
-        source_python(system.file("DecisionTree.py",package = "FLAME"))
-        parameter = tree_depth
-      }
-    } else {
-      # Default Model is Ridge Regression with L2 Regularization = 0.1
-      source_python(system.file("Ridge.py",package = "FLAME"))
-      parameter = 0.1
-    }
-
-    #Compute PE based on Python scikit learn function
-    if (length(covs_to_match) == 1) {
-      PE <- predictive_error(r_to_py(holdout), as.integer(num_covs), list(covs_to_match), parameter)
-    } else {
-      PE <- predictive_error(r_to_py(holdout),as.integer(num_covs),covs_to_match, parameter)
-    }
+    PE <- PE_function(outcome_treated, outcome_control, covs_treated, covs_control)
   }
 
   #If the unmatched group does not have any control/treated units then return PE
 
   if (num_control == 0 | num_treated == 0) {
-    return(PE)
+    return(-PE)
   } else {
     BF <- num_control_matched/num_control + num_treated_matched/num_treated #Compute Balancing Factor
-    return(tradeoff * BF + PE)
+    return(tradeoff * BF - PE)
   }
 }
 
@@ -337,7 +338,7 @@ match_quality_PostgreSQL <- function(c, db, holdout, num_covs, cur_covs, tradeof
 #'dbDisconnect(db)
 #'}
 #'@import RPostgreSQL
-#'@import reticulate
+#'@import glmnet
 #'@importFrom graphics boxplot
 #'@importFrom stats rbinom rnorm runif setNames
 #'@importFrom stats lm var
@@ -364,44 +365,53 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
     stop("Outcome variable is not numeric data type")
   }
 
-  if (!py_module_available("pandas")) {
-    py_install("pandas")
-    if (!py_module_available("pandas")) {
-      warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
-              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-    }
-  }
+  ###
+  #if (!py_module_available("pandas")) {
+  #  py_install("pandas")
+  #  if (!py_module_available("pandas")) {
+  #    warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
+  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  #  }
+  #}
 
-  if (!py_module_available("numpy")) {
-    py_install("numpy")
-    if (!py_module_available("numpy")) {
-      warning("The package will use default linear regression in R since numpy module is not available. This will be VERY SLOW!
-              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-    }
-  }
+  #if (!py_module_available("numpy")) {
+  #  py_install("numpy")
+  #  if (!py_module_available("numpy")) {
+  #    warning("The package will use default linear regression in R since numpy module is not available. This will be VERY SLOW!
+  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  #  }
+  #}
 
-  if (!py_module_available("sklearn")) {
-    py_install("sklearn")
-    if (!py_module_available("sklearn")) {
-      warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
-              For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-    }
-  }
+  #if (!py_module_available("sklearn")) {
+  #  py_install("sklearn")
+  #  if (!py_module_available("sklearn")) {
+  #    warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
+  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
+  #  }
+  #}
 
-  py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
+  #py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
+
+  factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
+  covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
+
+  covs_max_list <- covs_max_list[order(covs_max_list)]
+  factor_level <- factor_level[names(covs_max_list)]
+
+  data[,c(1:num_covs)] = data[,names(covs_max_list)]
+  colnames(data) <- c(names(covs_max_list), "outcome", "treated")
+
+  holdout[,c(1:num_covs)] = holdout[,names(covs_max_list)]
+  colnames(holdout) <- c(names(covs_max_list), "outcome", "treated")
+
 
   #add column matched to input data
   data$matched <- as.integer(0)
   column <- colnames(data)
 
-  factor_level <- lapply(data[,1:num_covs],levels) # Get levels of each factor
-
   # Convert each covariate and treated into type integer
   data[,c(1:num_covs)] <- sapply(data[,c(1:num_covs)], function(x) as.integer(x))
   data[,num_covs + 2] <- as.integer(levels(data[,num_covs+2])[data[,num_covs+2]])
-
-  holdout[,c(1:num_covs)] <- sapply(holdout[,c(1:num_covs)],function(x) as.integer(x))
-  holdout[,num_covs + 2] <- as.integer(levels(holdout[,num_covs+2])[holdout[,num_covs+2]])
 
   #change input data and holdout training data column name
   colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
@@ -440,9 +450,12 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
     list_score <- unlist(lapply(cur_covs, match_quality_PostgreSQL, db, holdout, num_covs, cur_covs, tradeoff,
                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
     quality <- max(list_score)
-    covs_to_drop <- cur_covs[which(list_score == quality)]
 
-    cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping covariate(s)
+    # randomly select one covariate to drop
+    drop <- sample(which(list_score == quality),1)
+    covs_to_drop <- cur_covs[drop]
+
+    cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping one covariate
     if (length(cur_covs) == 0) {
       break
     }
@@ -484,8 +497,3 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
 #ridge_reg = NULL
 #lasso_reg = NULL
 #tree_depth = NULL
-
-
-
-
-
