@@ -269,11 +269,7 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
   }
   else {
     # Compute PE based on user defined PE_function
-    outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
-    outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']
-    covs_treated <- as.matrix(holdout[holdout[,'treated'] == 1,][,covs_to_match + 1])
-    covs_control <- as.matrix(holdout[holdout[,'treated'] == 0,][,covs_to_match + 1])
-    PE <- PE_function(outcome_treated, outcome_control, covs_treated, covs_control)
+    PE_function(holdout_trt$outcome, holdout_ctl$outcome, holdout_trt[,-which(colnames(holdout_trt) == "outcome")], holdout_ctl[,-which(colnames(holdout_ctl) == "outcome")])
   }
 
 
@@ -443,8 +439,14 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
     quality <- max(list_score)
 
-    # randomly sample one covariate to drop if multiple covariates have the same match quality
-    drop <- sample(which(list_score == quality),1)
+    # randomly sample one covariate to drop
+    if (length(quality) > 1) {
+      drop <- sample(which(list_score == quality),1)
+    }
+    else {
+      drop <- which(list_score == quality)
+    }
+
     covs_to_drop <- cur_covs[drop]
 
     cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping one covariate

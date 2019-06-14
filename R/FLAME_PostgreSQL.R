@@ -276,11 +276,7 @@ match_quality_PostgreSQL <- function(c, db, holdout, num_covs, cur_covs, tradeof
 
   else {
     # Compute PE based on user defined PE_function
-    outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
-    outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']
-    covs_treated <- as.matrix(holdout[holdout[,'treated'] == 1,][,covs_to_match + 1])
-    covs_control <- as.matrix(holdout[holdout[,'treated'] == 0,][,covs_to_match + 1])
-    PE <- PE_function(outcome_treated, outcome_control, covs_treated, covs_control)
+    PE_function(holdout_trt$outcome, holdout_ctl$outcome, holdout_trt[,-which(colnames(holdout_trt) == "outcome")], holdout_ctl[,-which(colnames(holdout_ctl) == "outcome")])
   }
 
   #If the unmatched group does not have any control/treated units then return PE
@@ -451,8 +447,14 @@ FLAME_PostgreSQL <- function(db, data, holdout, compute_var = FALSE, tradeoff = 
                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
     quality <- max(list_score)
 
-    # randomly select one covariate to drop
-    drop <- sample(which(list_score == quality),1)
+    # randomly sample one covariate to drop
+    if (length(quality) > 1) {
+      drop <- sample(which(list_score == quality),1)
+    }
+    else {
+      drop <- which(list_score == quality)
+    }
+
     covs_to_drop <- cur_covs[drop]
 
     cur_covs = cur_covs[! cur_covs %in% covs_to_drop]  #Dropping one covariate

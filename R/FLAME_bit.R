@@ -202,11 +202,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 
   else {
     # Compute PE based on user defined PE_function
-    outcome_treated <- holdout[holdout[,'treated'] == 1,][,'outcome']
-    outcome_control <- holdout[holdout[,'treated'] == 0,][,'outcome']
-    covs_treated <- as.matrix(holdout[holdout[,'treated'] == 1,][,covs_to_match + 1])
-    covs_control <- as.matrix(holdout[holdout[,'treated'] == 0,][,covs_to_match + 1])
-    PE <- PE_function(outcome_treated, outcome_control, covs_treated, covs_control)
+    PE <- PE_function(holdout_trt$outcome, holdout_ctl$outcome, holdout_trt[,-which(colnames(holdout_trt) == "outcome")], holdout_ctl[,-which(colnames(holdout_ctl) == "outcome")])
   }
 
   if (num_control == 0 | num_treated == 0) {
@@ -363,7 +359,12 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     quality <- max(list_score)
 
     # randomly sample one covariate to drop
-    drop <- sample(which(list_score == quality),1)
+    if (length(quality) > 1) {
+      drop <- sample(which(list_score == quality),1)
+    }
+    else {
+      drop <- which(list_score == quality)
+    }
 
     covs_to_drop <- cur_covs[drop]
 
