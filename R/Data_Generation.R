@@ -1,12 +1,13 @@
 #' Generate Synthetic Data
 #'
 #' \code{Data_Generation} generates synthetic data, where each covariate is a
-#' binary variable. The function used to create synthetic data can be found
+#' binary variable.
 #'
 #' @param num_control number of samples in the control group
 #' @param num_treated number of samples in the treated group
 #' @param num_cov_dense number of important covariates
 #' @param num_cov_unimportant number of unimportant covariates
+#' @param non_linear number of non-linear covariates
 #' @param U non-linear term coefficient
 #' @return synthetic data
 #' @examples
@@ -16,7 +17,7 @@
 #' @export
 
 Data_Generation <- function(num_control, num_treated,
-                            num_cov_dense, num_cov_unimportant, U) {
+                            num_cov_dense, num_cov_unimportant, non_linear, U) {
 
   if (num_cov_dense != 0) {
     # Generate important x_{i} for both control and treated, where each x_{i} is bernoulli(0.5)
@@ -36,12 +37,13 @@ Data_Generation <- function(num_control, num_treated,
 
     # Generate nonlinear term for treated units
     treatment_effect_second = rep(0,num_treated)
-    xt_second = xt[,1:5]
-    for (i in 1:4)
-      for (j in (i+1):5) {
-        treatment_effect_second = treatment_effect_second + (xt_second[,i] * xt_second[,j])
-      }
-
+    if (U != 0) {
+      xt_second = xt[,1:non_linear]
+      for (i in 1:non_linear-1)
+        for (j in (i+1):non_linear) {
+          treatment_effect_second = treatment_effect_second + (xt_second[,i] * xt_second[,j])
+        }
+    }
     treatment_effect_second = matrix(treatment_effect_second)
 
     # Compute outcome for treated units
