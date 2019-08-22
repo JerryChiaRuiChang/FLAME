@@ -474,9 +474,8 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
 
 #data <- read.csv("/Users/Jerry/Desktop/this_breaks_FLAME_bit.csv")
 #data[,c(1:20,22)] <- lapply(data[,c(1:20,22)], factor)
-#holdout <- data
 #db <- dbConnect(SQLite(),"tempdb")
-#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = holdout, compute_var = FALSE)
+#result_SQLite <- FLAME_SQLite(db = db, data = data, holdout = data, compute_var = FALSE)
 #dbDisconnect(db)
 
 
