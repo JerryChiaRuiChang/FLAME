@@ -70,4 +70,3 @@ MATCH <- function(FLAME_object, cov_name, cov_val) {
 #cov_val <- c(0,0,0,1,1,0)
 #Match(result_bit, cov_name, cov_val)
 #Match(result_PostgreSQL, cov_name, cov_val)
-#Match(result_SQLite, cov_name, cov_val)
