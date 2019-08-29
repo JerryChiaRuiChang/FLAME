@@ -148,7 +148,7 @@ GLMNET_PE_bit <- function(holdout_trt, holdout_ctl, lambda, alpha) {
 #returning Match Quality.
 
 match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_list, tradeoff,
-                              PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run) {
+                              PE_function, model, ridge_reg, lasso_reg, compute_var) {
 
   # temporarly remove covariate c
   covs_to_match = cur_covs[cur_covs != c]
@@ -217,21 +217,19 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' Bit Vectors Implementation
 #'
 #' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors.
-#' The required arguments include (1) data and (2) holdout.
-#' The rest of the arguments are optional.
+#' The required arguments include (1) data and (2) holdout. The default model
+#' for
 #'
 #' @param data input data
 #' @param holdout holdout training data
-#' @param compute_var indicator variable of computing variance (optional, default = FALSE)
-#' @param tradeoff tradeoff parameter to compute Match Quality (optional, default =
+#' @param compute_var variance indicator (optional, default = FALSE)
+#' @param tradeoff Match Quality tradeoff parameter (optional, default =
 #'   0.1)
 #' @param PE_function user defined function to compute predictive error
 #'   (optional)
-#' @param model user defined model - Linear, Ridge, Lasso, or DecisionTree
-#'   (optional)
+#' @param model Linear, Ridge, Lasso, or DecisionTree (optional)
 #' @param ridge_reg L2 regularization parameter if model = Ridge (optional)
 #' @param lasso_reg L1 regularization parameter if model = Lasso (optional)
-#' @param tree_depth maximum depth of decision tree if model = DecisionTree
 #'   (optional)
 #' @return (1) list of covariates FLAME performs matching at each iteration, (2)
 #' Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
@@ -251,7 +249,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #' @export
 
 FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_function = NULL,
-                      model = NULL, ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL) {
+                      model = NULL, ridge_reg = NULL, lasso_reg = NULL) {
 
   num_covs = ncol(data) - 2
 
@@ -270,23 +268,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   if (!is.numeric(data[,num_covs + 1]) | !is.numeric(holdout[,num_covs + 1])) {
     stop("Outcome variable is not numeric data type")
   }
-
-  #py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
-
-  #if (!py_module_available("pandas")) {
-  #    warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
-  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  #}
-
-  #if (!py_module_available("numpy")) {
-  #    warning("The package will use default linear regression in R since numpy module is not available. This will be VERY SLOW!
-  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  #}
-
-  #if (!py_module_available("sklearn")) {
-  #    warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
-  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  #}
 
   factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
   covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
@@ -308,11 +289,6 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
   # Convert each covariate and treated into type integer
   data[,c(1:num_covs, num_covs + 2)] <- sapply(data[,c(1:num_covs, num_covs + 2)], function(x) as.integer(x))
   data$treated <- data$treated - 1
-
-  ####### do not convert holdout to integer ==> delete them
-  #holdout[,c(1:num_covs, num_covs + 2)] <- sapply(holdout[,c(1:num_covs, num_covs + 2)], function(x) as.integer(x))
-  #holdout$treated <- holdout$treated - 1
-  ######
 
   #change input data and holdout training data column name
   colnames(data) <- c(paste("x",seq(0,num_covs-1), sep = ""),"outcome","treated","matched")
@@ -355,7 +331,7 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
     #Drop the covariate that returns highest Match Quality Score
 
     list_score <- unlist(lapply(cur_covs, match_quality_bit, data, holdout, num_covs, cur_covs, covs_max_list,
-                                tradeoff, PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
+                                tradeoff, PE_function, model, ridge_reg, lasso_reg, compute_var))
     quality <- max(list_score)
 
     # randomly sample one covariate to drop
@@ -413,8 +389,8 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #holdout <- data
 #result_bit <- FLAME::FLAME_bit(data, holdout)
 #set.seed(1234)
-#data <- FLAME::Data_Generation(num_control = 5000, num_treated = 5000,
-#                               num_cov_dense = 10, num_cov_unimportant = 5, U = 5)
+#data <- FLAME::Data_Generation(ncontrol= 5000, ntreated = 5000, nimportant = 10,
+#                               ntrivial= 5, non_linear = 5, U = 5)
 #holdout <- data
 #result_bit <- FLAME_bit(data, holdout)
 #data <- read.csv("/Users/Jerry/Desktop/Natality_db_abnormality.csv")
@@ -425,6 +401,5 @@ FLAME_bit <- function(data, holdout, tradeoff = 0.1, compute_var = FALSE, PE_fun
 #model <- NULL
 #ridge_reg <- NULL
 #lasso_reg <- NULL
-#tree_depth <- NULL
 #compute_var <- FALSE
 
