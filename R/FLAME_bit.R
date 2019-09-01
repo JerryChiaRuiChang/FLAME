@@ -218,7 +218,7 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #'
 #' \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors.
 #' The required arguments include (1) data and (2) holdout. The default model
-#' for
+#' for Match Quality is set to Ridge regression with 0.1 regularization parameter.
 #'
 #' @param data input data
 #' @param holdout holdout training data
@@ -227,10 +227,9 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 #'   0.1)
 #' @param PE_function user defined function to compute predictive error
 #'   (optional)
-#' @param model Linear, Ridge, Lasso, or DecisionTree (optional)
+#' @param model Linear, Ridge, or Lasso (optional)
 #' @param ridge_reg L2 regularization parameter if model = Ridge (optional)
 #' @param lasso_reg L1 regularization parameter if model = Lasso (optional)
-#'   (optional)
 #' @return (1) list of covariates FLAME performs matching at each iteration, (2)
 #' Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
 #' of matches at each iteration, (3) match quality at each iteration, and (4) the original
