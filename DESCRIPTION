@@ -1,7 +1,7 @@
 Package: FLAME
 Type: Package
 Title: A Fast Large-Scale Almost Matching Exactly Approach to Causal Inference
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(person("Chia-Rui (Jerry)", "Chang", role=c("aut", "cre"),
     email = "chiarui424@gmail.com"),
     person("Cynthia", "Rudin", role = c("aut"),
