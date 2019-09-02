@@ -168,7 +168,7 @@ GLMNET_PE_SQLite <- function(holdout_trt, holdout_ctl, lambda, alpha) {
 #returning Match Quality.
 
 match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
-                                 PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run) {
+                                 PE_function, model, ridge_reg, lasso_reg, compute_var) {
 
   #temporarly remove covariate c
 
@@ -288,25 +288,20 @@ match_quality_SQLite <- function(c, db, holdout, num_covs, cur_covs, tradeoff,
 #'\code{FLAME_SQLite} applies the FLAME algorithm based on SQLite.
 #'\code{FLAME_SQLite} does not require external database installment. However,
 #'user should connect to a temporary database with command
-#'\code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
-#'\strong{db}. The required arguments include (1) db, (2) data, and (3) holdout.
-#' The rest of the arguments are optional.
+#'\code{dbConnect(SQLite(),"tempdb_name")}. The required arguments include (1) db,
+#'(2) data, and (3) holdout. The rest of the arguments are optional.
 #'
 #'
-#'@param db name of the connection to temporary database  (\strong{must name the
-#'  connection as db})
+#'@param db name of the connection to temporary database
 #'@param data input data
 #'@param holdout holdout training data
-#'@param compute_var indicator variable of computing variance (optional, default = FALSE)
-#'@param tradeoff tradeoff parameter to compute Match Quality (optional, default = 0.1)
+#'@param compute_var variance indicator (optional, default = FALSE)
+#'@param tradeoff Match Quality tradeoff parameter (optional, default = 0.1)
 #'@param PE_function user defined function to compute predictive error
 #'  (optional)
-#'@param model user defined model - Linear, Ridge, Lasso, or DecisionTree
-#'  (optional)
+#'@param model user defined model - Linear, Ridge, or Lasso (optional)
 #'@param ridge_reg L2 regularization parameter if model = Ridge (optional)
 #'@param lasso_reg L1 regularization parameter if model = Lasso (optional)
-#'@param tree_depth maximum depth of decision tree if model = DecisionTree
-#'  (optional)
 #'@return (1) list of covariates FLAME performs matching at each iteration, (2)
 #' Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
 #' of matches at each iteration, (3) match quality at each iteration, and (4) the original
@@ -349,32 +344,6 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   if (!is.numeric(data[,num_covs + 1]) | !is.numeric(holdout[,num_covs + 1])) {
     stop("Outcome variable is not numeric data type")
   }
-
-  #if (!py_module_available("pandas")) {
-  #  py_install("pandas")
-  #  if (!py_module_available("pandas")) {
-  #    warning("The package will use default linear regression in R since pandas module is not available. This will be VERY SLOW!
-  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  #  }
-  #}
-
-  #if (!py_module_available("numpy")) {
-  #  py_install("numpy")
-  #  if (!py_module_available("numpy")) {
-  #    warning("The package will use default linear regression in R since numpy module is not available. This will be VERY SLOW!
-  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  #  }
-  #}
-
-  #if (!py_module_available("sklearn")) {
-  #  py_install("sklearn")
-  #  if (!py_module_available("sklearn")) {
-  #    warning("The package will use default linear regression in R since sklearn module is not available. This will be VERY SLOW!
-  #            For more information on how to attach Python module to R, please refer to https://rstudio.github.io/reticulate/reference/import.html.")
-  #  }
-  #}
-
-  #py_run = py_module_available("sklearn") && py_module_available("pandas") && py_module_available("numpy")
 
   factor_level <- lapply(data[,1:num_covs], levels)  # Get levels of each factor
   covs_max_list <- sapply(factor_level, length)   # Get the number of level of each covariate
@@ -436,7 +405,7 @@ FLAME_SQLite <- function(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
     #Drop the covariate that returns highest Match Quality Score
 
     list_score <- unlist(lapply(cur_covs,match_quality_SQLite, db, holdout, num_covs, cur_covs, tradeoff,
-                                PE_function, model, ridge_reg, lasso_reg, tree_depth, compute_var, py_run))
+                                PE_function, model, ridge_reg, lasso_reg, compute_var))
     quality <- max(list_score)
 
     # randomly sample one covariate to drop

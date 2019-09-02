@@ -299,20 +299,18 @@ match_quality_PostgreSQL <- function(c, db, holdout, num_covs, cur_covs, tradeof
 #'User must connect to PostgreSQL server in R using the command
 #'\code{dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
 #'host='your_localhost', port='your_port', user='your_username', password =
-#''your_password')} and name the connection as \strong{db}
+#''your_password')}
 #'
-#'@param db name of the database connection (\strong{must name the connection as
-#'  db})
+#'@param db name of the database connection
 #'@param data input data
 #'@param holdout holdout training data
-#' @param compute_var variance indicator (optional, default = FALSE)
-#' @param tradeoff Match Quality tradeoff parameter (optional, default =
-#'   0.1)
-#' @param PE_function user defined function to compute predictive error
-#'   (optional)
-#' @param model Linear, Ridge, or Lasso (optional)
-#' @param ridge_reg L2 regularization parameter if model = Ridge (optional)
-#' @param lasso_reg L1 regularization parameter if model = Lasso (optional)
+#'@param compute_var variance indicator (optional, default = FALSE)
+#'@param tradeoff Match Quality tradeoff parameter (optional, default = 0.1)
+#'@param PE_function user defined function to compute predictive error
+#'  (optional)
+#'@param model Linear, Ridge, or Lasso (optional)
+#'@param ridge_reg L2 regularization parameter if model = Ridge (optional)
+#'@param lasso_reg L1 regularization parameter if model = Lasso (optional)
 #'@return (1) list of covariates FLAME performs matching at each iteration, (2)
 #' Sizes, conditional average treatment effects (CATEs), and variance (if compute_var = TRUE)
 #' of matches at each iteration, (3) match quality at each iteration, and (4) the original
