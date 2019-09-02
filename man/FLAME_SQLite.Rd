@@ -9,29 +9,24 @@ FLAME_SQLite(db, data, holdout, compute_var = FALSE, tradeoff = 0.1,
   lasso_reg = NULL, tree_depth = NULL)
 }
 \arguments{
-\item{db}{name of the connection to temporary database  (\strong{must name the
-connection as db})}
+\item{db}{name of the connection to temporary database}
 
 \item{data}{input data}
 
 \item{holdout}{holdout training data}
 
-\item{compute_var}{indicator variable of computing variance (optional, default = FALSE)}
+\item{compute_var}{variance indicator (optional, default = FALSE)}
 
-\item{tradeoff}{tradeoff parameter to compute Match Quality (optional, default = 0.1)}
+\item{tradeoff}{Match Quality tradeoff parameter (optional, default = 0.1)}
 
 \item{PE_function}{user defined function to compute predictive error
 (optional)}
 
-\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree
-(optional)}
+\item{model}{user defined model - Linear, Ridge, or Lasso (optional)}
 
 \item{ridge_reg}{L2 regularization parameter if model = Ridge (optional)}
 
 \item{lasso_reg}{L1 regularization parameter if model = Lasso (optional)}
-
-\item{tree_depth}{maximum depth of decision tree if model = DecisionTree
-(optional)}
 }
 \value{
 (1) list of covariates FLAME performs matching at each iteration, (2)
@@ -44,9 +39,8 @@ matched on. If a unit is never matched, then *matched* will be 0.
 \code{FLAME_SQLite} applies the FLAME algorithm based on SQLite.
 \code{FLAME_SQLite} does not require external database installment. However,
 user should connect to a temporary database with command
-\code{dbConnect(SQLite(),"tempdb_name")} and name the connection as
-\strong{db}. The required arguments include (1) db, (2) data, and (3) holdout.
-The rest of the arguments are optional.
+\code{dbConnect(SQLite(),"tempdb_name")}. The required arguments include (1) db,
+(2) data, and (3) holdout. The rest of the arguments are optional.
 }
 \examples{
 \donttest{

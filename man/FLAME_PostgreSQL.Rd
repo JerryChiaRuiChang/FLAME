@@ -6,32 +6,27 @@
 \usage{
 FLAME_PostgreSQL(db, data, holdout, compute_var = FALSE,
   tradeoff = 0.1, PE_function = NULL, model = NULL,
-  ridge_reg = NULL, lasso_reg = NULL, tree_depth = NULL)
+  ridge_reg = NULL, lasso_reg = NULL)
 }
 \arguments{
-\item{db}{name of the database connection (\strong{must name the connection as
-db})}
+\item{db}{name of the database connection}
 
 \item{data}{input data}
 
 \item{holdout}{holdout training data}
 
-\item{compute_var}{indicator variable of computing variance (optional, default = FALSE)}
+\item{compute_var}{variance indicator (optional, default = FALSE)}
 
-\item{tradeoff}{tradeoff parameter to compute Match Quality (optional, default = 0.1)}
+\item{tradeoff}{Match Quality tradeoff parameter (optional, default = 0.1)}
 
 \item{PE_function}{user defined function to compute predictive error
 (optional)}
 
-\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree
-(optional)}
+\item{model}{Linear, Ridge, or Lasso (optional)}
 
 \item{ridge_reg}{L2 regularization parameter if model = Ridge (optional)}
 
 \item{lasso_reg}{L1 regularization parameter if model = Lasso (optional)}
-
-\item{tree_depth}{maximum depth of decision tree if model = DecisionTree
-(optional)}
 }
 \value{
 (1) list of covariates FLAME performs matching at each iteration, (2)
@@ -49,7 +44,7 @@ server, please refer to this
 User must connect to PostgreSQL server in R using the command
 \code{dbConnect(dbDriver('PostgreSQL'), dbname="your_dbname",
 host='your_localhost', port='your_port', user='your_username', password =
-'your_password')} and name the connection as \strong{db}
+'your_password')}
 }
 \examples{
 \donttest{
@@ -57,8 +52,8 @@ data <- data(toy_data)
 
 drv <- dbDriver('PostgreSQL')
 
-db <- dbConnect(drv, dbname="FLAME", host='localhost',
-port=5432, user="postgres", password = 'new_password')
+db <- dbConnect(drv, user="flame", dbname= "flame",
+               host='localhost', port=5432)
 
 FLAME_PostgreSQL(db = db, data = data, holdout = data)
 

@@ -6,30 +6,26 @@
 \usage{
 FLAME_bit(data, holdout, tradeoff = 0.1, compute_var = FALSE,
   PE_function = NULL, model = NULL, ridge_reg = NULL,
-  lasso_reg = NULL, tree_depth = NULL)
+  lasso_reg = NULL)
 }
 \arguments{
 \item{data}{input data}
 
 \item{holdout}{holdout training data}
 
-\item{tradeoff}{tradeoff parameter to compute Match Quality (optional, default =
+\item{tradeoff}{Match Quality tradeoff parameter (optional, default =
 0.1)}
 
-\item{compute_var}{indicator variable of computing variance (optional, default = FALSE)}
+\item{compute_var}{variance indicator (optional, default = FALSE)}
 
 \item{PE_function}{user defined function to compute predictive error
 (optional)}
 
-\item{model}{user defined model - Linear, Ridge, Lasso, or DecisionTree
-(optional)}
+\item{model}{Linear, Ridge, or Lasso (optional)}
 
 \item{ridge_reg}{L2 regularization parameter if model = Ridge (optional)}
 
 \item{lasso_reg}{L1 regularization parameter if model = Lasso (optional)}
-
-\item{tree_depth}{maximum depth of decision tree if model = DecisionTree
-(optional)}
 }
 \value{
 (1) list of covariates FLAME performs matching at each iteration, (2)
@@ -40,8 +36,8 @@ matched on. If a unit is never matched, then *matched* will be 0.
 }
 \description{
 \code{FLAME_bit} applies FLAME matching algorithm based on bit vectors.
-The required arguments include (1) data and (2) holdout.
-The rest of the arguments are optional.
+The required arguments include (1) data and (2) holdout. The default model
+for Match Quality is set to Ridge regression with 0.1 regularization parameter.
 }
 \examples{
 data(toy_data)
