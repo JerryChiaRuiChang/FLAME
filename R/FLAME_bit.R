@@ -13,7 +13,7 @@ aggregate_table <- function(list) {
 
 update_matched_bit <- function(data, cur_covs, covs_max_list, compute_var) {
 
-  data_wo_t = as.matrix(data[,cur_covs+1]) # the covariates values as a matrix
+  data_wo_t = as.bigz(as.matrix(data[,cur_covs+1])) # the covariates values as a matrix
 
   options("scipen"=100, "digits"=4)
 
@@ -202,7 +202,8 @@ match_quality_bit <- function(c, data, holdout, num_covs, cur_covs, covs_max_lis
 
   else {
     # Compute PE based on user defined PE_function
-    PE <- PE_function(holdout_trt$outcome, holdout_ctl$outcome, holdout_trt[,-which(colnames(holdout_trt) == "outcome")], holdout_ctl[,-which(colnames(holdout_ctl) == "outcome")])
+    PE <- PE_function(holdout_trt$outcome, holdout_ctl$outcome, cbind(holdout_trt[,-which(colnames(holdout_trt) == "outcome")]),
+                      cbind(holdout_ctl[,-which(colnames(holdout_ctl) == "outcome")]))
   }
 
   if (num_control == 0 | num_treated == 0) {
